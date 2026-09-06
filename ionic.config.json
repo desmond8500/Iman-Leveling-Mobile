@@ -1,0 +1,7 @@
+{
+  "name": "ImanMobile",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
