@@ -1,2 +1,28 @@
-/* For information on how to create your own theme, please refer to:
-http://ionicframework.com/docs/theming/ */
+:root {
+  /* Palette « jeu » : émeraude profond + or */
+  --iman-bg-top: #0b1d1a;
+  --iman-bg-bottom: #06100e;
+  --iman-card: #10302a;
+  --iman-card-done: #14463a;
+  --iman-gold: #f2c94c;
+  --iman-emerald: #2ecc9a;
+  --iman-text-soft: #9fbdb3;
+
+  --ion-color-primary: #2ecc9a;
+  --ion-color-primary-rgb: 46, 204, 154;
+  --ion-color-primary-contrast: #06100e;
+  --ion-color-primary-contrast-rgb: 6, 16, 14;
+  --ion-color-primary-shade: #28b43c;
+  --ion-color-primary-tint: #43d1a5;
+
+  --ion-color-warning: #f2c94c;
+  --ion-color-warning-rgb: 242, 201, 76;
+  --ion-color-warning-contrast: #06100e;
+  --ion-color-warning-contrast-rgb: 6, 16, 14;
+  --ion-color-warning-shade: #d5b043;
+  --ion-color-warning-tint: #f4ce5e;
+}
+
+ion-content.iman-content {
+  --background: linear-gradient(180deg, var(--iman-bg-top), var(--iman-bg-bottom));
+}
