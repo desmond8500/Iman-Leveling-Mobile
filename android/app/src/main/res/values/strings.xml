@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Iman Leveling</string>
+    <string name="title_activity_main">Iman Leveling</string>
+    <string name="package_name">com.iman.leveling</string>
+    <string name="custom_url_scheme">com.iman.leveling</string>
+</resources>
