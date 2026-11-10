@@ -13,6 +13,7 @@ npm install
 npm run dev      # ouvre l'app dans le navigateur (mode mobile conseillé dans les outils de dev)
 npm test         # tests unitaires (Vitest)
 npm run build    # vérification TypeScript + build de production
+npm run preview  # sert le build : c'est là qu'on teste la PWA (voir plus bas)
 ```
 
 ## Fonctionnalités actuelles
@@ -49,6 +50,23 @@ trait doré = partiel) et un bouton calendrier qui ouvre la vue mensuelle. Touch
 ses prières, sunnas, invocations et Hasanat. Les jours passés sont en consultation seule : seul le
 jour en cours peut être modifié.
 
+**PWA (installable et hors ligne).** L'app a un manifeste, un service worker (vite-plugin-pwa) et
+des icônes dédiées, dont une icône « maskable » pour Android. Tout est mis en cache : une fois
+chargée, l'app fonctionne sans réseau, les données étant locales. Après un déploiement, la nouvelle
+version s'active toute seule au lancement suivant. Dans l'app native Capacitor, le service worker
+n'est pas enregistré. Le manifeste est dans `pwa.manifest.ts`.
+
+Le service worker n'est pas actif avec `npm run dev`. Pour tester :
+
+```bash
+npm run build && npm run preview     # puis ouvrir l'adresse affichée (localhost est accepté sans HTTPS)
+```
+
+Dans Chrome : DevTools > Application > Manifest (icônes, installabilité) et Service Workers, puis
+l'icône d'installation dans la barre d'adresse. Pour tester le hors-ligne, cocher « Offline » et
+recharger. Sur iOS (Safari) : Partager > Sur l'écran d'accueil. En ligne, l'hébergement doit servir
+l'app en HTTPS, avec `index.html` renvoyé pour toute route inconnue.
+
 **Icône et écran de démarrage.** Un croissant et une étoile dorés sur fond émeraude, avec des
 chevrons de niveau. Les sources sont dans `resources/` (SVG et PNG). L'app affiche un écran de
 démarrage animé au lancement ; sur mobile, `npm run assets` génère l'icône et le splash natifs
@@ -82,6 +100,8 @@ src/
                WeekStrip, MonthCalendar, DhikrCard, SplashScreen
   views/       TabsPage (barre d'onglets), HomePage, AdhkarPage
 resources/     icône et splash (SVG + PNG)
+public/        icônes PWA (pwa-192, pwa-512, pwa-maskable-512, apple-touch-icon)
+pwa.manifest.ts  manifeste de la PWA
 tests/unit/    tests Vitest
 ```
 
