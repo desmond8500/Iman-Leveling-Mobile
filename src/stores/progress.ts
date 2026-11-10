@@ -7,7 +7,16 @@ import {
   LocalProgressRepository,
   type ProgressRepository,
 } from '@/services/progressRepository';
-import type { DayLevel, DayRecord, DayStats, Period, PrayerId, PrayerView, SunnahId } from '@/types';
+import type {
+  DayLevel,
+  DayRecord,
+  DayStats,
+  Period,
+  PrayerId,
+  PrayerView,
+  ProgressData,
+  SunnahId,
+} from '@/types';
 import { toDateKey } from '@/utils/date';
 import { hasanatForDay, levelFromHasanat, sunnahReward } from '@/utils/hasanat';
 import { computeStreak } from '@/utils/streak';
@@ -105,6 +114,17 @@ export const useProgressStore = defineStore('progress', () => {
     loaded.value = true;
   }
 
+  /** Progression complète, pour la synchronisation avec un serveur. */
+  function exportData(): ProgressData {
+    return { ...emptyProgress(), days: days.value };
+  }
+
+  /** Remplace la progression (après une fusion avec le serveur) et l'enregistre. */
+  async function importData(data: ProgressData) {
+    days.value = data.days ?? {};
+    await repository.save(exportData());
+  }
+
   /** À appeler quand l'app revient au premier plan (minuit passé). */
   function refreshToday() {
     const wasToday = selectedDate.value === today.value;
@@ -166,6 +186,8 @@ export const useProgressStore = defineStore('progress', () => {
     isDhikrDone,
     adhkarDoneCount,
     load,
+    exportData,
+    importData,
     refreshToday,
     selectDate,
     togglePrayer,

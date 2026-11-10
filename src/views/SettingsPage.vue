@@ -1,0 +1,360 @@
+<template>
+  <ion-page>
+    <ion-header :translucent="true">
+      <ion-toolbar>
+        <ion-title>Paramètres</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="iman-content" :fullscreen="true">
+      <div class="wrap">
+        <!-- Genre -->
+        <section class="card">
+          <h2>Profil</h2>
+          <span class="label">Genre</span>
+          <ion-segment :value="settings.gender ?? ''" @ionChange="onGender">
+            <ion-segment-button value="male">
+              <ion-label>Homme</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="female">
+              <ion-label>Femme</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+          <p v-if="!settings.gender" class="hint">Non renseigné.</p>
+        </section>
+
+        <!-- Pays -->
+        <section class="card">
+          <h2>Pays</h2>
+          <p class="value">
+            <ion-icon :icon="locationOutline" />
+            {{ settings.countryCode ? countryName(settings.countryCode) : 'Non renseigné' }}
+          </p>
+          <div class="row">
+            <ion-button size="small" :disabled="locating" @click="onDetect">
+              <ion-spinner v-if="locating" name="dots" slot="start" />
+              {{ locating ? 'Localisation…' : 'Détecter ma position' }}
+            </ion-button>
+            <ion-button size="small" fill="outline" @click="pickerOpen = true">Choisir</ion-button>
+          </div>
+          <p class="hint">
+            La détection utilise ta position approximative, arrondie à environ 11 km, envoyée au
+            service de géocodage BigDataCloud pour trouver le pays. Rien n'est enregistré à part le
+            pays. Tu peux aussi le choisir à la main.
+          </p>
+        </section>
+
+        <!-- Compte et sauvegarde -->
+        <section class="card">
+          <h2>Sauvegarde en ligne</h2>
+
+          <template v-if="settings.isLinked">
+            <p class="value">
+              <ion-icon :icon="cloudDoneOutline" />
+              {{ settings.user?.name || settings.user?.email }}
+            </p>
+            <p class="hint">
+              {{ settings.user?.email }}<br />
+              Dernière synchronisation : {{ lastSyncLabel }}
+            </p>
+            <p v-if="settings.syncError" class="error" role="alert">{{ settings.syncError }}</p>
+            <div class="row">
+              <ion-button size="small" :disabled="settings.syncing" @click="onSync">
+                <ion-spinner v-if="settings.syncing" name="dots" slot="start" />
+                Synchroniser maintenant
+              </ion-button>
+              <ion-button size="small" fill="outline" color="medium" @click="onLogout">
+                Se déconnecter
+              </ion-button>
+            </div>
+            <p class="hint">
+              Se déconnecter n'efface pas ta progression sur cet appareil.
+            </p>
+          </template>
+
+          <template v-else>
+            <p class="hint">
+              Sans compte, ta progression reste uniquement sur cet appareil. Lie un compte pour la
+              sauvegarder en ligne et la retrouver ailleurs.
+            </p>
+
+            <label class="field">
+              <span class="label">Adresse du serveur</span>
+              <input
+                v-model="form.serverUrl"
+                type="url"
+                inputmode="url"
+                autocapitalize="off"
+                autocomplete="url"
+                placeholder="https://mon-serveur.exemple"
+                @blur="saveServer"
+              />
+            </label>
+            <p v-if="urlError" class="error" role="alert">{{ urlError }}</p>
+
+            <ion-segment :value="mode" @ionChange="onMode">
+              <ion-segment-button value="login">
+                <ion-label>Connexion</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="register">
+                <ion-label>Créer un compte</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+
+            <form class="form" @submit.prevent="onSubmit">
+              <label v-if="mode === 'register'" class="field">
+                <span class="label">Nom</span>
+                <input v-model="form.name" type="text" autocomplete="name" required />
+              </label>
+              <label class="field">
+                <span class="label">E-mail</span>
+                <input v-model="form.email" type="email" autocomplete="email" required />
+              </label>
+              <label class="field">
+                <span class="label">Mot de passe</span>
+                <input
+                  v-model="form.password"
+                  type="password"
+                  minlength="8"
+                  :autocomplete="mode === 'register' ? 'new-password' : 'current-password'"
+                  required
+                />
+              </label>
+
+              <p v-if="authError" class="error" role="alert">{{ authError }}</p>
+
+              <ion-button type="submit" expand="block" :disabled="busy">
+                <ion-spinner v-if="busy" name="dots" slot="start" />
+                {{ mode === 'register' ? 'Créer le compte et sauvegarder' : 'Se connecter et synchroniser' }}
+              </ion-button>
+            </form>
+          </template>
+        </section>
+      </div>
+
+      <ion-toast
+        :is-open="toast.open"
+        :message="toast.message"
+        :duration="2200"
+        position="top"
+        @didDismiss="toast.open = false"
+      />
+    </ion-content>
+
+    <CountryPicker
+      :open="pickerOpen"
+      :selected="settings.countryCode"
+      @select="onPickCountry"
+      @close="pickerOpen = false"
+    />
+  </ion-page>
+</template>
+
+<script setup lang="ts">
+import { computed, reactive, ref } from 'vue';
+import {
+  IonButton,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonLabel,
+  IonPage,
+  IonSegment,
+  IonSegmentButton,
+  IonSpinner,
+  IonTitle,
+  IonToast,
+  IonToolbar,
+} from '@ionic/vue';
+import { cloudDoneOutline, locationOutline } from 'ionicons/icons';
+import CountryPicker from '@/components/CountryPicker.vue';
+import { countryName } from '@/data/countries';
+import { LocationError } from '@/services/geolocation';
+import { useSettingsStore } from '@/stores/settings';
+
+const settings = useSettingsStore();
+
+const toast = reactive({ open: false, message: '' });
+const say = (message: string) => {
+  toast.message = message;
+  toast.open = true;
+};
+
+// --- Genre ---
+function onGender(event: CustomEvent) {
+  const value = event.detail.value;
+  if (value === 'male' || value === 'female') void settings.setGender(value);
+}
+
+// --- Pays ---
+const pickerOpen = ref(false);
+const locating = ref(false);
+
+async function onDetect() {
+  locating.value = true;
+  try {
+    const code = await settings.detectAndSetCountry();
+    say(`Pays détecté : ${countryName(code)}`);
+  } catch (e) {
+    say(e instanceof LocationError ? `${e.message} Choisis ton pays à la main.` : 'Détection impossible.');
+  } finally {
+    locating.value = false;
+  }
+}
+
+async function onPickCountry(code: string) {
+  pickerOpen.value = false;
+  await settings.setCountry(code);
+}
+
+// --- Compte ---
+const mode = ref<'login' | 'register'>('login');
+const busy = ref(false);
+const urlError = ref('');
+const authError = ref('');
+const form = reactive({
+  serverUrl: settings.serverUrl,
+  name: '',
+  email: '',
+  password: '',
+});
+
+function onMode(event: CustomEvent) {
+  const value = event.detail.value;
+  if (value === 'login' || value === 'register') {
+    mode.value = value;
+    authError.value = '';
+  }
+}
+
+async function saveServer(): Promise<boolean> {
+  if (!form.serverUrl.trim()) {
+    urlError.value = "Renseigne l'adresse du serveur.";
+    return false;
+  }
+  const ok = await settings.setServerUrl(form.serverUrl);
+  urlError.value = ok
+    ? ''
+    : "Adresse refusée : utilise une adresse https:// (http:// n'est accepté que pour localhost).";
+  if (ok) form.serverUrl = settings.serverUrl;
+  return ok;
+}
+
+async function onSubmit() {
+  authError.value = '';
+  if (!(await saveServer())) return;
+  busy.value = true;
+  try {
+    await settings.authenticate(mode.value, {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      password: form.password,
+    });
+    form.password = '';
+    say(settings.syncError ? 'Compte lié, mais la synchronisation a échoué.' : 'Compte lié et progression sauvegardée.');
+  } catch (e) {
+    authError.value = e instanceof Error ? e.message : 'Connexion impossible.';
+  } finally {
+    busy.value = false;
+  }
+}
+
+async function onSync() {
+  const ok = await settings.syncNow();
+  if (ok) say('Progression synchronisée.');
+}
+
+async function onLogout() {
+  await settings.logout();
+  say('Compte déconnecté.');
+}
+
+const lastSyncLabel = computed(() => {
+  const iso = settings.lastSync;
+  if (!iso) return 'jamais';
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime())
+    ? 'jamais'
+    : date.toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+});
+</script>
+
+<style scoped>
+.wrap {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.card {
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: var(--iman-card);
+}
+h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--iman-gold);
+}
+.value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--iman-text-soft);
+}
+.error {
+  margin: 8px 0;
+  font-size: 13px;
+  color: #ff7a7a;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+.field {
+  display: block;
+  margin-top: 12px;
+}
+.form .field {
+  margin-top: 0;
+}
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  font: inherit;
+}
+input:focus {
+  outline: 2px solid var(--iman-gold);
+  outline-offset: 1px;
+}
+</style>

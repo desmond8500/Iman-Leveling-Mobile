@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import type { RouteRecordRaw } from 'vue-router';
 import AdhkarPage from '@/views/AdhkarPage.vue';
 import HomePage from '@/views/HomePage.vue';
+import SettingsPage from '@/views/SettingsPage.vue';
 import TabsPage from '@/views/TabsPage.vue';
 
 const routes: Array<RouteRecordRaw> = [
@@ -13,6 +14,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: '', redirect: '/tabs/home' },
       { path: 'home', name: 'home', component: HomePage },
       { path: 'adhkar', name: 'adhkar', component: AdhkarPage },
+      { path: 'settings', name: 'settings', component: SettingsPage },
     ],
   },
   { path: '/:pathMatch(.*)*', redirect: '/tabs/home' },

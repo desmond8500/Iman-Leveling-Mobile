@@ -81,3 +81,28 @@ export interface LevelInfo {
   hasanatIntoLevel: number;
   hasanatForNext: number;
 }
+
+export type Gender = 'male' | 'female';
+
+export interface AccountInfo {
+  name: string;
+  email: string;
+}
+
+export interface ServerSettings {
+  /** Adresse du serveur (ex. https://iman.example.com). Vide tant qu'elle n'est pas renseignée. */
+  url: string;
+  /** Jeton d'accès, présent seulement quand le compte est lié. Le mot de passe n'est jamais enregistré. */
+  token: string | null;
+  user: AccountInfo | null;
+  /** Date ISO de la dernière synchronisation réussie. */
+  lastSync: string | null;
+}
+
+export interface SettingsData {
+  version: 1;
+  gender: Gender | null;
+  /** Code pays ISO 3166-1 alpha-2 (ex. « FR »). */
+  countryCode: string | null;
+  server: ServerSettings;
+}
