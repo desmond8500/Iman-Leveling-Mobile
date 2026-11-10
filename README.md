@@ -50,6 +50,36 @@ trait doré = partiel) et un bouton calendrier qui ouvre la vue mensuelle. Touch
 ses prières, sunnas, invocations et Hasanat. Les jours passés sont en consultation seule : seul le
 jour en cours peut être modifié.
 
+**Paramètres.** Onglet « Paramètres » :
+
+- **Genre** (homme ou femme), enregistré sur l'appareil. Il servira plus tard à adapter les
+  récompenses (voir `todo.md`).
+- **Pays** : bouton « Détecter ma position » ou choix manuel dans une liste avec recherche. La
+  détection envoie une position arrondie (environ 11 km) au service de géocodage BigDataCloud, qui
+  répond le pays ; seule la réponse (le pays) est enregistrée. Si la position est refusée ou
+  indisponible, l'app propose de choisir le pays à la main.
+- **Sauvegarde en ligne** : on saisit l'adresse du serveur, puis on se connecte ou on crée un compte.
+  La progression est alors synchronisée (à la connexion du compte, à la demande, et au lancement de l'app).
+  La fusion ne perd jamais de données : une case cochée sur un appareil ou sur le serveur reste
+  cochée (décocher ne se propage donc pas). Se déconnecter n'efface pas la progression de l'appareil.
+  Le mot de passe n'est jamais enregistré ; seul le jeton d'accès l'est, en stockage local de
+  l'appareil. HTTPS est obligatoire, sauf pour `localhost`.
+
+Le serveur n'existe pas encore : le contrat d'API qu'il doit respecter est décrit dans
+[`docs/API.md`](docs/API.md).
+
+Pour la localisation sur Android, après `npm install` : `npx cap sync`, puis ajouter dans
+`android/app/src/main/AndroidManifest.xml` (à l'intérieur de `<manifest>`) :
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-feature android:name="android.hardware.location.gps" />
+```
+
+Sur iOS, ajouter `NSLocationWhenInUseUsageDescription` dans `Info.plist` avec une phrase qui
+explique l'usage (ex. « Pour trouver ton pays »).
+
 **PWA (installable et hors ligne).** L'app a un manifeste, un service worker (vite-plugin-pwa) et
 des icônes dédiées, dont une icône « maskable » pour Android. Tout est mis en cache : une fois
 chargée, l'app fonctionne sans réseau, les données étant locales. Après un déploiement, la nouvelle
@@ -87,6 +117,11 @@ démarrage animé au lancement ; sur mobile, `npm run assets` génère l'icône 
    ouvre le mois ; les jours futurs sont grisés.
 9. Pour voir un jour passé rempli, ajouter une entrée de la veille dans les données locales
    (`localStorage`, clé `CapacitorStorage.iman.progress.v1`) puis recharger, ou revenir le lendemain.
+10. Onglet « Paramètres » : choisir un genre ; « Détecter ma position » (accepter la demande du
+    navigateur) puis vérifier le pays affiché ; « Choisir » ouvre la liste, la recherche ignore
+    les accents (« senegal » trouve « Sénégal »). Recharger : tout est conservé.
+11. Sauvegarde en ligne : une adresse `http://…` autre que localhost est refusée ; sans serveur
+    disponible, « Se connecter » affiche « Serveur injoignable » sans rien perdre.
 
 ## Structure
 
@@ -94,11 +129,12 @@ démarrage animé au lancement ; sur mobile, `npm run assets` génère l'icône 
 src/
   data/        prières et sunnas, invocations (adhkar)
   utils/       Hasanat/niveaux, dates, calendrier, série (fonctions pures, testées)
-  services/    stockage local et ProgressRepository (point d'entrée vers un futur serveur)
-  stores/      store Pinia (progress)
+  services/    stockage local, ProgressRepository, client API du serveur, géolocalisation
+  stores/      stores Pinia : progress (progression), settings (réglages, compte, synchronisation)
   components/  PlayerHeader, HasanatBar, PrayerGroup, PrayerCard, SunnahRow,
-               WeekStrip, MonthCalendar, DhikrCard, SplashScreen
-  views/       TabsPage (barre d'onglets), HomePage, AdhkarPage
+               WeekStrip, MonthCalendar, DhikrCard, CountryPicker, SplashScreen
+  views/       TabsPage (barre d'onglets), HomePage, AdhkarPage, SettingsPage
+docs/          contrat d'API du serveur de sauvegarde
 resources/     icône et splash (SVG + PNG)
 public/        icônes PWA (pwa-192, pwa-512, pwa-maskable-512, apple-touch-icon)
 pwa.manifest.ts  manifeste de la PWA
@@ -110,4 +146,4 @@ tests/unit/    tests Vitest
 - Étape 2 : lecture du Coran (pages/sourates lues, objectifs, Hasanat)
 - Étape 3 : hadiths et invocations selon les situations (après la prière, avant de dormir, ...)
 - Étape 4 : statistiques, historique et succès
-- Étape 5 : synchronisation avec le serveur Laravel
+- Étape 5 : serveur Laravel 13 de sauvegarde (le client est déjà prêt, voir `docs/API.md`)

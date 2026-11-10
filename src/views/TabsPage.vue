@@ -11,6 +11,10 @@
           <ion-icon :icon="bookOutline" />
           <ion-label>Invocations</ion-label>
         </ion-tab-button>
+        <ion-tab-button tab="settings" href="/tabs/settings">
+          <ion-icon :icon="settingsOutline" />
+          <ion-label>Paramètres</ion-label>
+        </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
   </ion-page>
@@ -18,5 +22,5 @@
 
 <script setup lang="ts">
 import { IonIcon, IonLabel, IonPage, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/vue';
-import { bookOutline, home } from 'ionicons/icons';
+import { bookOutline, home, settingsOutline } from 'ionicons/icons';
 </script>
