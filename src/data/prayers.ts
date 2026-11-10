@@ -1,9 +1,53 @@
-import type { Prayer } from '@/types';
+import type { Prayer, Sunnah } from '@/types';
 
+/*
+ * Les nombres de rak'ahs des sunnas varient selon les écoles juridiques ;
+ * cette liste suit l'usage le plus courant et pourra devenir configurable.
+ */
 export const PRAYERS: Prayer[] = [
-  { id: 'fajr', name: 'Fajr', arabic: 'الفجر', hint: 'Aube' },
-  { id: 'dhuhr', name: 'Dhuhr', arabic: 'الظهر', hint: 'Midi' },
-  { id: 'asr', name: 'Asr', arabic: 'العصر', hint: 'Après-midi' },
-  { id: 'maghrib', name: 'Maghrib', arabic: 'المغرب', hint: 'Coucher du soleil' },
-  { id: 'isha', name: 'Isha', arabic: 'العشاء', hint: 'Nuit' },
+  {
+    id: 'fajr',
+    name: 'Fajr',
+    arabic: 'الفجر',
+    hint: 'Aube',
+    before: [{ id: 'fajr-before', name: 'Sunna de Fajr', rakaat: 2, emphasized: true }],
+    after: [],
+  },
+  {
+    id: 'dhuhr',
+    name: 'Dhuhr',
+    arabic: 'الظهر',
+    hint: 'Midi',
+    before: [{ id: 'dhuhr-before', name: 'Sunna avant Dhuhr', rakaat: 4, emphasized: true }],
+    after: [{ id: 'dhuhr-after', name: 'Sunna après Dhuhr', rakaat: 2, emphasized: true }],
+  },
+  {
+    id: 'asr',
+    name: 'Asr',
+    arabic: 'العصر',
+    hint: 'Après-midi',
+    before: [{ id: 'asr-before', name: 'Sunna avant Asr', rakaat: 4, emphasized: false }],
+    after: [],
+  },
+  {
+    id: 'maghrib',
+    name: 'Maghrib',
+    arabic: 'المغرب',
+    hint: 'Coucher du soleil',
+    before: [],
+    after: [{ id: 'maghrib-after', name: 'Sunna après Maghrib', rakaat: 2, emphasized: true }],
+  },
+  {
+    id: 'isha',
+    name: 'Isha',
+    arabic: 'العشاء',
+    hint: 'Nuit',
+    before: [],
+    after: [
+      { id: 'isha-after', name: 'Sunna après Isha', rakaat: 2, emphasized: true },
+      { id: 'witr', name: 'Witr', rakaat: 1, emphasized: true },
+    ],
+  },
 ];
+
+export const ALL_SUNNAH: Sunnah[] = PRAYERS.flatMap((p) => [...p.before, ...p.after]);

@@ -12,11 +12,13 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "assets": "capacitor-assets generate --iconBackgroundColor '#0f3a31' --splashBackgroundColor '#0f3a31'"
   },
   "dependencies": {
     "@capacitor/core": "^7.0.0",
     "@capacitor/preferences": "^7.0.0",
+    "@capacitor/splash-screen": "^7.0.0",
     "@ionic/vue": "^8.5.0",
     "@ionic/vue-router": "^8.5.0",
     "ionicons": "^7.4.0",
@@ -25,6 +27,7 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^7.0.0",
     "@vitejs/plugin-vue": "^5.2.0",
     "@vue/test-utils": "^2.4.6",

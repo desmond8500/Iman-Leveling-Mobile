@@ -10,9 +10,9 @@
       <div class="wrap">
         <PlayerHeader
           :level="store.levelInfo.level"
-          :xp-into-level="store.levelInfo.xpIntoLevel"
-          :xp-for-next="store.levelInfo.xpForNext"
-          :total-xp="store.totalXp"
+          :hasanat-into-level="store.levelInfo.hasanatIntoLevel"
+          :hasanat-for-next="store.levelInfo.hasanatForNext"
+          :total-hasanat="store.totalHasanat"
           :streak="store.streak"
         />
 
@@ -22,15 +22,19 @@
         </div>
 
         <div class="list">
-          <PrayerCard
+          <PrayerGroup
             v-for="prayer in store.todayPrayers"
             :key="prayer.id"
             :prayer="prayer"
-            @toggle="onToggle(prayer.id)"
+            @toggle-prayer="onTogglePrayer"
+            @toggle-sunnah="onToggleSunnah"
           />
         </div>
 
-        <p class="tip">Les 5 prières accomplies rapportent un bonus de 50 XP.</p>
+        <p class="tip">
+          Les 5 prières accomplies rapportent un bonus de 50 Hasanat. Les prières surérogatoires
+          (sunnas) rapportent 10 ou 5 Hasanat.
+        </p>
       </div>
 
       <ion-toast
@@ -48,23 +52,30 @@
 import { onMounted, onUnmounted, reactive } from 'vue';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToast, IonToolbar } from '@ionic/vue';
 import PlayerHeader from '@/components/PlayerHeader.vue';
-import PrayerCard from '@/components/PrayerCard.vue';
+import PrayerGroup from '@/components/PrayerGroup.vue';
 import { useProgressStore } from '@/stores/progress';
-import type { PrayerId } from '@/types';
+import type { PrayerId, SunnahId } from '@/types';
 
 const store = useProgressStore();
 const toast = reactive({ open: false, message: '' });
 
-async function onToggle(id: PrayerId) {
-  const { xpDelta, leveledUp } = await store.togglePrayer(id);
+function notify({ hasanatDelta, leveledUp }: { hasanatDelta: number; leveledUp: boolean }) {
   if (leveledUp) {
     toast.message = `Niveau ${store.levelInfo.level} atteint !`;
-  } else if (xpDelta > 0) {
-    toast.message = `+${xpDelta} XP`;
+  } else if (hasanatDelta > 0) {
+    toast.message = `+${hasanatDelta} Hasanat`;
   } else {
-    toast.message = `${xpDelta} XP`;
+    toast.message = `${hasanatDelta} Hasanat`;
   }
   toast.open = true;
+}
+
+async function onTogglePrayer(id: PrayerId) {
+  notify(await store.togglePrayer(id));
+}
+
+async function onToggleSunnah(id: SunnahId) {
+  notify(await store.toggleSunnah(id));
 }
 
 // Si l'app reste ouverte au-delà de minuit, on repart sur la nouvelle journée.
@@ -105,7 +116,7 @@ onUnmounted(() => {
 .list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
 }
 .tip {
   margin-top: 20px;
