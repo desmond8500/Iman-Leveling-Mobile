@@ -1,15 +1,15 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
-import { PRAYERS } from '@/data/prayers';
+import { ALL_SUNNAH, PRAYERS } from '@/data/prayers';
 import {
   emptyProgress,
   LocalProgressRepository,
   type ProgressRepository,
 } from '@/services/progressRepository';
-import type { DayRecord, PrayerId } from '@/types';
+import type { DayRecord, PrayerId, PrayerView, SunnahId } from '@/types';
 import { toDateKey } from '@/utils/date';
+import { levelFromHasanat, hasanatForDay, sunnahReward } from '@/utils/hasanat';
 import { computeStreak } from '@/utils/streak';
-import { levelFromXp, xpForDay } from '@/utils/xp';
 
 let repository: ProgressRepository = new LocalProgressRepository();
 
@@ -18,33 +18,39 @@ export function setProgressRepository(repo: ProgressRepository) {
   repository = repo;
 }
 
-const countDone = (day?: DayRecord) =>
-  PRAYERS.filter((p) => day?.prayers[p.id]).length;
+const countDone = (day?: DayRecord) => PRAYERS.filter((p) => day?.prayers[p.id]).length;
+
+const sunnahTotal = (day?: DayRecord) =>
+  ALL_SUNNAH.reduce((sum, s) => (day?.sunnah?.[s.id] ? sum + sunnahReward(s.emphasized) : sum), 0);
 
 export const useProgressStore = defineStore('progress', () => {
   const days = ref<Record<string, DayRecord>>({});
   const loaded = ref(false);
   const today = ref(toDateKey(new Date()));
 
-  const todayPrayers = computed(() =>
-    PRAYERS.map((prayer) => ({
+  const todayPrayers = computed<PrayerView[]>(() => {
+    const day = days.value[today.value];
+    return PRAYERS.map((prayer) => ({
       ...prayer,
-      done: !!days.value[today.value]?.prayers[prayer.id],
-    })),
-  );
+      done: !!day?.prayers[prayer.id],
+      before: prayer.before.map((s) => ({ ...s, done: !!day?.sunnah?.[s.id] })),
+      after: prayer.after.map((s) => ({ ...s, done: !!day?.sunnah?.[s.id] })),
+    }));
+  });
 
   const doneToday = computed(() => countDone(days.value[today.value]));
 
-  // L'XP est recalculée à partir des journées : impossible de la « farmer » en cochant/décochant.
-  const totalXp = computed(() =>
+  // Les Hasanat sont recalculés à partir des journées : impossible de les « farmer » en cochant/décochant.
+  const totalHasanat = computed(() =>
     Object.values(days.value).reduce(
-      (sum, day) => sum + xpForDay(countDone(day), PRAYERS.length),
+      (sum, day) => sum + hasanatForDay(countDone(day), PRAYERS.length, sunnahTotal(day)),
       0,
     ),
   );
 
-  const levelInfo = computed(() => levelFromXp(totalXp.value));
+  const levelInfo = computed(() => levelFromHasanat(totalHasanat.value));
 
+  // La série ne dépend que des 5 prières obligatoires.
   const streak = computed(() =>
     computeStreak(today.value, (key) => countDone(days.value[key]) === PRAYERS.length),
   );
@@ -61,23 +67,28 @@ export const useProgressStore = defineStore('progress', () => {
     today.value = toDateKey(new Date());
   }
 
-  async function togglePrayer(id: PrayerId) {
+  async function commit(update: (day: DayRecord) => DayRecord) {
     const key = today.value;
     const levelBefore = levelInfo.value.level;
-    const xpBefore = totalXp.value;
-    const current = days.value[key]?.prayers ?? {};
+    const hasanatBefore = totalHasanat.value;
+    const current = days.value[key] ?? { prayers: {} };
 
-    days.value = {
-      ...days.value,
-      [key]: { prayers: { ...current, [id]: !current[id] } },
-    };
+    days.value = { ...days.value, [key]: update(current) };
 
     await repository.save({ ...emptyProgress(), days: days.value });
 
     return {
-      xpDelta: totalXp.value - xpBefore,
+      hasanatDelta: totalHasanat.value - hasanatBefore,
       leveledUp: levelInfo.value.level > levelBefore,
     };
+  }
+
+  function togglePrayer(id: PrayerId) {
+    return commit((day) => ({ ...day, prayers: { ...day.prayers, [id]: !day.prayers[id] } }));
+  }
+
+  function toggleSunnah(id: SunnahId) {
+    return commit((day) => ({ ...day, sunnah: { ...day.sunnah, [id]: !day.sunnah?.[id] } }));
   }
 
   return {
@@ -86,11 +97,12 @@ export const useProgressStore = defineStore('progress', () => {
     today,
     todayPrayers,
     doneToday,
-    totalXp,
+    totalHasanat,
     levelInfo,
     streak,
     load,
     refreshToday,
     togglePrayer,
+    toggleSunnah,
   };
 });

@@ -6,12 +6,12 @@
     </div>
     <div class="info">
       <div class="top-row">
-        <strong>{{ totalXp }} XP</strong>
+        <strong>{{ totalHasanat }} Hasanat</strong>
         <span class="streak" :class="{ active: streak > 0 }">
           <ion-icon :icon="flame" /> {{ streak }} j
         </span>
       </div>
-      <XPBar :xp-into-level="xpIntoLevel" :xp-for-next="xpForNext" />
+      <HasanatBar :hasanat-into-level="hasanatIntoLevel" :hasanat-for-next="hasanatForNext" />
     </div>
   </section>
 </template>
@@ -19,13 +19,13 @@
 <script setup lang="ts">
 import { IonIcon } from '@ionic/vue';
 import { flame } from 'ionicons/icons';
-import XPBar from './XPBar.vue';
+import HasanatBar from './HasanatBar.vue';
 
 defineProps<{
   level: number;
-  xpIntoLevel: number;
-  xpForNext: number;
-  totalXp: number;
+  hasanatIntoLevel: number;
+  hasanatForNext: number;
+  totalHasanat: number;
   streak: number;
 }>();
 </script>
