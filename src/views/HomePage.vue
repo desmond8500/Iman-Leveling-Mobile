@@ -16,16 +16,38 @@
           :streak="store.streak"
         />
 
+        <WeekStrip
+          :today="store.today"
+          :selected="store.selectedDate"
+          :level-of="levelOf"
+          @select="store.selectDate"
+          @open-calendar="calendarOpen = true"
+        />
+
         <div class="section-title">
-          <h2>Prières du jour</h2>
-          <span class="count">{{ store.doneToday }} / {{ store.todayPrayers.length }}</span>
+          <h2>{{ store.isToday ? 'Prières du jour' : capitalize(formatLong(store.selectedDate)) }}</h2>
+          <span class="count">{{ store.doneCount }} / {{ store.dayPrayers.length }}</span>
         </div>
+
+        <p class="summary">
+          {{ store.selectedStats.hasanat }} Hasanat · {{ store.selectedStats.sunnah }} sunnas ·
+          {{ store.selectedStats.adhkar }} invocations
+        </p>
+
+        <p v-if="!store.isToday" class="readonly-note">
+          <ion-icon :icon="lockClosedOutline" />
+          Consultation seule : seul le jour en cours peut être modifié.
+          <button type="button" class="link" @click="store.selectDate(store.today)">
+            Revenir à aujourd'hui
+          </button>
+        </p>
 
         <div class="list">
           <PrayerGroup
-            v-for="prayer in store.todayPrayers"
+            v-for="prayer in store.dayPrayers"
             :key="prayer.id"
             :prayer="prayer"
+            :readonly="!store.isToday"
             @toggle-prayer="onTogglePrayer"
             @toggle-sunnah="onToggleSunnah"
           />
@@ -45,19 +67,64 @@
         @didDismiss="toast.open = false"
       />
     </ion-content>
+
+    <ion-modal :is-open="calendarOpen" @didDismiss="calendarOpen = false">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Calendrier</ion-title>
+          <ion-buttons slot="end">
+            <ion-button @click="calendarOpen = false">Fermer</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="iman-content">
+        <div class="wrap">
+          <MonthCalendar
+            :today="store.today"
+            :selected="store.selectedDate"
+            :level-of="levelOf"
+            @select="onPickDate"
+          />
+        </div>
+      </ion-content>
+    </ion-modal>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive } from 'vue';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToast, IonToolbar } from '@ionic/vue';
+import { reactive, ref } from 'vue';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonModal,
+  IonPage,
+  IonTitle,
+  IonToast,
+  IonToolbar,
+} from '@ionic/vue';
+import { lockClosedOutline } from 'ionicons/icons';
+import MonthCalendar from '@/components/MonthCalendar.vue';
 import PlayerHeader from '@/components/PlayerHeader.vue';
 import PrayerGroup from '@/components/PrayerGroup.vue';
+import WeekStrip from '@/components/WeekStrip.vue';
 import { useProgressStore } from '@/stores/progress';
 import type { PrayerId, SunnahId } from '@/types';
+import { formatLong } from '@/utils/calendar';
 
 const store = useProgressStore();
 const toast = reactive({ open: false, message: '' });
+const calendarOpen = ref(false);
+
+const levelOf = (key: string) => store.dayStats(key).level;
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+function onPickDate(key: string) {
+  store.selectDate(key);
+  calendarOpen.value = false;
+}
 
 function notify({ hasanatDelta, leveledUp }: { hasanatDelta: number; leveledUp: boolean }) {
   if (leveledUp) {
@@ -77,20 +144,6 @@ async function onTogglePrayer(id: PrayerId) {
 async function onToggleSunnah(id: SunnahId) {
   notify(await store.toggleSunnah(id));
 }
-
-// Si l'app reste ouverte au-delà de minuit, on repart sur la nouvelle journée.
-function onVisible() {
-  if (document.visibilityState === 'visible') store.refreshToday();
-}
-
-onMounted(() => {
-  store.load();
-  document.addEventListener('visibilitychange', onVisible);
-});
-
-onUnmounted(() => {
-  document.removeEventListener('visibilitychange', onVisible);
-});
 </script>
 
 <style scoped>
@@ -103,7 +156,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin: 24px 4px 12px;
+  margin: 24px 4px 4px;
 }
 .section-title h2 {
   margin: 0;
@@ -112,6 +165,31 @@ onUnmounted(() => {
 .count {
   color: var(--iman-gold);
   font-weight: 700;
+}
+.summary {
+  margin: 0 4px 12px;
+  font-size: 13px;
+  color: var(--iman-text-soft);
+}
+.readonly-note {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(242, 201, 76, 0.1);
+  font-size: 13px;
+  color: var(--iman-gold);
+}
+.link {
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--iman-emerald);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
 }
 .list {
   display: flex;

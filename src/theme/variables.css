@@ -26,3 +26,16 @@
 ion-content.iman-content {
   --background: linear-gradient(180deg, var(--iman-bg-top), var(--iman-bg-bottom));
 }
+
+/* Barre d'onglets */
+ion-tab-bar {
+  --background: var(--iman-card);
+  --border: 1px solid rgba(255, 255, 255, 0.06);
+  --color: var(--iman-text-soft);
+  --color-selected: var(--iman-gold);
+}
+
+/* Segment matin / soir */
+ion-segment {
+  --background: var(--iman-card);
+}

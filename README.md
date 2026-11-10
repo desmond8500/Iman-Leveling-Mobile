@@ -37,6 +37,18 @@ Une sunna confirmée rapporte 10 Hasanat, les autres 5. Elles ne comptent pas da
 Les nombres de rak'ahs varient selon les écoles : la liste est dans `src/data/prayers.ts`
 et sera rendue configurable.
 
+**Invocations du matin et du soir.** Onglet « Invocations » : chaque invocation est affichée en
+arabe, en phonétique et en français, avec le nombre de répétitions et la source. Le choix
+Matin / Soir s'ouvre par défaut selon l'heure (matin avant 15 h). Certains textes changent entre
+matin et soir (« Asbahna » / « Amsayna »), d'autres sont propres à une période. Marquer une
+invocation comme faite rapporte 5 Hasanat. Les textes sont dans `src/data/adhkar.ts` : ils sont
+issus des recueils classiques mais doivent être relus par une personne qualifiée avant diffusion.
+
+**Calendrier.** Sur l'accueil, une bande des 7 derniers jours (trait vert = 5 prières faites,
+trait doré = partiel) et un bouton calendrier qui ouvre la vue mensuelle. Toucher un jour affiche
+ses prières, sunnas, invocations et Hasanat. Les jours passés sont en consultation seule : seul le
+jour en cours peut être modifié.
+
 **Icône et écran de démarrage.** Un croissant et une étoile dorés sur fond émeraude, avec des
 chevrons de niveau. Les sources sont dans `resources/` (SVG et PNG). L'app affiche un écran de
 démarrage animé au lancement ; sur mobile, `npm run assets` génère l'icône et le splash natifs
@@ -51,17 +63,24 @@ démarrage animé au lancement ; sur mobile, `npm run assets` génère l'icône 
 4. Isha affiche deux sunnas en dessous (sunna après Isha et Witr).
 5. Cocher les 5 prières : bonus de 50, niveau 2 atteint, série de 1 jour.
 6. Recharger la page : tout est conservé.
+7. Onglet « Invocations » : basculer Matin / Soir, vérifier arabe, phonétique et français, puis
+   marquer une invocation comme faite (+5 Hasanat).
+8. Revenir à l'accueil : la bande des jours affiche aujourd'hui en doré. Le bouton calendrier
+   ouvre le mois ; les jours futurs sont grisés.
+9. Pour voir un jour passé rempli, ajouter une entrée de la veille dans les données locales
+   (`localStorage`, clé `CapacitorStorage.iman.progress.v1`) puis recharger, ou revenir le lendemain.
 
 ## Structure
 
 ```
 src/
-  data/        liste des prières
-  utils/       Hasanat/niveaux, dates, série (fonctions pures, testées)
+  data/        prières et sunnas, invocations (adhkar)
+  utils/       Hasanat/niveaux, dates, calendrier, série (fonctions pures, testées)
   services/    stockage local et ProgressRepository (point d'entrée vers un futur serveur)
   stores/      store Pinia (progress)
-  components/  PlayerHeader, HasanatBar, PrayerGroup, PrayerCard, SunnahRow, SplashScreen
-  views/       HomePage
+  components/  PlayerHeader, HasanatBar, PrayerGroup, PrayerCard, SunnahRow,
+               WeekStrip, MonthCalendar, DhikrCard, SplashScreen
+  views/       TabsPage (barre d'onglets), HomePage, AdhkarPage
 resources/     icône et splash (SVG + PNG)
 tests/unit/    tests Vitest
 ```
@@ -69,6 +88,6 @@ tests/unit/    tests Vitest
 ## Prochaines étapes prévues
 
 - Étape 2 : lecture du Coran (pages/sourates lues, objectifs, Hasanat)
-- Étape 3 : hadiths et invocations (du matin, du soir, selon les situations)
+- Étape 3 : hadiths et invocations selon les situations (après la prière, avant de dormir, ...)
 - Étape 4 : statistiques, historique et succès
 - Étape 5 : synchronisation avec le serveur Laravel

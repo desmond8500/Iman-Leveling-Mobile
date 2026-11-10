@@ -19,6 +19,11 @@ describe('hasanatForDay', () => {
     expect(hasanatForDay(1, 5, 15)).toBe(35);
     expect(hasanatForDay(5, 5, 60)).toBe(210);
   });
+
+  it('ajoute 5 Hasanat par invocation', () => {
+    expect(hasanatForDay(0, 5, 0, 3)).toBe(15);
+    expect(hasanatForDay(5, 5, 10, 2)).toBe(170);
+  });
 });
 
 describe('sunnahReward', () => {
