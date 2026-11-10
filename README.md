@@ -97,6 +97,26 @@ l'icône d'installation dans la barre d'adresse. Pour tester le hors-ligne, coch
 recharger. Sur iOS (Safari) : Partager > Sur l'écran d'accueil. En ligne, l'hébergement doit servir
 l'app en HTTPS, avec `index.html` renvoyé pour toute route inconnue.
 
+**Paramètres.** Onglet « Paramètres » :
+
+- *Genre* : homme ou femme (enregistré, pas encore utilisé pour le calcul des Hasanat).
+- *Pays* : bouton « Détecter ma position » (position approximative arrondie à ~11 km, envoyée au
+  service BigDataCloud uniquement pour trouver le pays ; seul le code pays est enregistré), ou choix
+  manuel dans une liste avec recherche.
+- *Sauvegarde en ligne* : adresse du serveur, puis connexion ou création de compte. La progression
+  est synchronisée à la connexion, au lancement de l'app et via « Synchroniser maintenant ». Sans
+  compte, tout reste sur l'appareil. Se déconnecter n'efface pas la progression locale. La fusion
+  ne perd rien (une case cochée reste cochée) mais décocher ne se propage pas aux autres appareils.
+  Le mot de passe n'est jamais enregistré ; seul le jeton de session l'est, en stockage local.
+  L'adresse doit être en `https://` (`http://localhost` accepté en développement).
+
+Le serveur n'existe pas encore : le contrat d'API à implémenter est dans `docs/API.md` (Laravel 13
+avec Sanctum recommandé). Tant qu'il n'est pas en ligne, la liaison de compte ne peut pas aboutir.
+
+Pour la détection de position en natif, après `npm install` : `npx cap sync`, puis ajouter la
+permission Android `ACCESS_COARSE_LOCATION` dans `AndroidManifest.xml` et la clé
+`NSLocationWhenInUseUsageDescription` dans `Info.plist` (iOS).
+
 **Icône et écran de démarrage.** Un croissant et une étoile dorés sur fond émeraude, avec des
 chevrons de niveau. Les sources sont dans `resources/` (SVG et PNG). L'app affiche un écran de
 démarrage animé au lancement ; sur mobile, `npm run assets` génère l'icône et le splash natifs
@@ -127,7 +147,7 @@ démarrage animé au lancement ; sur mobile, `npm run assets` génère l'icône 
 
 ```
 src/
-  data/        prières et sunnas, invocations (adhkar)
+  data/        prières et sunnas, invocations (adhkar), pays
   utils/       Hasanat/niveaux, dates, calendrier, série (fonctions pures, testées)
   services/    stockage local, ProgressRepository, client API du serveur, géolocalisation
   stores/      stores Pinia : progress (progression), settings (réglages, compte, synchronisation)
