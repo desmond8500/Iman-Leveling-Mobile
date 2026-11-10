@@ -1,7 +1,7 @@
 <template>
   <transition name="splash-fade">
     <div v-if="visible" class="splash" role="presentation">
-      <img class="logo" src="/icon-512.png" alt="" width="144" height="144" />
+      <img class="logo" src="/pwa-512.png" alt="" width="144" height="144" />
       <h1 class="title">Iman Leveling</h1>
       <p class="subtitle">Monte en niveau, une Hasana à la fois</p>
     </div>

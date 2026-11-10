@@ -1,6 +1,8 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import { Capacitor } from '@capacitor/core';
 import { IonicVue } from '@ionic/vue';
+import { registerSW } from 'virtual:pwa-register';
 import App from './App.vue';
 import router from './router';
 
@@ -23,3 +25,8 @@ const app = createApp(App).use(IonicVue).use(createPinia()).use(router);
 router.isReady().then(() => {
   app.mount('#app');
 });
+
+// Service worker (hors ligne + installation) : seulement sur le web, pas dans l'app native Capacitor.
+if (!Capacitor.isNativePlatform()) {
+  registerSW({ immediate: true });
+}
