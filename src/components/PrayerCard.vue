@@ -1,5 +1,11 @@
 <template>
-  <button class="prayer" :class="{ done: prayer.done }" type="button" @click="$emit('toggle')">
+  <button
+    class="prayer"
+    :class="{ done: prayer.done }"
+    type="button"
+    :disabled="disabled"
+    @click="$emit('toggle')"
+  >
     <ion-icon class="prayer-icon" :icon="icons[prayer.id]" />
     <span class="prayer-text">
       <span class="prayer-name">{{ prayer.name }}</span>
@@ -25,6 +31,7 @@ import type { PrayerId } from '@/types';
 
 defineProps<{
   prayer: { id: PrayerId; name: string; arabic: string; hint: string; done: boolean };
+  disabled?: boolean;
 }>();
 defineEmits<{ (e: 'toggle'): void }>();
 
@@ -53,8 +60,11 @@ const icons: Record<PrayerId, string> = {
   cursor: pointer;
   transition: transform 0.1s ease, background 0.2s ease, border-color 0.2s ease;
 }
-.prayer:active {
+.prayer:active:not(:disabled) {
   transform: scale(0.98);
+}
+.prayer:disabled {
+  cursor: default;
 }
 .prayer.done {
   background: var(--iman-card-done);

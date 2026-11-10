@@ -5,6 +5,8 @@ export const ALL_PRAYERS_BONUS = 50;
 export const SUNNAH_EMPHASIZED_HASANAT = 10;
 export const SUNNAH_HASANAT = 5;
 
+export const ADHKAR_HASANAT = 5;
+
 /** Hasanat d'une sunna : 10 pour une sunna confirmée, 5 sinon. */
 export function sunnahReward(emphasized: boolean): number {
   return emphasized ? SUNNAH_EMPHASIZED_HASANAT : SUNNAH_HASANAT;
@@ -12,11 +14,16 @@ export function sunnahReward(emphasized: boolean): number {
 
 /**
  * Hasanat gagnés sur une journée : 20 par prière obligatoire, +50 de bonus si les 5 sont faites,
- * plus les Hasanat des sunnas (`sunnahTotal`).
+ * plus ceux des sunnas (`sunnahTotal`) et 5 par invocation du matin ou du soir (`adhkarDone`).
  */
-export function hasanatForDay(done: number, total: number, sunnahTotal = 0): number {
+export function hasanatForDay(
+  done: number,
+  total: number,
+  sunnahTotal = 0,
+  adhkarDone = 0,
+): number {
   const bonus = total > 0 && done === total ? ALL_PRAYERS_BONUS : 0;
-  return done * PRAYER_HASANAT + bonus + sunnahTotal;
+  return done * PRAYER_HASANAT + bonus + sunnahTotal + adhkarDone * ADHKAR_HASANAT;
 }
 
 /** Hasanat nécessaires pour passer du niveau `level` au suivant (niveau 1 : 100, niveau 2 : 150, ...). */

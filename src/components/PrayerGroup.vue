@@ -5,16 +5,18 @@
       v-for="s in prayer.before"
       :key="s.id"
       :sunnah="s"
+      :disabled="readonly"
       @toggle="$emit('toggle-sunnah', s.id)"
     />
 
-    <PrayerCard :prayer="prayer" @toggle="$emit('toggle-prayer', prayer.id)" />
+    <PrayerCard :prayer="prayer" :disabled="readonly" @toggle="$emit('toggle-prayer', prayer.id)" />
 
     <!-- Sunnas à faire après la prière : en dessous -->
     <SunnahRow
       v-for="s in prayer.after"
       :key="s.id"
       :sunnah="s"
+      :disabled="readonly"
       @toggle="$emit('toggle-sunnah', s.id)"
     />
   </div>
@@ -25,7 +27,7 @@ import PrayerCard from './PrayerCard.vue';
 import SunnahRow from './SunnahRow.vue';
 import type { PrayerId, PrayerView, SunnahId } from '@/types';
 
-defineProps<{ prayer: PrayerView }>();
+defineProps<{ prayer: PrayerView; readonly?: boolean }>();
 defineEmits<{
   (e: 'toggle-prayer', id: PrayerId): void;
   (e: 'toggle-sunnah', id: SunnahId): void;

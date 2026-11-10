@@ -1,5 +1,11 @@
 <template>
-  <button class="sunnah" :class="{ done: sunnah.done }" type="button" @click="$emit('toggle')">
+  <button
+    class="sunnah"
+    :class="{ done: sunnah.done }"
+    type="button"
+    :disabled="disabled"
+    @click="$emit('toggle')"
+  >
     <span class="dot" />
     <span class="text">
       <span class="name">{{ sunnah.name }}</span>
@@ -17,7 +23,7 @@ import { checkmarkCircle, ellipseOutline } from 'ionicons/icons';
 import type { SunnahView } from '@/types';
 import { sunnahReward } from '@/utils/hasanat';
 
-const props = defineProps<{ sunnah: SunnahView }>();
+const props = defineProps<{ sunnah: SunnahView; disabled?: boolean }>();
 defineEmits<{ (e: 'toggle'): void }>();
 
 const reward = computed(() => sunnahReward(props.sunnah.emphasized));
@@ -39,6 +45,9 @@ const reward = computed(() => sunnahReward(props.sunnah.emphasized));
   text-align: left;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
+}
+.sunnah:disabled {
+  cursor: default;
 }
 .sunnah.done {
   background: rgba(46, 204, 154, 0.12);
