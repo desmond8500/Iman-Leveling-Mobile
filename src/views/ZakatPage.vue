@@ -28,11 +28,14 @@
           Ces repères sont généraux. En cas de doute, demande à un savant ou à une institution de confiance.
         </p>
       </div>
+
+      <ScrollTopButton slot="fixed" />
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
+import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { ref } from 'vue';
 import {
   IonBackButton,

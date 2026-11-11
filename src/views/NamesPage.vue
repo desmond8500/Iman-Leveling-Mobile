@@ -42,11 +42,14 @@
           énumération, et certaines listes diffèrent légèrement.
         </p>
       </div>
+
+      <ScrollTopButton slot="fixed" />
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
+import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { computed, ref } from 'vue';
 import { IonContent, IonHeader, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/vue';
 import { NAMES_VERSE, searchNames } from '@/data/names';

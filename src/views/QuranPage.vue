@@ -37,11 +37,14 @@
           sourate, puis conservé sur l'appareil pour une lecture hors ligne.
         </p>
       </div>
+
+      <ScrollTopButton slot="fixed" />
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
+import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { computed, ref } from 'vue';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/vue';
 import { searchSurahs } from '@/data/surahs';

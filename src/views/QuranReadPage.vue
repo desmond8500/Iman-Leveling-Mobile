@@ -57,11 +57,14 @@
           </nav>
         </template>
       </div>
+
+      <ScrollTopButton slot="fixed" />
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
+import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { computed, reactive, ref, watch } from 'vue';
 import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/vue';
 import { surahByNumber } from '@/data/surahs';

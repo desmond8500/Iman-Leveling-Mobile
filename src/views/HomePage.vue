@@ -85,6 +85,8 @@
         position="top"
         @didDismiss="toast.open = false"
       />
+
+      <ScrollTopButton slot="fixed" />
     </ion-content>
 
     <ion-modal :is-open="calendarOpen" @didDismiss="calendarOpen = false">
@@ -111,6 +113,7 @@
 </template>
 
 <script setup lang="ts">
+import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import {
   IonButton,

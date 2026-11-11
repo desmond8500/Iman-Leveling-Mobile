@@ -58,11 +58,14 @@
       </div>
 
       <p v-else class="missing">Ce nom n'existe pas.</p>
+
+      <ScrollTopButton slot="fixed" />
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
+import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import {
