@@ -43,11 +43,15 @@ export function ramadanDays(start: Date): RamadanDay[] {
   });
 }
 
-/** Les trois blocs de dix jours. */
+/**
+ * Les trois blocs de dix jours, avec leur phase. Cette répartition (miséricorde, pardon,
+ * affranchissement du Feu) est traditionnelle, mais le hadith qui la rapporte est jugé faible
+ * par de nombreux savants : elle sert ici de repère de lecture, pas de règle.
+ */
 export const RAMADAN_BLOCKS = [
-  { id: 1, title: 'Jours 1 à 10', from: 1, to: 10 },
-  { id: 2, title: 'Jours 11 à 20', from: 11, to: 20 },
-  { id: 3, title: 'Jours 21 à 30', from: 21, to: 30 },
+  { id: 1, title: 'Miséricorde', arabic: 'الرحمة', range: 'Jours 1 à 10', from: 1, to: 10 },
+  { id: 2, title: 'Pardon', arabic: 'المغفرة', range: 'Jours 11 à 20', from: 11, to: 20 },
+  { id: 3, title: 'Affranchissement du Feu', arabic: 'العتق من النار', range: 'Jours 21 à 30', from: 21, to: 30 },
 ] as const;
 
 export function blockOf(days: RamadanDay[], from: number, to: number): RamadanDay[] {
@@ -93,4 +97,23 @@ export function resolveRamadan(
     return { hijriYear: auto.hijriYear, start: custom, overridden: daysBetween(auto.start, custom) !== 0, calendarStart: auto.start };
   }
   return { ...auto, overridden: false, calendarStart: auto.start };
+}
+
+export type DayState = 'past' | 'today' | 'upcoming';
+
+export function dayState(day: RamadanDay, today: Date): DayState {
+  const diff = daysBetween(today, day.date);
+  return diff < 0 ? 'past' : diff === 0 ? 'today' : 'upcoming';
+}
+
+export type BlockState = 'done' | 'current' | 'upcoming';
+
+/** Avancement d'un bloc : terminé, en cours ou à venir, et nombre de jours déjà écoulés ou en cours. */
+export function blockProgress(days: RamadanDay[], today: Date): { state: BlockState; elapsed: number; total: number } {
+  const real = days.filter((d) => d.exists);
+  const elapsed = real.filter((d) => dayState(d, today) !== 'upcoming').length;
+  const total = real.length;
+  const finished = real.length > 0 && real.every((d) => dayState(d, today) === 'past');
+  const state: BlockState = finished ? 'done' : elapsed > 0 ? 'current' : 'upcoming';
+  return { state, elapsed, total };
 }

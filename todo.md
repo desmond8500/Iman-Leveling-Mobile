@@ -21,8 +21,8 @@
 
 - [x] Modifier la date de début
 - [] lorsqu'on clique sur une date rediriger vers une page ou on liste des prière surrérogatoires à faire
-- [] modifier l'affichage des dates selon l'avancement dans le mois
-- [] les 10 jours  seront séparées en trois phases qui seront aussi mise en titre (misericorde, pardon et afranchissement de l'enfer)
+- [x] modifier l'affichage des dates selon l'avancement dans le mois
+- [x] les 10 jours  seront séparées en trois phases qui seront aussi mise en titre (misericorde, pardon et afranchissement de l'enfer)
 
 ## Zakat
 
