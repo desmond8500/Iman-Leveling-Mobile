@@ -117,6 +117,8 @@ export interface SettingsData {
   /** Apparence : automatique (bleu le vendredi), émeraude ou bleu. */
   theme: 'auto' | 'emerald' | 'blue';
   /** Rappels d'ablutions et de prière (application mobile uniquement). */
-  notifications: { enabled: boolean; ablutionMinutes: number };
+  notifications: { enabled: boolean; ablutionMinutes: number; endMinutes: number };
+  /** Premier jour du Ramadan choisi par l'utilisateur (AAAA-MM-JJ), ou `null` = calendrier. */
+  ramadanStart: string | null;
   server: ServerSettings;
 }

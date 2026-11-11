@@ -61,3 +61,36 @@ const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDat
 export function daysBetween(from: Date, to: Date): number {
   return Math.round((startOfDay(to) - startOfDay(from)) / MS_DAY);
 }
+
+const KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+const pad = (n: number) => String(n).padStart(2, '0');
+export const toKey = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+/** Date « AAAA-MM-JJ » -> Date locale, ou `null` si invalide. */
+export function parseStartKey(key: unknown): Date | null {
+  if (typeof key !== 'string' || !KEY_RE.test(key)) return null;
+  const [y, m, d] = key.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d ? date : null;
+}
+
+/** Écart maximal accepté entre la date saisie et celle du calendrier (la lune varie d'un jour ou deux). */
+export const MAX_START_SHIFT_DAYS = 3;
+
+/**
+ * Ramadan à afficher : celui du calendrier, dont le premier jour peut être décalé par l'utilisateur
+ * (observation de la lune dans son pays). Une date trop éloignée du calendrier est ignorée.
+ */
+export function resolveRamadan(
+  today: Date,
+  override: string | null,
+): { hijriYear: number; start: Date; overridden: boolean; calendarStart: Date } | null {
+  const auto = currentOrNextRamadan(today);
+  if (!auto) return null;
+  const custom = parseStartKey(override);
+  if (custom && Math.abs(daysBetween(auto.start, custom)) <= MAX_START_SHIFT_DAYS) {
+    return { hijriYear: auto.hijriYear, start: custom, overridden: daysBetween(auto.start, custom) !== 0, calendarStart: auto.start };
+  }
+  return { ...auto, overridden: false, calendarStart: auto.start };
+}

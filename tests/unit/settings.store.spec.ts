@@ -149,6 +149,23 @@ describe('settings store', () => {
     });
   });
 
+  describe('début du Ramadan', () => {
+    it('enregistre une date valide, refuse le reste, et revient au calendrier avec null', async () => {
+      const { settings } = await freshStores();
+      expect(settings.ramadanStart).toBeNull();
+      await settings.setRamadanStart('2027-02-09');
+      expect(settings.ramadanStart).toBe('2027-02-09');
+      await settings.setRamadanStart('2027-13-45');
+      expect(settings.ramadanStart).toBe('2027-02-09');
+      await settings.setRamadanStart(null);
+      expect(settings.ramadanStart).toBeNull();
+    });
+    it('écarte une valeur invalide lue sur l\'appareil', () => {
+      expect(normalizeSettings({ ramadanStart: 'demain' }).ramadanStart).toBeNull();
+      expect(normalizeSettings({ ramadanStart: '2027-02-09' }).ramadanStart).toBe('2027-02-09');
+    });
+  });
+
   describe('adresse du serveur', () => {
     it('refuse http hors localhost et accepte https', async () => {
       const { settings } = await freshStores();

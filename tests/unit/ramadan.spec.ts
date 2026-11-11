@@ -1,4 +1,4 @@
-import { RAMADAN_BLOCKS, blockOf, currentOrNextRamadan, daysBetween, ramadanDays, ramadanStart } from '../../src/utils/ramadan';
+import { RAMADAN_BLOCKS, blockOf, currentOrNextRamadan, daysBetween, parseStartKey, ramadanDays, ramadanStart, resolveRamadan, toKey } from '../../src/utils/ramadan';
 import { toHijri } from '../../src/utils/hijri';
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
@@ -42,5 +42,33 @@ describe('ramadanDays', () => {
   });
   it('nuits impaires des dix derniers jours', () => {
     expect(days.filter((x) => x.oddLastTen).map((x) => x.n)).toEqual([21, 23, 25, 27, 29]);
+  });
+});
+
+describe('date de début choisie par l\'utilisateur', () => {
+  const today = d(2026, 1, 10); // avant le Ramadan 1447 (début calendrier : 18 février 2026)
+
+  it('sans choix : la date du calendrier', () => {
+    const r = resolveRamadan(today, null)!;
+    expect(toKey(r.start)).toBe('2026-02-18');
+    expect(r.overridden).toBe(false);
+  });
+  it('décale d\'un jour', () => {
+    const r = resolveRamadan(today, '2026-02-19')!;
+    expect(toKey(r.start)).toBe('2026-02-19');
+    expect(r.overridden).toBe(true);
+    expect(toKey(r.calendarStart)).toBe('2026-02-18');
+    expect(toKey(ramadanDays(r.start)[0].date)).toBe('2026-02-19');
+  });
+  it('ignore une date très éloignée ou invalide', () => {
+    expect(resolveRamadan(today, '2026-04-01')!.overridden).toBe(false);
+    expect(toKey(resolveRamadan(today, '2026-04-01')!.start)).toBe('2026-02-18');
+    expect(resolveRamadan(today, 'n\'importe quoi')!.overridden).toBe(false);
+  });
+  it('analyse les dates', () => {
+    expect(parseStartKey('2026-02-30')).toBeNull();
+    expect(parseStartKey('2026-2-1')).toBeNull();
+    expect(parseStartKey(null)).toBeNull();
+    expect(toKey(parseStartKey('2027-02-08')!)).toBe('2027-02-08');
   });
 });
