@@ -120,5 +120,7 @@ export interface SettingsData {
   notifications: { enabled: boolean; ablutionMinutes: number; endMinutes: number };
   /** Premier jour du Ramadan choisi par l'utilisateur (AAAA-MM-JJ), ou `null` = calendrier. */
   ramadanStart: string | null;
+  /** Interface simplifiée : l'essentiel (prières, invocations, Coran) sans le reste. */
+  simpleMode: boolean;
   server: ServerSettings;
 }

@@ -26,6 +26,11 @@
         <!-- Apparence -->
         <section class="card">
           <h2>Apparence</h2>
+          <ion-toggle :checked="settings.simpleMode" @ionChange="onSimple">Interface simplifiée</ion-toggle>
+          <p class="hint">
+            Ne garde que l'essentiel : les 5 prières, les invocations et le Coran. Le mode avancé
+            affiche aussi les sunnas, les noms d'Allah, Ramadan, la Zakat et le reste.
+          </p>
           <ion-segment :value="settings.theme" @ionChange="onTheme">
             <ion-segment-button value="auto"><ion-label>Auto</ion-label></ion-segment-button>
             <ion-segment-button value="emerald"><ion-label>Émeraude</ion-label></ion-segment-button>
@@ -310,6 +315,11 @@ function onEnd(event: CustomEvent) {
 }
 
 // --- Apparence ---
+function onSimple(event: CustomEvent) {
+  const value = !!event.detail.checked;
+  if (value !== settings.simpleMode) void settings.setSimpleMode(value);
+}
+
 function onTheme(event: CustomEvent) {
   const value = event.detail.value;
   if (isThemeSetting(value)) void settings.setTheme(value);

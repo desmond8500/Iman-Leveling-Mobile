@@ -181,6 +181,23 @@ describe('settings store', () => {
     });
   });
 
+  describe('interface simplifiée', () => {
+    it('désactivée par défaut, valeurs invalides ignorées', async () => {
+      expect(normalizeSettings(null).simpleMode).toBe(false);
+      expect(normalizeSettings({ simpleMode: 'oui' }).simpleMode).toBe(false);
+      expect(normalizeSettings({ simpleMode: true }).simpleMode).toBe(true);
+    });
+
+    it('se règle et se conserve', async () => {
+      const { settings } = await freshStores();
+      expect(settings.simpleMode).toBe(false);
+      await settings.setSimpleMode(true);
+      expect(settings.simpleMode).toBe(true);
+      await settings.setSimpleMode(false);
+      expect(settings.simpleMode).toBe(false);
+    });
+  });
+
   describe('adresse du serveur', () => {
     it('refuse http hors localhost et accepte https', async () => {
       const { settings } = await freshStores();

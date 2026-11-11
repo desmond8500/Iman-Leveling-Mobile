@@ -11,11 +11,15 @@
           <ion-icon :icon="bookOutline" />
           <ion-label>Invocations</ion-label>
         </ion-tab-button>
-        <ion-tab-button tab="names" href="/tabs/names">
+        <ion-tab-button v-if="settings.simpleMode" tab="quran" href="/tabs/quran">
+          <ion-icon :icon="libraryOutline" />
+          <ion-label>Coran</ion-label>
+        </ion-tab-button>
+        <ion-tab-button v-if="!settings.simpleMode" tab="names" href="/tabs/names">
           <ion-icon :icon="sparklesOutline" />
           <ion-label>Noms d'Allah</ion-label>
         </ion-tab-button>
-        <ion-tab-button tab="more" href="/tabs/more">
+        <ion-tab-button v-if="!settings.simpleMode" tab="more" href="/tabs/more">
           <ion-icon :icon="gridOutline" />
           <ion-label>Plus</ion-label>
         </ion-tab-button>
@@ -30,5 +34,8 @@
 
 <script setup lang="ts">
 import { IonIcon, IonLabel, IonPage, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/vue';
-import { bookOutline, gridOutline, home, settingsOutline, sparklesOutline } from 'ionicons/icons';
+import { useSettingsStore } from '@/stores/settings';
+import { bookOutline, gridOutline, home, libraryOutline, settingsOutline, sparklesOutline } from 'ionicons/icons';
+
+const settings = useSettingsStore();
 </script>

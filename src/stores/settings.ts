@@ -23,6 +23,7 @@ export const defaultSettings = (): SettingsData => ({
   theme: 'auto',
   notifications: defaultNotificationSettings(),
   ramadanStart: null,
+  simpleMode: false,
   server: { url: DEFAULT_SERVER_URL, token: null, user: null, lastSync: null },
 });
 
@@ -50,6 +51,7 @@ export function normalizeSettings(stored: unknown): SettingsData {
     theme: isThemeSetting(s.theme) ? s.theme : 'auto',
     notifications: normalizeNotificationSettings(s.notifications),
     ramadanStart: parseStartKey(s.ramadanStart) ? (s.ramadanStart as string) : null,
+    simpleMode: s.simpleMode === true,
     server: {
       url: typeof server.url === 'string' && server.url ? server.url : DEFAULT_SERVER_URL,
       token: typeof server.token === 'string' && server.token ? server.token : null,
@@ -73,6 +75,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const theme = computed(() => data.value.theme);
   const notifications = computed(() => data.value.notifications);
   const ramadanStart = computed(() => data.value.ramadanStart);
+  const simpleMode = computed(() => data.value.simpleMode);
   const location = computed(() => data.value.location);
   /** Méthode choisie, ou celle du pays à défaut. */
   const prayerMethod = computed<MethodId>(() =>
@@ -120,6 +123,11 @@ export const useSettingsStore = defineStore('settings', () => {
   async function setRamadanStart(value: string | null) {
     if (value !== null && !parseStartKey(value)) return;
     data.value = { ...data.value, ramadanStart: value };
+    await persist();
+  }
+
+  async function setSimpleMode(value: boolean) {
+    data.value = { ...data.value, simpleMode: value === true };
     await persist();
   }
 
@@ -245,6 +253,8 @@ export const useSettingsStore = defineStore('settings', () => {
     theme,
     notifications,
     ramadanStart,
+    simpleMode,
+    setSimpleMode,
     serverUrl,
     user,
     lastSync,

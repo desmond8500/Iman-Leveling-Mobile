@@ -3,7 +3,7 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button default-href="/tabs/more" text="" />
+          <ion-back-button :default-href="settings.simpleMode ? '/tabs/home' : '/tabs/more'" text="" />
         </ion-buttons>
         <ion-title>Coran</ion-title>
       </ion-toolbar>
@@ -48,7 +48,9 @@ import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { computed, ref } from 'vue';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/vue';
 import { searchSurahs } from '@/data/surahs';
+import { useSettingsStore } from '@/stores/settings';
 
+const settings = useSettingsStore();
 const query = ref('');
 const results = computed(() => searchSurahs(query.value));
 </script>

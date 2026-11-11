@@ -2,7 +2,7 @@
   <div class="group">
     <!-- Sunnas à faire avant la prière : au-dessus -->
     <SunnahRow
-      v-for="s in prayer.before"
+      v-for="s in simple ? [] : prayer.before"
       :key="s.id"
       :sunnah="s"
       :disabled="readonly"
@@ -27,7 +27,7 @@
 
     <!-- Sunnas à faire après la prière : en dessous -->
     <SunnahRow
-      v-for="s in prayer.after"
+      v-for="s in simple ? [] : prayer.after"
       :key="s.id"
       :sunnah="s"
       :disabled="readonly"
@@ -47,6 +47,8 @@ defineProps<{
   readonly?: boolean;
   /** Afficher le choix mosquée / maison (hommes). */
   showPlace?: boolean;
+  /** Interface simplifiée : sans les sunnas. */
+  simple?: boolean;
   /** Heure de la prière, déjà formatée. */
   time?: string | null;
   /** Fin du temps de la prière, déjà formatée. */
