@@ -12,6 +12,8 @@ export interface CitadelleDua {
   phonetic: string;
   french: string;
   source: string;
+  /** Nombre de récitations recommandé, s'il y en a un. */
+  count?: number;
 }
 
 export interface CitadelleCategory {
@@ -25,6 +27,18 @@ export const CITADELLE: CitadelleCategory[] = [
     id: 'sommeil',
     title: 'Sommeil et réveil',
     duas: [
+      {
+        id: 'amana-rassoul',
+        title: 'Amana Rassoul (Coran 2:285-286)',
+        arabic:
+          'آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ ۚ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِّن رُّسُلِهِ ۚ وَقَالُوا سَمِعْنَا وَأَطَعْنَا ۖ غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ ۝ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا ۚ لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ ۗ رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِن قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ ۖ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا ۚ أَنتَ مَوْلَانَا فَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ',
+        phonetic:
+          "Amanar-rasulu bima unzila ilayhi min Rabbihi wal-mu'minun. Kullun amana billahi wa mala'ikatihi wa kutubihi wa rusulih, la nufarriqu bayna ahadin min rusulih. Wa qalu sami'na wa ata'na, ghufranaka Rabbana wa ilaykal-masir. La yukallifullahu nafsan illa wus'aha, laha ma kasabat wa 'alayha maktasabat. Rabbana la tu'akhidhna in nasina aw akhta'na. Rabbana wa la tahmil 'alayna isran kama hamaltahu 'alal-ladhina min qablina. Rabbana wa la tuhammilna ma la taqata lana bih. Wa'fu 'anna, waghfir lana, warhamna. Anta mawlana fansurna 'alal-qawmil-kafirin.",
+        french:
+          "Le Messager a cru en ce qui lui a été révélé de la part de son Seigneur, et les croyants aussi. Tous ont cru en Allah, en Ses anges, en Ses livres et en Ses messagers : « Nous ne faisons aucune distinction entre Ses messagers. » Et ils ont dit : « Nous avons entendu et nous avons obéi. Pardonne-nous, notre Seigneur, et c'est vers Toi que sera le retour. » Allah n'impose à aucune âme une charge supérieure à sa capacité : elle aura ce qu'elle a acquis et subira ce qu'elle a acquis. « Notre Seigneur, ne nous châtie pas si nous oublions ou commettons une erreur. Notre Seigneur, ne nous charge pas d'un fardeau comme Tu en as chargé ceux qui nous ont précédés. Notre Seigneur, ne nous impose pas ce que nous ne pouvons supporter. Efface nos fautes, pardonne-nous et fais-nous miséricorde. Tu es notre Maître : donne-nous la victoire sur le peuple des mécréants. » (traduction du sens)",
+        source: "Coran 2:285-286 ; Al-Boukhari 5009, Mouslim 807 (celui qui les récite la nuit, elles lui suffiront)",
+        count: 1,
+      },
       {
         id: 'avant-dormir',
         title: 'Avant de dormir',

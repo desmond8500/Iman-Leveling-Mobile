@@ -11,6 +11,18 @@ function cleanFlags(value: unknown): Record<string, boolean> {
   return out;
 }
 
+/** Ne garde que des entiers positifs raisonnables dans une table de compteurs. */
+function cleanCounts(value: unknown): Record<string, number> {
+  const out: Record<string, number> = {};
+  if (!isObject(value)) return out;
+  for (const [k, v] of Object.entries(value)) {
+    if (typeof v === 'number' && Number.isInteger(v) && v > 0 && v <= MAX_COUNT) out[k] = v;
+  }
+  return out;
+}
+
+export const MAX_COUNT = 100000;
+
 /** Remet en forme des données reçues d'un serveur : tout ce qui n'a pas la bonne forme est ignoré. */
 export function sanitizeProgress(input: unknown): ProgressData {
   const days: Record<string, DayRecord> = {};
@@ -21,6 +33,7 @@ export function sanitizeProgress(input: unknown): ProgressData {
     if (isObject(day.mosque)) record.mosque = cleanFlags(day.mosque);
     if (isObject(day.sunnah)) record.sunnah = cleanFlags(day.sunnah);
     if (isObject(day.adhkar)) record.adhkar = cleanFlags(day.adhkar);
+    if (isObject(day.counts)) record.counts = cleanCounts(day.counts);
     days[key] = record;
   }
   return { version: 1, days };
@@ -32,11 +45,19 @@ const orFlags = (a?: Record<string, boolean>, b?: Record<string, boolean>) => {
   return out;
 };
 
+/** Pour les compteurs, on garde la valeur la plus haute : une récitation comptée n'est jamais perdue. */
+const maxCounts = (a?: Record<string, number>, b?: Record<string, number>) => {
+  const out: Record<string, number> = { ...a };
+  for (const [k, v] of Object.entries(b ?? {})) out[k] = Math.max(out[k] ?? 0, v);
+  return out;
+};
+
 function mergeDay(a?: DayRecord, b?: DayRecord): DayRecord {
   const merged: DayRecord = { prayers: orFlags(a?.prayers, b?.prayers) };
   if (a?.mosque || b?.mosque) merged.mosque = orFlags(a?.mosque, b?.mosque);
   if (a?.sunnah || b?.sunnah) merged.sunnah = orFlags(a?.sunnah, b?.sunnah);
   if (a?.adhkar || b?.adhkar) merged.adhkar = orFlags(a?.adhkar, b?.adhkar);
+  if (a?.counts || b?.counts) merged.counts = maxCounts(a?.counts, b?.counts);
   return merged;
 }
 

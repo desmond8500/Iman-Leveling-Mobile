@@ -76,3 +76,16 @@ describe('sanitizeProgress', () => {
     expect(out.days['2026-11-09'].prayers).toEqual({ fajr: true });
   });
 });
+
+describe('compteurs de récitations', () => {
+  const day = (counts?: Record<string, number>) => ({ version: 1 as const, days: { '2026-11-09': { prayers: {}, counts } } });
+
+  it('garde la valeur la plus haute à la fusion', () => {
+    const merged = mergeProgress(day({ 'morning:kursi': 1, a: 5 }), day({ 'morning:kursi': 3, b: 2 }));
+    expect(merged.days['2026-11-09'].counts).toEqual({ 'morning:kursi': 3, a: 5, b: 2 });
+  });
+  it('nettoie les valeurs invalides venant d\'un serveur', () => {
+    const clean = sanitizeProgress({ days: { '2026-11-09': { prayers: {}, counts: { ok: 3, neg: -1, flt: 1.5, str: '2', big: 10 ** 9 } } } });
+    expect(clean.days['2026-11-09'].counts).toEqual({ ok: 3 });
+  });
+});

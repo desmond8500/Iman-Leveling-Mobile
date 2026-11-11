@@ -19,3 +19,14 @@ describe('Citadelle du musulman (sélection)', () => {
     for (const c of CITADELLE) expect(c.duas.length).toBeGreaterThan(0);
   });
 });
+
+describe('Amana Rassoul', () => {
+  it('est présente, avec arabe, phonétique, français et source 2:285-286', () => {
+    const dua = CITADELLE.flatMap((c) => c.duas).find((d) => d.id === 'amana-rassoul')!;
+    expect(dua).toBeDefined();
+    expect(dua.source).toContain('2:285-286');
+    expect(dua.arabic.startsWith('آمَنَ الرَّسُولُ')).toBe(true);
+    expect(dua.arabic).toContain('الْكَافِرِينَ');
+    expect(dua.count).toBe(1);
+  });
+});

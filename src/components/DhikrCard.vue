@@ -17,6 +17,8 @@
       <p class="french">{{ dhikr.french }}</p>
     </section>
 
+    <CountControl :counter-key="counterKey" :target="dhikr.count" :complete-key="counterKey" />
+
     <footer class="foot">
       <span class="source">{{ dhikr.source }}</span>
       <button type="button" class="check" :class="{ done }" :aria-pressed="done" @click="$emit('toggle')">
@@ -30,9 +32,10 @@
 <script setup lang="ts">
 import { IonIcon } from '@ionic/vue';
 import { checkmarkCircle, ellipseOutline } from 'ionicons/icons';
+import CountControl from '@/components/CountControl.vue';
 import type { Dhikr } from '@/types';
 
-defineProps<{ dhikr: Dhikr; done: boolean }>();
+defineProps<{ dhikr: Dhikr; done: boolean; counterKey: string }>();
 defineEmits<{ (e: 'toggle'): void }>();
 </script>
 

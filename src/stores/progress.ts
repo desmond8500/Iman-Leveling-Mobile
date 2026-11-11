@@ -19,6 +19,7 @@ import type {
   SunnahId,
 } from '@/types';
 import { toDateKey } from '@/utils/date';
+import { MAX_COUNT } from '@/utils/merge';
 import { hasanatForDay, levelFromHasanat, prayerReward } from '@/utils/hasanat';
 import { computeStreak } from '@/utils/streak';
 
@@ -195,6 +196,29 @@ export const useProgressStore = defineStore('progress', () => {
     return commit((day) => ({ ...day, adhkar: { ...day.adhkar, [key]: !day.adhkar?.[key] } }));
   }
 
+  /** Compteur du jour pour une invocation (0 si aucun). */
+  function countOf(key: string): number {
+    return days.value[today.value]?.counts?.[key] ?? 0;
+  }
+
+  /**
+   * Ajoute ou retire une récitation au compteur du jour (jamais en dessous de 0).
+   * Si `adhkarKeyToComplete` est donné, atteindre `target` coche l'invocation (une seule fois).
+   */
+  async function bumpCount(key: string, delta: 1 | -1, target?: number, adhkarKeyToComplete?: string) {
+    const current = countOf(key);
+    const next = Math.min(MAX_COUNT, Math.max(0, current + delta));
+    if (next === current) return NOOP_RESULT;
+    return commit((day) => {
+      const updated: DayRecord = { ...day, counts: { ...day.counts, [key]: next } };
+      if (next === 0 && updated.counts) delete updated.counts[key];
+      if (adhkarKeyToComplete && target && next >= target && !day.adhkar?.[adhkarKeyToComplete]) {
+        updated.adhkar = { ...day.adhkar, [adhkarKeyToComplete]: true };
+      }
+      return updated;
+    });
+  }
+
   return {
     days,
     loaded,
@@ -221,5 +245,7 @@ export const useProgressStore = defineStore('progress', () => {
     togglePlace,
     toggleSunnah,
     toggleDhikr,
+    countOf,
+    bumpCount,
   };
 });

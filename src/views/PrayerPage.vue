@@ -60,6 +60,7 @@
               <p class="phonetic">{{ i.phonetic }}</p>
               <p class="french">{{ i.french }}</p>
               <span class="source">{{ i.source }}</span>
+              <CountControl :counter-key="`guide:${i.id}`" :target="i.count" />
             </li>
           </ul>
         </section>
@@ -90,6 +91,7 @@
               <p class="phonetic">{{ i.phonetic }}</p>
               <p class="french">{{ i.french }}</p>
               <span class="source">{{ i.source }}</span>
+              <CountControl :counter-key="`guide:${i.id}`" :target="i.count" />
             </li>
           </ul>
           <p class="hint">
@@ -104,6 +106,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import CountControl from '@/components/CountControl.vue';
 import { PRAYERS } from '@/data/prayers';
 import {
   AFTER_PRAYER_INVOCATIONS,

@@ -5,12 +5,17 @@
     <p class="phonetic">{{ item.phonetic }}</p>
     <p class="french">{{ item.french }}</p>
     <span class="source">{{ item.source }}</span>
+    <CountControl v-if="counterKey" :counter-key="counterKey" :target="item.count" />
   </article>
 </template>
 
 <script setup lang="ts">
+import CountControl from '@/components/CountControl.vue';
+
 defineProps<{
-  item: { title: string; arabic: string; phonetic: string; french: string; source: string };
+  item: { title: string; arabic: string; phonetic: string; french: string; source: string; count?: number };
+  /** Si renseignée, affiche le compteur + / − (clé propre à l'invocation). */
+  counterKey?: string;
 }>();
 </script>
 

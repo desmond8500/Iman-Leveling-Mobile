@@ -61,6 +61,8 @@ export interface DayRecord {
   sunnah?: Partial<Record<SunnahId, boolean>>;
   /** Clés « période:id » (voir adhkarKey). Absent avant l'ajout des invocations. */
   adhkar?: Record<string, boolean>;
+  /** Compteurs de récitations du jour (clé d'invocation -> nombre). Absent avant leur ajout. */
+  counts?: Record<string, number>;
 }
 
 /** Niveau d'accomplissement d'une journée, pour le calendrier. */

@@ -36,8 +36,8 @@
 
 ## Invocations
 
-- [] Ajouter en bas de chaque invocation un bouton + et - afin de décompter chaque récitation
-- [] ajouter amana rassoul, les deux derniers versets de la sourate 2
+- [x] Ajouter en bas de chaque invocation un bouton + et - afin de décompter chaque récitation
+- [x] ajouter amana rassoul, les deux derniers versets de la sourate 2
 
 ## Authentification
 
