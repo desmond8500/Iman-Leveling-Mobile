@@ -30,7 +30,7 @@
           v-else
           type="button"
           class="cell"
-          :class="[levelOf(key), { selected: key === selected, today: key === today }]"
+          :class="[levelOf(key), { selected: key === selected, today: key === today, white: info(key).white, forbidden: info(key).forbidden }]"
           :disabled="key > today"
           :aria-label="formatLong(key)"
           @click="$emit('select', key)"
@@ -45,6 +45,7 @@
       <li><span class="swatch full" /> 5 prières faites</li>
       <li><span class="swatch partial" /> Partiel</li>
       <li><span class="swatch none" /> Rien</li>
+      <li><span class="swatch white" /> Jours blancs (jeûne)</li>
     </ul>
   </div>
 </template>
@@ -54,6 +55,7 @@ import { computed, ref } from 'vue';
 import { IonIcon } from '@ionic/vue';
 import { chevronBack, chevronForward } from 'ionicons/icons';
 import type { DayLevel } from '@/types';
+import { fastingInfo } from '@/utils/fasting';
 import { hijriMonthName, hijriRangeLabel, toHijri } from '@/utils/hijri';
 import {
   WEEK_HEADER,
@@ -77,6 +79,7 @@ const start = parseKey(props.selected);
 const view = ref({ year: start.getFullYear(), month: start.getMonth() });
 
 const weeks = computed(() => buildMonthGrid(view.value.year, view.value.month));
+const info = (key: string) => fastingInfo(parseKey(key));
 const hijriLabel = computed(() => hijriRangeLabel(view.value.year, view.value.month));
 /** Jour du mois hégirien ; le 1er du mois est écrit avec le nom du mois. */
 const hijriDay = (key: string) => {
@@ -177,6 +180,9 @@ function go(delta: number) {
 .cell.partial {
   background: rgba(242, 201, 76, 0.28);
 }
+.cell.white {
+  border-color: #8fd3ff;
+}
 .cell.selected {
   border-color: var(--iman-gold);
 }
@@ -189,6 +195,7 @@ function go(delta: number) {
 }
 .legend {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 16px;
   margin: 16px 0 0;
@@ -210,6 +217,10 @@ function go(delta: number) {
 }
 .swatch.full {
   background: var(--iman-emerald);
+}
+.swatch.white {
+  border: 2px solid #8fd3ff;
+  background: transparent;
 }
 .swatch.partial {
   background: rgba(242, 201, 76, 0.5);
