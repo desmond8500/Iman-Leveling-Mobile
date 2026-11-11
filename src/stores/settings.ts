@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { isCountryCode } from '@/data/countries';
-import { ApiClient, ApiError, normalizeServerUrl, type AuthResponse } from '@/services/api';
+import { ApiClient, ApiError, DEFAULT_SERVER_URL, normalizeServerUrl, type AuthResponse } from '@/services/api';
 import { detectPlace } from '@/services/geolocation';
 import { loadJson, saveJson } from '@/services/storage';
 import { useProgressStore } from '@/stores/progress';
@@ -23,7 +23,7 @@ export const defaultSettings = (): SettingsData => ({
   theme: 'auto',
   notifications: defaultNotificationSettings(),
   ramadanStart: null,
-  server: { url: '', token: null, user: null, lastSync: null },
+  server: { url: DEFAULT_SERVER_URL, token: null, user: null, lastSync: null },
 });
 
 function normalizeLocation(value: unknown): SettingsData['location'] {
@@ -51,7 +51,7 @@ export function normalizeSettings(stored: unknown): SettingsData {
     notifications: normalizeNotificationSettings(s.notifications),
     ramadanStart: parseStartKey(s.ramadanStart) ? (s.ramadanStart as string) : null,
     server: {
-      url: typeof server.url === 'string' ? server.url : '',
+      url: typeof server.url === 'string' && server.url ? server.url : DEFAULT_SERVER_URL,
       token: typeof server.token === 'string' && server.token ? server.token : null,
       user:
         user && typeof user.name === 'string' && typeof user.email === 'string'

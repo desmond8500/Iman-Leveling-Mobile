@@ -2,8 +2,8 @@
 
 ## Server
 
-- [] Ajouter swagger pour les API
-- [] intégrer le lien du serveur à l'aplication [imanserver.yonkou.info](https://imanserver.yonkou.info/)
+- [x] Ajouter swagger pour les API (dépôt serveur : /docs)
+- [x] intégrer le lien du serveur à l'aplication [imanserver.yonkou.info](https://imanserver.yonkou.info/)
 - [] Versionner le logiciel et afficher la version au meilleur endroit
 
 ## Interface

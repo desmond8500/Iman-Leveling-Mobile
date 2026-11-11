@@ -171,6 +171,14 @@
               />
             </label>
             <p v-if="urlError" class="error" role="alert">{{ urlError }}</p>
+            <button
+              v-if="form.serverUrl !== DEFAULT_SERVER_URL"
+              type="button"
+              class="link-button"
+              @click="useOfficialServer"
+            >
+              Utiliser le serveur officiel
+            </button>
 
             <ion-segment :value="mode" @ionChange="onMode">
               <ion-segment-button value="login">
@@ -254,6 +262,7 @@ import CountryPicker from '@/components/CountryPicker.vue';
 import { countryName } from '@/data/countries';
 import { LocationError } from '@/services/geolocation';
 import { useSettingsStore } from '@/stores/settings';
+import { DEFAULT_SERVER_URL } from '@/services/api';
 import { requestNotificationPermission, notificationsSupported } from '@/services/notifications';
 import { ABLUTION_CHOICES, END_CHOICES } from '@/utils/notifications';
 import { isThemeSetting } from '@/utils/theme';
@@ -364,6 +373,11 @@ async function saveServer(): Promise<boolean> {
   return ok;
 }
 
+async function useOfficialServer() {
+  form.serverUrl = DEFAULT_SERVER_URL;
+  await saveServer();
+}
+
 async function onSubmit() {
   authError.value = '';
   if (!(await saveServer())) return;
@@ -404,6 +418,17 @@ const lastSyncLabel = computed(() => {
 </script>
 
 <style scoped>
+.link-button {
+  align-self: flex-start;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--iman-emerald);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
 .wrap {
   margin: 0 auto;
   padding: 16px;

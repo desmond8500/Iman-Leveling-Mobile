@@ -1,4 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia';
+import { DEFAULT_SERVER_URL, normalizeServerUrl } from '@/services/api';
 import type { ProgressRepository } from '@/services/progressRepository';
 import { setProgressRepository, useProgressStore } from '@/stores/progress';
 import { normalizeSettings, useSettingsStore } from '@/stores/settings';
@@ -166,11 +167,25 @@ describe('settings store', () => {
     });
   });
 
+  describe('serveur par défaut', () => {
+    it('utilise le serveur officiel tant qu\'aucun autre n\'est choisi', async () => {
+      expect(normalizeSettings(null).server.url).toBe('https://imanserver.yonkou.info');
+      expect(normalizeSettings({ server: { url: '' } }).server.url).toBe(DEFAULT_SERVER_URL);
+      expect(normalizeSettings({ server: { url: 'https://autre.example.com' } }).server.url).toBe('https://autre.example.com');
+      const { settings } = await freshStores();
+      expect(settings.serverUrl).toBe(DEFAULT_SERVER_URL);
+    });
+
+    it('l\'adresse officielle est acceptée', () => {
+      expect(normalizeServerUrl(DEFAULT_SERVER_URL)).toBe(DEFAULT_SERVER_URL);
+    });
+  });
+
   describe('adresse du serveur', () => {
     it('refuse http hors localhost et accepte https', async () => {
       const { settings } = await freshStores();
       expect(await settings.setServerUrl('http://iman.example.com')).toBe(false);
-      expect(settings.serverUrl).toBe('');
+      expect(settings.serverUrl).toBe(DEFAULT_SERVER_URL);
       expect(await settings.setServerUrl('https://iman.example.com/')).toBe(true);
       expect(settings.serverUrl).toBe('https://iman.example.com');
     });
@@ -187,11 +202,22 @@ describe('settings store', () => {
   });
 
   describe('compte et synchronisation', () => {
-    it('refuse de se connecter sans adresse de serveur', async () => {
-      const { settings } = await freshStores();
-      await expect(settings.authenticate('login', { email: 'a@b.c', password: 'x' })).rejects.toMatchObject({
-        message: "Renseigne d'abord l'adresse du serveur.",
-      });
+    it('se connecte au serveur officiel tant qu\'aucune autre adresse n\'est choisie', async () => {
+      const urls: string[] = [];
+      const original = globalThis.fetch;
+      globalThis.fetch = (async (url: string) => {
+        urls.push(url);
+        throw new TypeError('Failed to fetch');
+      }) as unknown as typeof fetch;
+      try {
+        const { settings } = await freshStores();
+        await expect(settings.authenticate('login', { email: 'a@b.c', password: 'x' })).rejects.toMatchObject({
+          message: 'Serveur injoignable.',
+        });
+        expect(urls[0]).toBe(`${DEFAULT_SERVER_URL}/api/auth/login`);
+      } finally {
+        globalThis.fetch = original;
+      }
     });
 
     it('connexion : jeton enregistré, progression locale envoyée au serveur', async () => {

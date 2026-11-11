@@ -12,6 +12,9 @@ export class ApiError extends Error {
   }
 }
 
+/** Serveur officiel d'Iman Leveling, utilisé par défaut. */
+export const DEFAULT_SERVER_URL = 'https://imanserver.yonkou.info';
+
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1']);
 
 /**
