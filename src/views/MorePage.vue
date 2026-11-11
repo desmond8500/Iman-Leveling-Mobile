@@ -27,9 +27,10 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
-import { chevronForward, moonOutline } from 'ionicons/icons';
+import { bookmarkOutline, chevronForward, moonOutline } from 'ionicons/icons';
 
 const items = [
+  { href: '/tabs/prayer', title: 'Prière', subtitle: 'Les 5 prières, ablutions, déroulement', icon: bookmarkOutline },
   { href: '/tabs/ramadan', title: 'Ramadan', subtitle: 'Calendrier des 30 jours', icon: moonOutline },
 ];
 </script>
