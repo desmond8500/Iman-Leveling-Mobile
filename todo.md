@@ -8,6 +8,7 @@
 
 - [] Propose un système d'évaluation des realisations de la journée et réparti les point en conséquence
 - [] Bouton pour aller vers le haut
+- [] ajouter un moyen dans les paramètres d'avoir une interface simplifiée orientée vers l'objectif de base de l'application et un mode avancé pour le tout
 
 ## Prière
 
