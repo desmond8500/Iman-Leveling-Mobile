@@ -4,7 +4,10 @@
       <button type="button" class="arrow" aria-label="Mois précédent" @click="go(-1)">
         <ion-icon :icon="chevronBack" />
       </button>
-      <strong class="title">{{ label }}</strong>
+      <div class="title-box">
+        <strong class="title">{{ label }}</strong>
+        <span class="hijri-label">{{ hijriLabel }}</span>
+      </div>
       <button
         type="button"
         class="arrow"
@@ -32,7 +35,8 @@
           :aria-label="formatLong(key)"
           @click="$emit('select', key)"
         >
-          {{ dayNumber(key) }}
+          <span class="num">{{ dayNumber(key) }}</span>
+          <span class="hj">{{ hijriDay(key) }}</span>
         </button>
       </template>
     </div>
@@ -50,6 +54,7 @@ import { computed, ref } from 'vue';
 import { IonIcon } from '@ionic/vue';
 import { chevronBack, chevronForward } from 'ionicons/icons';
 import type { DayLevel } from '@/types';
+import { hijriMonthName, hijriRangeLabel, toHijri } from '@/utils/hijri';
 import {
   WEEK_HEADER,
   buildMonthGrid,
@@ -72,6 +77,12 @@ const start = parseKey(props.selected);
 const view = ref({ year: start.getFullYear(), month: start.getMonth() });
 
 const weeks = computed(() => buildMonthGrid(view.value.year, view.value.month));
+const hijriLabel = computed(() => hijriRangeLabel(view.value.year, view.value.month));
+/** Jour du mois hégirien ; le 1er du mois est écrit avec le nom du mois. */
+const hijriDay = (key: string) => {
+  const h = toHijri(parseKey(key));
+  return h.day === 1 ? hijriMonthName(h.month).slice(0, 4) : String(h.day);
+};
 const label = computed(() => monthLabel(view.value.year, view.value.month));
 
 const canGoNext = computed(() => {
@@ -97,9 +108,28 @@ function go(delta: number) {
   justify-content: space-between;
   margin-bottom: 12px;
 }
+.title-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .title {
   text-transform: capitalize;
   font-size: 18px;
+}
+.hijri-label {
+  font-size: 12px;
+  color: var(--iman-gold);
+}
+.num {
+  display: block;
+  line-height: 1.1;
+}
+.hj {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.75;
 }
 .arrow {
   width: 40px;
@@ -133,6 +163,7 @@ function go(delta: number) {
   aspect-ratio: 1;
   border: 2px solid transparent;
   border-radius: 12px;
+  padding: 2px;
   background: var(--iman-card);
   color: inherit;
   font: inherit;

@@ -14,7 +14,7 @@
 
 ## calendrier
 
-- [] intégrer le calendrier musulman
+- [x] intégrer le calendrier musulman
 - [] afficher les jours blanc pour jeuner
 - [] mettre en evidence les bons jours pour jeuner comme le lundi et le jeudi
 
