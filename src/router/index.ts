@@ -2,8 +2,10 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import type { RouteRecordRaw } from 'vue-router';
 import AdhkarPage from '@/views/AdhkarPage.vue';
 import HomePage from '@/views/HomePage.vue';
+import MorePage from '@/views/MorePage.vue';
 import NameDetailPage from '@/views/NameDetailPage.vue';
 import NamesPage from '@/views/NamesPage.vue';
+import RamadanPage from '@/views/RamadanPage.vue';
 import SettingsPage from '@/views/SettingsPage.vue';
 import TabsPage from '@/views/TabsPage.vue';
 
@@ -18,6 +20,8 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'adhkar', name: 'adhkar', component: AdhkarPage },
       { path: 'names', name: 'names', component: NamesPage },
       { path: 'names/:n(\\d+)', name: 'name-detail', component: NameDetailPage, props: true },
+      { path: 'more', name: 'more', component: MorePage },
+      { path: 'ramadan', name: 'ramadan', component: RamadanPage },
       { path: 'settings', name: 'settings', component: SettingsPage },
     ],
   },

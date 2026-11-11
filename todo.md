@@ -20,8 +20,8 @@
 
 ## Ramadan
 
-- [] Page ramadan
-- [] Mettre un calendrier de 30 jours séparé en blocs de 10 jours
+- [x] Page ramadan
+- [x] Mettre un calendrier de 30 jours séparé en blocs de 10 jours
 
 ## Prière
 
