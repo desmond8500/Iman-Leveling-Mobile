@@ -34,3 +34,14 @@ describe('jours interdits', () => {
     expect(fastingInfo(d(2026, 3, 20)).forbidden).toBe(true);
   });
 });
+
+describe('lundi et jeudi', () => {
+  it('recommandés, sauf jour interdit', () => {
+    expect(fastingInfo(d(2026, 11, 9)).weekly).toBe(true); // lundi
+    expect(fastingInfo(d(2026, 11, 12)).weekly).toBe(true); // jeudi
+    expect(fastingInfo(d(2026, 11, 10)).weekly).toBe(false); // mardi
+    expect(fastingInfo(d(2026, 11, 14)).weekly).toBe(false); // samedi
+    expect(fastingInfo(d(2026, 5, 28)).forbidden).toBe(true); // 11 Dhou al-hijja, un jeudi
+    expect(fastingInfo(d(2026, 5, 28)).weekly).toBe(false);
+  });
+});

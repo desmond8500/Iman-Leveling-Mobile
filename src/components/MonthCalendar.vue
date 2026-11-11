@@ -30,7 +30,7 @@
           v-else
           type="button"
           class="cell"
-          :class="[levelOf(key), { selected: key === selected, today: key === today, white: info(key).white, forbidden: info(key).forbidden }]"
+          :class="[levelOf(key), { selected: key === selected, today: key === today, white: info(key).white, weekly: info(key).weekly, forbidden: info(key).forbidden }]"
           :disabled="key > today"
           :aria-label="formatLong(key)"
           @click="$emit('select', key)"
@@ -46,6 +46,7 @@
       <li><span class="swatch partial" /> Partiel</li>
       <li><span class="swatch none" /> Rien</li>
       <li><span class="swatch white" /> Jours blancs (jeûne)</li>
+      <li><span class="dot" /> Lundi / jeudi (jeûne recommandé)</li>
     </ul>
   </div>
 </template>
@@ -180,6 +181,22 @@ function go(delta: number) {
 .cell.partial {
   background: rgba(242, 201, 76, 0.28);
 }
+.cell {
+  position: relative;
+}
+.cell.weekly::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--iman-gold);
+}
+.cell.full.weekly::after {
+  background: #06100e;
+}
 .cell.white {
   border-color: #8fd3ff;
 }
@@ -217,6 +234,12 @@ function go(delta: number) {
 }
 .swatch.full {
   background: var(--iman-emerald);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--iman-gold);
 }
 .swatch.white {
   border: 2px solid #8fd3ff;

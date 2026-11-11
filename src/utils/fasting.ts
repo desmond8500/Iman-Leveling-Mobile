@@ -9,6 +9,8 @@ export interface FastingInfo {
   ramadan: boolean;
   /** Jours blancs (ayyam al-bid) : 13, 14 et 15 de chaque mois hégirien. */
   white: boolean;
+  /** Lundi ou jeudi : jours où le jeûne surérogatoire est recommandé. */
+  weekly: boolean;
 }
 
 /** Jours où le jeûne est interdit : 1er Chawwal, 10 à 13 Dhou al-hijja. */
@@ -24,6 +26,7 @@ export function fastingInfo(date: Date): FastingInfo {
   return {
     forbidden,
     ramadan: h.month === RAMADAN,
+    weekly: !forbidden && (date.getDay() === 1 || date.getDay() === 4),
     white: !forbidden && h.month !== RAMADAN && WHITE_DAYS.includes(h.day),
   };
 }
