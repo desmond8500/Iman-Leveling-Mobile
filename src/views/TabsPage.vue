@@ -15,6 +15,10 @@
           <ion-icon :icon="sparklesOutline" />
           <ion-label>Noms d'Allah</ion-label>
         </ion-tab-button>
+        <ion-tab-button tab="more" href="/tabs/more">
+          <ion-icon :icon="gridOutline" />
+          <ion-label>Plus</ion-label>
+        </ion-tab-button>
         <ion-tab-button tab="settings" href="/tabs/settings">
           <ion-icon :icon="settingsOutline" />
           <ion-label>Paramètres</ion-label>
@@ -26,5 +30,5 @@
 
 <script setup lang="ts">
 import { IonIcon, IonLabel, IonPage, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/vue';
-import { bookOutline, home, settingsOutline, sparklesOutline } from 'ionicons/icons';
+import { bookOutline, gridOutline, home, settingsOutline, sparklesOutline } from 'ionicons/icons';
 </script>

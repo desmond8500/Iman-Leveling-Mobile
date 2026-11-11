@@ -4,7 +4,10 @@
       <button type="button" class="arrow" aria-label="Mois précédent" @click="go(-1)">
         <ion-icon :icon="chevronBack" />
       </button>
-      <strong class="title">{{ label }}</strong>
+      <div class="title-box">
+        <strong class="title">{{ label }}</strong>
+        <span class="hijri-label">{{ hijriLabel }}</span>
+      </div>
       <button
         type="button"
         class="arrow"
@@ -27,12 +30,13 @@
           v-else
           type="button"
           class="cell"
-          :class="[levelOf(key), { selected: key === selected, today: key === today }]"
+          :class="[levelOf(key), { selected: key === selected, today: key === today, white: info(key).white, weekly: info(key).weekly, forbidden: info(key).forbidden }]"
           :disabled="key > today"
           :aria-label="formatLong(key)"
           @click="$emit('select', key)"
         >
-          {{ dayNumber(key) }}
+          <span class="num">{{ dayNumber(key) }}</span>
+          <span class="hj">{{ hijriDay(key) }}</span>
         </button>
       </template>
     </div>
@@ -41,6 +45,8 @@
       <li><span class="swatch full" /> 5 prières faites</li>
       <li><span class="swatch partial" /> Partiel</li>
       <li><span class="swatch none" /> Rien</li>
+      <li><span class="swatch white" /> Jours blancs (jeûne)</li>
+      <li><span class="dot" /> Lundi / jeudi (jeûne recommandé)</li>
     </ul>
   </div>
 </template>
@@ -50,6 +56,8 @@ import { computed, ref } from 'vue';
 import { IonIcon } from '@ionic/vue';
 import { chevronBack, chevronForward } from 'ionicons/icons';
 import type { DayLevel } from '@/types';
+import { fastingInfo } from '@/utils/fasting';
+import { hijriMonthName, hijriRangeLabel, toHijri } from '@/utils/hijri';
 import {
   WEEK_HEADER,
   buildMonthGrid,
@@ -72,6 +80,13 @@ const start = parseKey(props.selected);
 const view = ref({ year: start.getFullYear(), month: start.getMonth() });
 
 const weeks = computed(() => buildMonthGrid(view.value.year, view.value.month));
+const info = (key: string) => fastingInfo(parseKey(key));
+const hijriLabel = computed(() => hijriRangeLabel(view.value.year, view.value.month));
+/** Jour du mois hégirien ; le 1er du mois est écrit avec le nom du mois. */
+const hijriDay = (key: string) => {
+  const h = toHijri(parseKey(key));
+  return h.day === 1 ? hijriMonthName(h.month).slice(0, 4) : String(h.day);
+};
 const label = computed(() => monthLabel(view.value.year, view.value.month));
 
 const canGoNext = computed(() => {
@@ -97,9 +112,28 @@ function go(delta: number) {
   justify-content: space-between;
   margin-bottom: 12px;
 }
+.title-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .title {
   text-transform: capitalize;
   font-size: 18px;
+}
+.hijri-label {
+  font-size: 12px;
+  color: var(--iman-gold);
+}
+.num {
+  display: block;
+  line-height: 1.1;
+}
+.hj {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.75;
 }
 .arrow {
   width: 40px;
@@ -133,6 +167,7 @@ function go(delta: number) {
   aspect-ratio: 1;
   border: 2px solid transparent;
   border-radius: 12px;
+  padding: 2px;
   background: var(--iman-card);
   color: inherit;
   font: inherit;
@@ -146,6 +181,25 @@ function go(delta: number) {
 .cell.partial {
   background: rgba(242, 201, 76, 0.28);
 }
+.cell {
+  position: relative;
+}
+.cell.weekly::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--iman-gold);
+}
+.cell.full.weekly::after {
+  background: #06100e;
+}
+.cell.white {
+  border-color: #8fd3ff;
+}
 .cell.selected {
   border-color: var(--iman-gold);
 }
@@ -158,6 +212,7 @@ function go(delta: number) {
 }
 .legend {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 16px;
   margin: 16px 0 0;
@@ -179,6 +234,16 @@ function go(delta: number) {
 }
 .swatch.full {
   background: var(--iman-emerald);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--iman-gold);
+}
+.swatch.white {
+  border: 2px solid #8fd3ff;
+  background: transparent;
 }
 .swatch.partial {
   background: rgba(242, 201, 76, 0.5);

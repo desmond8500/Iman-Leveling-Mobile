@@ -394,7 +394,6 @@ const lastSyncLabel = computed(() => {
 
 <style scoped>
 .wrap {
-  max-width: 560px;
   margin: 0 auto;
   padding: 16px;
   display: flex;

@@ -57,7 +57,6 @@ const results = computed(() => searchNames(query.value));
 
 <style scoped>
 .wrap {
-  max-width: 560px;
   margin: 0 auto;
   padding: 16px;
 }

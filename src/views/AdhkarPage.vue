@@ -5,12 +5,15 @@
         <ion-title>Invocations</ion-title>
       </ion-toolbar>
       <ion-toolbar>
-        <ion-segment :value="period" @ionChange="onPeriod">
+        <ion-segment :value="tab" @ionChange="onTab">
           <ion-segment-button value="morning">
             <ion-label>Matin</ion-label>
           </ion-segment-button>
           <ion-segment-button value="evening">
             <ion-label>Soir</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="citadelle">
+            <ion-label>Citadelle</ion-label>
           </ion-segment-button>
         </ion-segment>
       </ion-toolbar>
@@ -18,6 +21,22 @@
 
     <ion-content class="iman-content" :fullscreen="true">
       <div class="wrap">
+        <template v-if="tab === 'citadelle'">
+          <div class="section-title">
+            <h2>La Citadelle du musulman</h2>
+            <span class="count">{{ CITADELLE_COUNT }}</span>
+          </div>
+          <p class="tip">
+            Sélection d'invocations du quotidien, par situation. Ce n'est pas le recueil complet ;
+            d'autres invocations seront ajoutées.
+          </p>
+          <section v-for="cat in CITADELLE" :key="cat.id" class="cat">
+            <h3>{{ cat.title }}</h3>
+            <InvocationItem v-for="dua in cat.duas" :key="dua.id" :item="dua" />
+          </section>
+        </template>
+
+        <template v-else>
         <div class="section-title">
           <h2>{{ period === 'morning' ? 'Invocations du matin' : 'Invocations du soir' }}</h2>
           <span class="count">{{ done }} / {{ items.length }}</span>
@@ -37,6 +56,7 @@
           Chaque invocation faite rapporte {{ ADHKAR_HASANAT }} Hasanat. Les textes sont issus des
           recueils classiques ; vérifie-les auprès d'une personne de confiance.
         </p>
+        </template>
       </div>
 
       <ion-toast
@@ -64,6 +84,8 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 import DhikrCard from '@/components/DhikrCard.vue';
+import InvocationItem from '@/components/InvocationItem.vue';
+import { CITADELLE, CITADELLE_COUNT } from '@/data/citadelle';
 import { adhkarFor } from '@/data/adhkar';
 import { useProgressStore } from '@/stores/progress';
 import type { Period } from '@/types';
@@ -72,15 +94,16 @@ import { ADHKAR_HASANAT } from '@/utils/hasanat';
 const store = useProgressStore();
 
 // Matin avant 15 h, soir ensuite.
-const period = ref<Period>(new Date().getHours() < 15 ? 'morning' : 'evening');
+const tab = ref<'morning' | 'evening' | 'citadelle'>(new Date().getHours() < 15 ? 'morning' : 'evening');
+const period = computed<Period>(() => (tab.value === 'evening' ? 'evening' : 'morning'));
 const items = computed(() => adhkarFor(period.value));
 const done = computed(() => store.adhkarDoneCount(period.value));
 
 const toast = reactive({ open: false, message: '' });
 
-function onPeriod(event: CustomEvent) {
+function onTab(event: CustomEvent) {
   const value = event.detail.value;
-  if (value === 'morning' || value === 'evening') period.value = value;
+  if (value === 'morning' || value === 'evening' || value === 'citadelle') tab.value = value;
 }
 
 async function onToggle(id: string) {
@@ -93,8 +116,18 @@ async function onToggle(id: string) {
 </script>
 
 <style scoped>
+.cat {
+  margin-top: 20px;
+}
+.cat h3 {
+  margin: 0 4px 10px;
+  font-size: 15px;
+  color: var(--iman-gold);
+}
+.cat :deep(.invoc) {
+  margin-bottom: 12px;
+}
 .wrap {
-  max-width: 560px;
   margin: 0 auto;
   padding: 16px;
 }

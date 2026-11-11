@@ -39,6 +39,8 @@
           <span class="count">{{ store.doneCount }} / {{ store.dayPrayers.length }}</span>
         </div>
 
+        <p class="hijri-date">{{ hijriText }}</p>
+
         <p class="summary">
           {{ store.selectedStats.hasanat }} Hasanat · {{ store.selectedStats.sunnah }} sunnas ·
           {{ store.selectedStats.adhkar }} invocations
@@ -126,6 +128,7 @@ import { useProgressStore } from '@/stores/progress';
 import { useSettingsStore } from '@/stores/settings';
 import type { PrayerId, SunnahId } from '@/types';
 import { formatLong, parseKey } from '@/utils/calendar';
+import { formatHijri, toHijri } from '@/utils/hijri';
 import { computePrayerTimes, formatTime, nextPrayer, type PrayerKey } from '@/utils/prayerTimes';
 import {
   ALL_PRAYERS_BONUS,
@@ -176,6 +179,7 @@ const next = computed(() => {
   return { name, at: formatTime(n.time), in: h > 0 ? `${h} h ${String(minutes % 60).padStart(2, '0')}` : `${minutes} min` };
 });
 
+const hijriText = computed(() => formatHijri(toHijri(parseKey(store.selectedDate))));
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 function onPickDate(key: string) {
@@ -209,7 +213,6 @@ async function onToggleSunnah(id: SunnahId) {
 
 <style scoped>
 .wrap {
-  max-width: 560px;
   margin: 0 auto;
   padding: 16px;
 }
@@ -246,6 +249,11 @@ async function onToggleSunnah(id: SunnahId) {
   color: var(--iman-gold);
   font-weight: 700;
 }
+.hijri-date {
+  margin: 0 4px 4px;
+  font-size: 13px;
+  color: var(--iman-gold);
+}
 .summary {
   margin: 0 4px 12px;
   font-size: 13px;
@@ -275,6 +283,14 @@ async function onToggleSunnah(id: SunnahId) {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+/* Tablette et ordinateur : les cartes de prière sur deux colonnes. */
+@media (min-width: 900px) {
+  .list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
 }
 .tip {
   margin-top: 20px;

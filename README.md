@@ -140,6 +140,21 @@ dans chaque carte avec la prochaine prière en haut. Méthodes : Ligue islamique
 ISNA, Égypte, Oumm al-Qora, Karachi. Les heures peuvent différer de quelques minutes de celles de
 ta mosquée : en cas de doute, suis son calendrier.
 
+**Onglet « Plus ».** Ramadan (calendrier de 30 jours en 3 blocs de 10), Prière (5 prières, ablutions,
+déroulement, invocations des ablutions et de fin de prière) et Coran (114 sourates). Le calendrier
+du mois affiche la date hégirienne (Oumm al-Qora, ±1 jour selon la lune), les jours blancs
+(13-14-15) et le lundi/jeudi.
+
+**Coran.** Seules les métadonnées des sourates sont dans le code. Le texte (arabe uthmani,
+traduction française Hamidullah, translittération) est chargé depuis `api.alquran.cloud` à la
+première ouverture d'une sourate, puis gardé sur l'appareil. **Le format de réponse n'a pas pu être
+vérifié depuis l'environnement de développement** : teste une sourate avec une connexion et corrige
+`src/services/quran.ts` au besoin. Le marque-page automatique et la progression de lecture ne sont
+pas encore faits.
+
+**Citadelle du musulman.** Onglet de la page Invocations : une sélection de 15 invocations, pas le
+recueil complet.
+
 **Rappels et appel du muezzin.** `@capacitor/local-notifications` programme 3 jours à l'avance, et
 reprogramme au lancement et à chaque changement de réglage. Le **son de l'adhan n'est pas fourni** :
 il faut un fichier audio libre de droits à placer dans `android/app/src/main/res/raw/` (puis le
