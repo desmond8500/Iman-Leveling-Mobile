@@ -30,4 +30,4 @@
 
 ## Coran
 
-- [] Ajouter une page qui liste les sourates du coran qui redirige vers une page de lecture
+- [x] Ajouter une page qui liste les sourates du coran qui redirige vers une page de lecture
