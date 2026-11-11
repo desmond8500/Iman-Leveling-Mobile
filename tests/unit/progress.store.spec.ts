@@ -4,6 +4,7 @@ import { setProgressRepository, useProgressStore } from '@/stores/progress';
 import type { ProgressData } from '@/types';
 import { adhkarKey } from '@/data/adhkar';
 import { addDays, toDateKey } from '@/utils/date';
+import { fastingInfo } from '@/utils/fasting';
 
 function memoryRepository(initial?: ProgressData) {
   let data: ProgressData = initial ?? { version: 1, days: {} };
@@ -351,5 +352,39 @@ describe('compteurs de récitations', () => {
     expect(store.isDhikrDone('morning', 'kursi')).toBe(true);
     await store.bumpCount(key, -1, 2, key); // décrémenter ne décoche pas
     expect(store.isDhikrDone('morning', 'kursi')).toBe(true);
+  });
+
+  describe('jeûne', () => {
+    it('cocher le jeûne du jour donne 27 Hasanat, le décocher les retire', async () => {
+      const repo = memoryRepository();
+      setProgressRepository(repo);
+      setActivePinia(createPinia());
+      const store = useProgressStore();
+      await store.load();
+      const forbidden = fastingInfo(new Date()).forbidden;
+      const first = await store.toggleFast();
+      if (forbidden) {
+        // Aïd : le jeûne est interdit, la case ne se coche pas.
+        expect(first.hasanatDelta).toBe(0);
+        expect(store.isFasted(store.today)).toBe(false);
+        return;
+      }
+      expect(first.hasanatDelta).toBe(27);
+      expect(store.isFasted(store.today)).toBe(true);
+      expect(store.selectedStats.fasted).toBe(true);
+      expect(repo.saved().days[store.today].fasting).toEqual({ fast: true });
+      expect((await store.toggleFast()).hasanatDelta).toBe(-27);
+      expect(store.isFasted(store.today)).toBe(false);
+    });
+
+    it('un jour passé ne se modifie pas', async () => {
+      setProgressRepository(memoryRepository());
+      setActivePinia(createPinia());
+      const store = useProgressStore();
+      await store.load();
+      store.selectDate(addDays(store.today, -1));
+      expect((await store.toggleFast()).hasanatDelta).toBe(0);
+      expect(store.isFasted(store.selectedDate)).toBe(false);
+    });
   });
 });

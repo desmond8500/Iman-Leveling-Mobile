@@ -48,14 +48,16 @@ Réponse `200` : `{ "updated_at": string }` (date ISO 8601).
       "prayers": { "fajr": true, "dhuhr": true },
       "mosque":  { "fajr": true },
       "sunnah":  { "fajr-before": true },
-      "adhkar":  { "morning:kursi": true }
+      "adhkar":  { "morning:kursi": true },
+      "fasting": { "fast": true },
+      "counts":  { "morning:kursi": 3 }
     }
   }
 }
 ```
 
-Clés de jour au format `AAAA-MM-JJ` (date locale de l'utilisateur). `mosque` (prières faites à la mosquée), `sunnah` et
-`adhkar` sont optionnels. Le serveur doit stocker ce JSON tel quel (colonne JSON), un enregistrement par
+Clés de jour au format `AAAA-MM-JJ` (date locale de l'utilisateur). `mosque` (prières faites à la mosquée), `sunnah`, `adhkar`,
+`fasting` (jeûne du jour) et `counts` (compteurs de récitations : entiers positifs) sont optionnels. Le serveur doit stocker ce JSON tel quel (colonne JSON), un enregistrement par
 utilisateur.
 
 ## Erreurs

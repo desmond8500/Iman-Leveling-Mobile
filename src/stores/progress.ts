@@ -20,6 +20,8 @@ import type {
 } from '@/types';
 import { toDateKey } from '@/utils/date';
 import { MAX_COUNT } from '@/utils/merge';
+import { fastingInfo } from '@/utils/fasting';
+import { parseKey } from '@/utils/calendar';
 import { hasanatForDay, levelFromHasanat, prayerReward } from '@/utils/hasanat';
 import { computeStreak } from '@/utils/streak';
 
@@ -48,18 +50,21 @@ function statsOf(day: DayRecord | undefined, gender: Gender | null): DayStats {
   const prayers = countPrayers(day);
   const sunnah = countSunnah(day);
   const adhkar = countAdhkar(day);
+  const fasted = !!day?.fasting?.fast;
   const level: DayLevel =
-    prayers === PRAYERS.length ? 'full' : prayers + sunnah + adhkar > 0 ? 'partial' : 'none';
+    prayers === PRAYERS.length ? 'full' : prayers + sunnah + adhkar + (fasted ? 1 : 0) > 0 ? 'partial' : 'none';
   return {
     prayers,
     sunnah,
     adhkar,
+    fasted,
     hasanat: hasanatForDay({
       prayerHasanat: prayerHasanatOf(day, gender),
       done: prayers,
       total: PRAYERS.length,
       sunnah,
       adhkar,
+      fasted,
     }),
     level,
   };
@@ -190,6 +195,16 @@ export const useProgressStore = defineStore('progress', () => {
     return commit((day) => ({ ...day, sunnah: { ...day.sunnah, [id]: !day.sunnah?.[id] } }));
   }
 
+  /** Jeûne du jour. Modifiable pour aujourd'hui seulement, et pas un jour où le jeûne est interdit. */
+  async function toggleFast() {
+    if (!isToday.value || fastingInfo(parseKey(today.value)).forbidden) return NOOP_RESULT;
+    return commit((day) => ({ ...day, fasting: { fast: !day.fasting?.fast } }));
+  }
+
+  function isFasted(key: string): boolean {
+    return !!days.value[key]?.fasting?.fast;
+  }
+
   /** Les invocations se cochent toujours pour aujourd'hui, quel que soit le jour affiché sur l'accueil. */
   function toggleDhikr(period: Period, id: string) {
     const key = adhkarKey(period, id);
@@ -244,6 +259,8 @@ export const useProgressStore = defineStore('progress', () => {
     togglePrayer,
     togglePlace,
     toggleSunnah,
+    toggleFast,
+    isFasted,
     toggleDhikr,
     countOf,
     bumpCount,

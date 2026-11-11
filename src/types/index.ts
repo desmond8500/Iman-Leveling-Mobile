@@ -61,6 +61,8 @@ export interface DayRecord {
   sunnah?: Partial<Record<SunnahId, boolean>>;
   /** Clés « période:id » (voir adhkarKey). Absent avant l'ajout des invocations. */
   adhkar?: Record<string, boolean>;
+  /** Jeûne du jour : `{ fast: true }` si la personne a jeûné. Absent avant l'ajout du suivi du jeûne. */
+  fasting?: { fast?: boolean };
   /** Compteurs de récitations du jour (clé d'invocation -> nombre). Absent avant leur ajout. */
   counts?: Record<string, number>;
 }
@@ -72,6 +74,7 @@ export interface DayStats {
   prayers: number;
   sunnah: number;
   adhkar: number;
+  fasted: boolean;
   hasanat: number;
   level: DayLevel;
 }

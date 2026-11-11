@@ -33,6 +33,7 @@ export function sanitizeProgress(input: unknown): ProgressData {
     if (isObject(day.mosque)) record.mosque = cleanFlags(day.mosque);
     if (isObject(day.sunnah)) record.sunnah = cleanFlags(day.sunnah);
     if (isObject(day.adhkar)) record.adhkar = cleanFlags(day.adhkar);
+    if (isObject(day.fasting)) record.fasting = cleanFlags(day.fasting);
     if (isObject(day.counts)) record.counts = cleanCounts(day.counts);
     days[key] = record;
   }
@@ -57,6 +58,7 @@ function mergeDay(a?: DayRecord, b?: DayRecord): DayRecord {
   if (a?.mosque || b?.mosque) merged.mosque = orFlags(a?.mosque, b?.mosque);
   if (a?.sunnah || b?.sunnah) merged.sunnah = orFlags(a?.sunnah, b?.sunnah);
   if (a?.adhkar || b?.adhkar) merged.adhkar = orFlags(a?.adhkar, b?.adhkar);
+  if (a?.fasting || b?.fasting) merged.fasting = orFlags(a?.fasting, b?.fasting);
   if (a?.counts || b?.counts) merged.counts = maxCounts(a?.counts, b?.counts);
   return merged;
 }

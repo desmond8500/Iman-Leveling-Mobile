@@ -89,3 +89,16 @@ describe('compteurs de récitations', () => {
     expect(clean.days['2026-11-09'].counts).toEqual({ ok: 3 });
   });
 });
+
+describe('jeûne', () => {
+  it('la fusion garde le jeûne coché d\'un côté', () => {
+    const local = { version: 1 as const, days: { '2026-11-09': { prayers: {}, fasting: { fast: true } } } };
+    const remote = { version: 1 as const, days: { '2026-11-09': { prayers: {} } } };
+    expect(mergeProgress(local, remote).days['2026-11-09'].fasting).toEqual({ fast: true });
+    expect(mergeProgress(remote, local).days['2026-11-09'].fasting).toEqual({ fast: true });
+  });
+  it('nettoie les données reçues', () => {
+    const clean = sanitizeProgress({ days: { '2026-11-09': { prayers: {}, fasting: { fast: true, x: 'oui' } } } });
+    expect(clean.days['2026-11-09'].fasting).toEqual({ fast: true });
+  });
+});

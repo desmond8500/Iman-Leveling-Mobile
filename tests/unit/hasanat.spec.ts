@@ -72,3 +72,11 @@ describe('levelFromHasanat', () => {
     expect(levelFromHasanat(-20).level).toBe(1);
   });
 });
+
+describe('jeûne', () => {
+  it('ajoute 27 Hasanat par jour jeûné', () => {
+    const base = { prayerHasanat: 0, done: 0, total: 5, sunnah: 0, adhkar: 0 };
+    expect(hasanatForDay(base)).toBe(0);
+    expect(hasanatForDay({ ...base, fasted: true })).toBe(27);
+  });
+});

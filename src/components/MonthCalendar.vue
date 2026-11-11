@@ -30,7 +30,7 @@
           v-else
           type="button"
           class="cell"
-          :class="[levelOf(key), { selected: key === selected, today: key === today, white: info(key).white, weekly: info(key).weekly, forbidden: info(key).forbidden }]"
+          :class="[levelOf(key), { selected: key === selected, today: key === today, white: info(key).white, fasted: fastedOf?.(key), weekly: info(key).weekly, forbidden: info(key).forbidden }]"
           :disabled="key > today"
           :aria-label="formatLong(key)"
           @click="$emit('select', key)"
@@ -46,6 +46,7 @@
       <li><span class="swatch partial" /> Partiel</li>
       <li><span class="swatch none" /> Rien</li>
       <li><span class="swatch white" /> Jours blancs (jeûne)</li>
+      <li><span class="bar" /> Jeûné</li>
       <li><span class="dot" /> Lundi / jeudi (jeûne recommandé)</li>
     </ul>
   </div>
@@ -72,6 +73,8 @@ const props = defineProps<{
   today: string;
   selected: string;
   levelOf: (key: string) => DayLevel;
+  /** Jours jeûnés (repère sous le numéro). */
+  fastedOf?: (key: string) => boolean;
 }>();
 defineEmits<{ (e: 'select', key: string): void }>();
 
@@ -196,6 +199,23 @@ function go(delta: number) {
 }
 .cell.full.weekly::after {
   background: #06100e;
+}
+.cell.fasted::before {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 14px;
+  height: 3px;
+  margin-left: -7px;
+  border-radius: 2px;
+  background: #8fd3ff;
+}
+.bar {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: #8fd3ff;
 }
 .cell.white {
   border-color: #8fd3ff;

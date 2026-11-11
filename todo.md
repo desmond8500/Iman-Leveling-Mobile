@@ -65,7 +65,7 @@
 
 ## Jeune
 
-- [] Cocher les jours jeunés
+- [x] Cocher les jours jeunés
 
 ## Widgets
 

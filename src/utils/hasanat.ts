@@ -9,6 +9,8 @@ export const PRAYER_DEFAULT_HASANAT = 27;
 export const SUNNAH_HASANAT = 27;
 export const ALL_PRAYERS_BONUS = 50;
 export const ADHKAR_HASANAT = 5;
+/** Jour jeûné (Ramadan ou jeûne surérogatoire). */
+export const FAST_HASANAT = 27;
 
 /**
  * Hasanat d'une prière obligatoire. Le lieu (mosquée ou maison) ne compte que pour les hommes.
@@ -26,15 +28,17 @@ export interface DayTally {
   total: number;
   sunnah: number;
   adhkar: number;
+  /** Jour jeûné (facultatif). */
+  fasted?: boolean;
 }
 
 /**
  * Hasanat d'une journée : prières obligatoires, +50 de bonus si toutes sont faites,
  * 27 par prière surérogatoire et 5 par invocation du matin ou du soir.
  */
-export function hasanatForDay({ prayerHasanat, done, total, sunnah, adhkar }: DayTally): number {
+export function hasanatForDay({ prayerHasanat, done, total, sunnah, adhkar, fasted = false }: DayTally): number {
   const bonus = total > 0 && done === total ? ALL_PRAYERS_BONUS : 0;
-  return prayerHasanat + bonus + sunnah * SUNNAH_HASANAT + adhkar * ADHKAR_HASANAT;
+  return prayerHasanat + bonus + sunnah * SUNNAH_HASANAT + adhkar * ADHKAR_HASANAT + (fasted ? FAST_HASANAT : 0);
 }
 
 /** Hasanat nécessaires pour passer du niveau `level` au suivant (niveau 1 : 100, niveau 2 : 150, ...). */

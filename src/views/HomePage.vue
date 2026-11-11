@@ -74,6 +74,14 @@
           />
         </div>
 
+        <FastingCard
+          v-if="!settings.simpleMode || fastInfo.ramadan"
+          :info="fastInfo"
+          :fasted="store.isFasted(store.selectedDate)"
+          :disabled="!store.isToday"
+          @toggle="onToggleFast"
+        />
+
         <p class="tip">
           {{ rulesText }}
         </p>
@@ -105,6 +113,7 @@
             :today="store.today"
             :selected="store.selectedDate"
             :level-of="levelOf"
+            :fasted-of="store.isFasted"
             @select="onPickDate"
           />
         </div>
@@ -129,6 +138,7 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 import { alarmOutline, lockClosedOutline, locationOutline, timeOutline } from 'ionicons/icons';
+import FastingCard from '@/components/FastingCard.vue';
 import MonthCalendar from '@/components/MonthCalendar.vue';
 import PlayerHeader from '@/components/PlayerHeader.vue';
 import PrayerGroup from '@/components/PrayerGroup.vue';
@@ -137,6 +147,7 @@ import { useProgressStore } from '@/stores/progress';
 import { useSettingsStore } from '@/stores/settings';
 import type { PrayerId, SunnahId } from '@/types';
 import { formatLong, parseKey } from '@/utils/calendar';
+import { fastingInfo } from '@/utils/fasting';
 import { formatHijri, toHijri } from '@/utils/hijri';
 import { computePrayerTimes, currentPrayerWindow, formatTime, nextPrayer, prayerWindows, type PrayerKey } from '@/utils/prayerTimes';
 import {
@@ -208,6 +219,12 @@ const next = computed(() => {
   const name = store.dayPrayers.find((p) => p.id === n.id)?.name ?? n.id;
   return { name, at: formatTime(n.time), in: h > 0 ? `${h} h ${String(minutes % 60).padStart(2, '0')}` : `${minutes} min` };
 });
+
+const fastInfo = computed(() => fastingInfo(parseKey(store.selectedDate)));
+
+async function onToggleFast() {
+  await store.toggleFast();
+}
 
 const hijriText = computed(() => formatHijri(toHijri(parseKey(store.selectedDate))));
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
