@@ -10,7 +10,7 @@
 
 ## Invocations
 
-- []  Ajouter un onglet pour les invocations de la citadelle du musulman
+- [x] Ajouter un onglet pour les invocations de la citadelle du musulman
 
 ## calendrier
 
