@@ -28,7 +28,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'more', name: 'more', component: MorePage },
       { path: 'prayer', name: 'prayer', component: PrayerPage },
       { path: 'quran', name: 'quran', component: QuranPage },
-      { path: 'quran/:n(\\d+)', name: 'quran-read', component: QuranReadPage, props: true },
+      { path: 'quran/:n(\\d+)', name: 'quran-read', component: QuranReadPage, props: (route) => ({ n: route.params.n, v: route.query.v }) },
       { path: 'ramadan', name: 'ramadan', component: RamadanPage },
       { path: 'ramadan/:n(\\d+)', name: 'ramadan-day', component: RamadanDayPage, props: true },
       { path: 'zakat', name: 'zakat', component: ZakatPage },

@@ -19,6 +19,26 @@
 
     <ion-content class="iman-content" :fullscreen="true">
       <div class="wrap">
+        <section class="goal" aria-label="Lecture du mois">
+          <div class="goal-head">
+            <strong>Lecture du mois</strong>
+            <span>{{ reading.goal.read }} / {{ reading.goal.total }} versets</span>
+          </div>
+          <div class="bar" role="progressbar" :aria-valuenow="reading.goal.percent" aria-valuemin="0" aria-valuemax="100">
+            <div class="fill" :style="{ width: reading.goal.percent + '%' }" />
+          </div>
+          <p class="goal-note">
+            <template v-if="reading.goal.remaining === 0">Objectif atteint ce mois-ci, qu'Allah l'accepte.</template>
+            <template v-else>
+              Pour lire tout le Coran ce mois-ci : environ {{ reading.goal.perDay }} versets par jour
+              ({{ reading.goal.daysLeft }} jours restants). Un verset est compté quand tu le dépasses en défilant.
+            </template>
+          </p>
+          <router-link v-if="resume" :to="resume.link" class="resume">
+            Reprendre : {{ resume.name }}, verset {{ resume.verse }} →
+          </router-link>
+        </section>
+
         <ul class="list">
           <li v-for="s in results" :key="s.number">
             <router-link :to="`/tabs/quran/${s.number}`" class="item">
@@ -47,15 +67,59 @@
 import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { computed, ref } from 'vue';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/vue';
-import { searchSurahs } from '@/data/surahs';
+import { searchSurahs, surahByNumber } from '@/data/surahs';
+import { useReadingStore } from '@/stores/reading';
 import { useSettingsStore } from '@/stores/settings';
 
 const settings = useSettingsStore();
+const reading = useReadingStore();
+const resume = computed(() => {
+  const b = reading.bookmark;
+  const s = b && surahByNumber(b.surah);
+  return b && s ? { name: s.name, verse: b.verse, link: `/tabs/quran/${b.surah}?v=${b.verse}` } : null;
+});
 const query = ref('');
 const results = computed(() => searchSurahs(query.value));
 </script>
 
 <style scoped>
+.goal {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--iman-card);
+}
+.goal-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.goal-head span,
+.goal-note {
+  color: var(--iman-text-soft);
+  font-size: 13px;
+}
+.bar {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  background: var(--iman-emerald);
+  transition: width 0.3s;
+}
+.goal-note {
+  margin: 8px 0 0;
+}
+.resume {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--iman-gold);
+  font-weight: 700;
+  text-decoration: none;
+}
 .list {
   list-style: none;
   margin: 0;

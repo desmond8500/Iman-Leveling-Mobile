@@ -51,8 +51,8 @@
 
 - [x] Créer une page coran
 - [] utiliser l'api quran.com
-- [] Marque page
-- [] suivi de la lecture mensuelle
+- [x] Marque page
+- [x] suivi de la lecture mensuelle
 
 ## Evenements
 

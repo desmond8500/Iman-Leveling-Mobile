@@ -37,8 +37,8 @@
             <p>{{ error }}</p>
             <ion-button size="small" @click="load">Réessayer</ion-button>
           </div>
-          <ol v-else class="verses">
-            <li v-for="v in verses" :key="v.n" class="verse">
+          <ol v-else ref="listEl" class="verses">
+            <li v-for="v in verses" :key="v.n" class="verse" :data-n="v.n">
               <span class="vn">{{ v.n }}</span>
               <p v-if="show.arabic" class="v-ar" dir="rtl" lang="ar">{{ v.arabic }}</p>
               <p v-if="show.phonetic && v.phonetic" class="v-ph">{{ v.phonetic }}</p>
@@ -65,13 +65,14 @@
 
 <script setup lang="ts">
 import ScrollTopButton from '@/components/ScrollTopButton.vue';
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/vue';
 import { surahByNumber } from '@/data/surahs';
 import { loadSurah, QuranError, type Verse } from '@/services/quran';
+import { useReadingStore } from '@/stores/reading';
 
 // Le numéro arrive par la route (props: true) : plus fiable que useRoute dans les onglets Ionic.
-const props = defineProps<{ n: string | number }>();
+const props = defineProps<{ n: string | number; v?: string | number }>();
 
 const number = computed(() => Number(props.n));
 const surah = computed(() => surahByNumber(number.value));
@@ -85,7 +86,9 @@ const OPTIONS = [
 ] as const;
 const show = reactive({ arabic: true, phonetic: true, french: true });
 
+const reading = useReadingStore();
 const verses = ref<Verse[]>([]);
+const listEl = ref<HTMLElement | null>(null);
 const loading = ref(false);
 const error = ref('');
 
@@ -98,7 +101,12 @@ async function load() {
   const requested = s.number;
   try {
     const result = await loadSurah(s.number, s.verses);
-    if (requested === number.value) verses.value = result.verses;
+    if (requested === number.value) {
+      verses.value = result.verses;
+      await nextTick();
+      resumeAtBookmark();
+      startTracking();
+    }
   } catch (e) {
     if (requested === number.value) {
       error.value = e instanceof QuranError ? e.message : 'Chargement impossible.';
@@ -108,7 +116,75 @@ async function load() {
   }
 }
 
-watch(number, load, { immediate: true });
+// --- Marque-page automatique et suivi de lecture ---
+// Le marque-page suit le premier verset visible. Un verset compte comme lu quand il est sorti
+// de l'écran par le haut (on a défilé au-delà), ou quand on atteint la fin de la sourate.
+let observer: IntersectionObserver | null = null;
+let saveTimer: ReturnType<typeof setTimeout> | undefined;
+const visible = new Set<number>();
+let sessionFrom = 0;
+let readUpTo = 0;
+let lastBookmark = 0;
+let lastRead = 0;
+
+function resumeAtBookmark() {
+  const target = Number(props.v);
+  if (!Number.isInteger(target) || target < 1) return;
+  listEl.value?.querySelector(`li[data-n="${target}"]`)?.scrollIntoView({ block: 'start' });
+}
+
+function flush() {
+  clearTimeout(saveTimer);
+  const s = surah.value;
+  if (!s || !visible.size || !sessionFrom) return;
+  const first = Math.min(...visible);
+  if (first === lastBookmark && readUpTo === lastRead) return;
+  lastBookmark = first;
+  lastRead = readUpTo;
+  void reading.record(s.number, first, sessionFrom, readUpTo);
+}
+
+function onEntries(entries: IntersectionObserverEntry[]) {
+  const last = verses.value.length;
+  for (const entry of entries) {
+    const n = Number((entry.target as HTMLElement).dataset.n);
+    if (!Number.isInteger(n)) continue;
+    if (entry.isIntersecting) {
+      visible.add(n);
+      if (!sessionFrom || n < sessionFrom) sessionFrom = n;
+      if (n === last) readUpTo = last;
+    } else {
+      visible.delete(n);
+      if (entry.boundingClientRect.top < 0) readUpTo = Math.max(readUpTo, n);
+    }
+  }
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flush, 800);
+}
+
+function stopTracking() {
+  flush();
+  observer?.disconnect();
+  observer = null;
+  visible.clear();
+  sessionFrom = 0;
+  readUpTo = 0;
+  lastBookmark = 0;
+  lastRead = 0;
+}
+
+function startTracking() {
+  stopTracking();
+  if (typeof IntersectionObserver === 'undefined' || !listEl.value) return;
+  observer = new IntersectionObserver(onEntries, { threshold: 0 });
+  listEl.value.querySelectorAll('li[data-n]').forEach((el) => observer?.observe(el));
+}
+
+watch(number, () => {
+  stopTracking();
+  void load();
+}, { immediate: true });
+onBeforeUnmount(stopTracking);
 </script>
 
 <style scoped>
