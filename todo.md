@@ -7,6 +7,7 @@
 ## Interface
 
 - [] Propose un système d'évaluation des realisations de la journée et réparti les point en conséquence
+- [] Bouton pour aller vers le haut
 
 ## Prière
 
@@ -47,6 +48,8 @@
 
 - [] Créer une page coran
 - [] utiliser l'api quran.com
+- [] Marque page
+- [] suivi de la lecture mensuelle
 
 ## Evenements
 
@@ -56,3 +59,7 @@
 - [] Mariage
 - [] Bapteme
 - [] decès
+
+## Jeune
+
+- [] Cocher les jours jeunés
