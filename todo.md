@@ -6,11 +6,7 @@
 
 ## Home page
 
-- [] Modifier le mot fajr par soubh et garder Sunna de Fajr
-
-## Invocations
-
-- []  Ajouter un onglet pour les invocations de la citadelle du musulman
+- [] Modifier le mot fajr par soubh et garder Sunna de Fajr 
 
 ## calendrier
 
@@ -27,7 +23,3 @@
 
 - [] Ajouter une page prière
 - [] mettre des indications pour les invocations à faire des habulitions à la fin de la prière
-
-## Coran
-
-- [] Ajouter une page qui liste les sourates du coran qui redirige vers une page de lecture
