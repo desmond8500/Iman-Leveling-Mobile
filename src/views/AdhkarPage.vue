@@ -94,7 +94,6 @@ async function onToggle(id: string) {
 
 <style scoped>
 .wrap {
-  max-width: 560px;
   margin: 0 auto;
   padding: 16px;
 }

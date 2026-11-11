@@ -2,7 +2,7 @@
 
 ## Interface
 
-- [] Adapter l'interface de l'application selon le type d'écran, mobile, pc ou tablette
+- [x] Adapter l'interface de l'application selon le type d'écran, mobile, pc ou tablette
 
 ## Home page
 
