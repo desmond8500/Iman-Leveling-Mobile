@@ -64,9 +64,11 @@
               </span>
             </summary>
             <div class="grid">
-              <div
+              <component
+                :is="day.exists ? 'router-link' : 'div'"
                 v-for="day in blockOf(days, block.from, block.to)"
                 :key="day.n"
+                :to="day.exists ? `/tabs/ramadan/${day.n}` : undefined"
                 class="day"
                 :class="[stateOf(day), { missing: !day.exists }]"
               >
@@ -75,8 +77,9 @@
                 <span v-if="stateOf(day) === 'today'" class="now">Aujourd'hui</span>
                 <span v-else-if="stateOf(day) === 'past' && day.exists" class="tick">✓</span>
                 <span v-if="day.oddLastTen && day.exists" class="star" title="Nuit impaire des dix derniers jours">★</span>
-              </div>
+              </component>
             </div>
+            <p v-if="block.id === 1" class="note">Touche un jour pour voir les prières surérogatoires à faire.</p>
             <p v-if="block.id === 3" class="note">
               ★ Nuits impaires des dix derniers jours : on y recherche la nuit du Destin (Laylat al-Qadr).
               Le 30ᵉ jour n'existe que si le mois compte 30 jours.
@@ -210,6 +213,8 @@ const status = computed(() => {
   gap: 8px;
 }
 .day {
+  color: inherit;
+  text-decoration: none;
   position: relative;
   display: flex;
   flex-direction: column;

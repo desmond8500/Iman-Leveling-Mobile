@@ -8,6 +8,7 @@ import NamesPage from '@/views/NamesPage.vue';
 import PrayerPage from '@/views/PrayerPage.vue';
 import QuranPage from '@/views/QuranPage.vue';
 import QuranReadPage from '@/views/QuranReadPage.vue';
+import RamadanDayPage from '@/views/RamadanDayPage.vue';
 import RamadanPage from '@/views/RamadanPage.vue';
 import SettingsPage from '@/views/SettingsPage.vue';
 import TabsPage from '@/views/TabsPage.vue';
@@ -28,6 +29,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'quran', name: 'quran', component: QuranPage },
       { path: 'quran/:n(\\d+)', name: 'quran-read', component: QuranReadPage, props: true },
       { path: 'ramadan', name: 'ramadan', component: RamadanPage },
+      { path: 'ramadan/:n(\\d+)', name: 'ramadan-day', component: RamadanDayPage, props: true },
       { path: 'settings', name: 'settings', component: SettingsPage },
     ],
   },
