@@ -26,7 +26,7 @@
 ## Prière
 
 - [x] Ajouter une page prière
-- [] mettre des indications pour les invocations à faire des habulitions à la fin de la prière
+- [x] mettre des indications pour les invocations à faire des habulitions à la fin de la prière
 
 ## Coran
 

@@ -48,6 +48,23 @@
         </section>
 
         <section class="card">
+          <h2>Invocations des ablutions</h2>
+          <ul class="invocs">
+            <li v-for="i in WUDU_INVOCATIONS" :key="i.id" class="invoc">
+              <div class="i-head">
+                <strong>{{ i.title }}</strong>
+                <span v-if="i.count > 1" class="count">×{{ i.count }}</span>
+              </div>
+              <span class="when">{{ i.when }}</span>
+              <p class="arabic" dir="rtl" lang="ar">{{ i.arabic }}</p>
+              <p class="phonetic">{{ i.phonetic }}</p>
+              <p class="french">{{ i.french }}</p>
+              <span class="source">{{ i.source }}</span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="card">
           <h2>Déroulement de la prière</h2>
           <ol class="steps">
             <li v-for="s in PRAYER_STEPS" :key="s.title">
@@ -59,6 +76,26 @@
             Ce résumé ne remplace pas un apprentissage auprès d'une personne qualifiée.
           </p>
         </section>
+
+        <section class="card">
+          <h2>Invocations après la prière</h2>
+          <ul class="invocs">
+            <li v-for="i in AFTER_PRAYER_INVOCATIONS" :key="i.id" class="invoc">
+              <div class="i-head">
+                <strong>{{ i.title }}</strong>
+                <span v-if="i.count > 1" class="count">×{{ i.count }}</span>
+              </div>
+              <span class="when">{{ i.when }}</span>
+              <p class="arabic" dir="rtl" lang="ar">{{ i.arabic }}</p>
+              <p class="phonetic">{{ i.phonetic }}</p>
+              <p class="french">{{ i.french }}</p>
+              <span class="source">{{ i.source }}</span>
+            </li>
+          </ul>
+          <p class="hint">
+            Tu peux aussi réciter Ayat al-Kursi après chaque prière (voir l'onglet Invocations).
+          </p>
+        </section>
       </div>
     </ion-content>
   </ion-page>
@@ -68,7 +105,13 @@
 import { computed } from 'vue';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { PRAYERS } from '@/data/prayers';
-import { FARD_RAKAAT, PRAYER_STEPS, WUDU_STEPS } from '@/data/prayerGuide';
+import {
+  AFTER_PRAYER_INVOCATIONS,
+  FARD_RAKAAT,
+  PRAYER_STEPS,
+  WUDU_INVOCATIONS,
+  WUDU_STEPS,
+} from '@/data/prayerGuide';
 import { useSettingsStore } from '@/stores/settings';
 import type { PrayerId } from '@/types';
 import { computePrayerTimes, formatTime } from '@/utils/prayerTimes';
@@ -150,6 +193,41 @@ h2 {
 }
 .detail {
   margin: 2px 0 0;
+}
+.invocs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.i-head {
+  display: flex;
+  justify-content: space-between;
+}
+.count {
+  color: var(--iman-gold);
+  font-weight: 700;
+}
+.when,
+.source {
+  font-size: 12px;
+  color: var(--iman-text-soft);
+}
+.arabic {
+  margin: 8px 0;
+  font-size: 22px;
+  line-height: 1.9;
+  text-align: right;
+}
+.phonetic {
+  margin: 0 0 4px;
+  font-style: italic;
+  color: var(--iman-emerald);
+}
+.french {
+  margin: 0 0 4px;
 }
 .hint {
   margin: 12px 0 0;
