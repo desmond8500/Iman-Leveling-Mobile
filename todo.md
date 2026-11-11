@@ -1,39 +1,33 @@
 # [Todo](readme.md)
 
-## Description
+## Interface
 
-- la prière obligatoire compte pour 27 à la mosquée et 1 à la maison (homme)
-- la prière surrérogatoire compte pour 27 (homme et femme)
-- Liste des noms d'allah dans une page puis une page de détail par nom 
+- [] Adapter l'interface de l'application selon le type d'écran, mobile, pc ou tablette
 
-## Paramètres (en cours)
- 
-- localiser le pays
-- Ajouter une page de paramètres
-- choisir le genre homme ou femme
-- permettre de lier son compte à une base de donnée en ligne pour sauvegarder la progression
+## Home page
 
-## home page
-
-- Ajouter les heures de prière, faire une notification pour les habulitions et la prière, appel du muezzin
-- afficher la sourate khaf le vendredi, audio et texte, francais et arabe, changer la couleur de l'app vers du bleu
-- afficher les heures de prière dans les cartes des prières
+- [] Modifier le mot fajr par soubh et garder Sunna de Fajr
 
 ## Invocations
 
-- Ajouter une page pour les ivocations de la citadelle du musulman
+- []  Ajouter un onglet pour les invocations de la citadelle du musulman
 
-## Avatar
+## calendrier
 
-- ajouter des grades
+- [] intégrer le calendrier musulman
+- [] afficher les jours blanc pour jeuner
+- [] mettre en evidence les bons jours pour jeuner comme le lundi et le jeudi
+
+## Ramadan
+
+- [] Page ramadan
+- [] Mettre un calendrier de 30 jours séparé en blocs de 10 jours
+
+## Prière
+
+- [] Ajouter une page prière
+- [] mettre des indications pour les invocations à faire des habulitions à la fin de la prière
 
 ## Coran
 
-- Ajouter le coran en arabe, francais et phonetique
-- permettre de faire la lecture avec un marque page automatique et une progression
-
-## Zakat
-
-## Héritage
-
-
+- [] Ajouter une page qui liste les sourates du coran qui redirige vers une page de lecture
