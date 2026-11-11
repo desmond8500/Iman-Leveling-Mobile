@@ -1,14 +1,17 @@
-import { PRAYER_KEYS, computePrayerTimes, type CalcOptions, type Coordinates, type PrayerKey } from './prayerTimes';
+import { PRAYER_KEYS, formatTime, prayerWindows, type CalcOptions, type Coordinates, type PrayerKey } from './prayerTimes';
 
 export interface NotificationSettings {
   enabled: boolean;
   /** Rappel des ablutions avant la prière, en minutes ; 0 = désactivé. */
   ablutionMinutes: number;
+  /** Rappel avant la fin du temps de la prière, en minutes ; 0 = désactivé. */
+  endMinutes: number;
 }
 
-export const defaultNotificationSettings = (): NotificationSettings => ({ enabled: false, ablutionMinutes: 15 });
+export const defaultNotificationSettings = (): NotificationSettings => ({ enabled: false, ablutionMinutes: 15, endMinutes: 15 });
 
 export const ABLUTION_CHOICES = [0, 10, 15, 20, 30];
+export const END_CHOICES = [0, 10, 15, 20, 30, 45];
 
 export function normalizeNotificationSettings(value: unknown): NotificationSettings {
   const base = defaultNotificationSettings();
@@ -17,6 +20,7 @@ export function normalizeNotificationSettings(value: unknown): NotificationSetti
   return {
     enabled: v.enabled === true,
     ablutionMinutes: ABLUTION_CHOICES.includes(v.ablutionMinutes as number) ? (v.ablutionMinutes as number) : base.ablutionMinutes,
+    endMinutes: END_CHOICES.includes(v.endMinutes as number) ? (v.endMinutes as number) : base.endMinutes,
   };
 }
 
@@ -25,7 +29,7 @@ export interface PlannedNotification {
   at: Date;
   title: string;
   body: string;
-  kind: 'ablution' | 'prayer';
+  kind: 'ablution' | 'prayer' | 'ending';
   prayer: Exclude<PrayerKey, 'sunrise'>;
 }
 
@@ -56,11 +60,12 @@ export function buildSchedule(
   const out: PlannedNotification[] = [];
   for (let offset = 0; offset < days; offset++) {
     const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
-    const times = computePrayerTimes(day, coords, calc);
+    const windows = prayerWindows(day, coords, calc);
     PRAYER_KEYS.forEach((prayer, index) => {
-      const time = times[prayer];
-      if (!time) return;
-      const base = offset * 10 + index * 2 + 1;
+      const window = windows[prayer];
+      if (!window) return;
+      const time = window.start;
+      const base = offset * 20 + index * 3 + 1;
       const label = PRAYER_LABELS[prayer];
       if (settings.ablutionMinutes > 0) {
         const at = new Date(time.getTime() - settings.ablutionMinutes * 60000);
@@ -77,6 +82,20 @@ export function buildSchedule(
       }
       if (time.getTime() > now.getTime()) {
         out.push({ id: base + 1, at: time, title: label, body: `C'est l'heure de la prière de ${label}.`, kind: 'prayer', prayer });
+      }
+      if (settings.endMinutes > 0) {
+        const at = new Date(window.end.getTime() - settings.endMinutes * 60000);
+        // Le rappel n'a de sens que s'il tombe pendant le temps de la prière.
+        if (at.getTime() > now.getTime() && at.getTime() > time.getTime()) {
+          out.push({
+            id: base + 2,
+            at,
+            title: `${label} : bientôt la fin`,
+            body: `Il reste ${settings.endMinutes} min pour prier ${label} (jusqu'à ${formatTime(window.end)}).`,
+            kind: 'ending',
+            prayer,
+          });
+        }
       }
     });
   }

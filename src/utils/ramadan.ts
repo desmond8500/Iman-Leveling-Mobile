@@ -43,11 +43,15 @@ export function ramadanDays(start: Date): RamadanDay[] {
   });
 }
 
-/** Les trois blocs de dix jours. */
+/**
+ * Les trois blocs de dix jours, avec leur phase. Cette répartition (miséricorde, pardon,
+ * affranchissement du Feu) est traditionnelle, mais le hadith qui la rapporte est jugé faible
+ * par de nombreux savants : elle sert ici de repère de lecture, pas de règle.
+ */
 export const RAMADAN_BLOCKS = [
-  { id: 1, title: 'Jours 1 à 10', from: 1, to: 10 },
-  { id: 2, title: 'Jours 11 à 20', from: 11, to: 20 },
-  { id: 3, title: 'Jours 21 à 30', from: 21, to: 30 },
+  { id: 1, title: 'Miséricorde', arabic: 'الرحمة', range: 'Jours 1 à 10', from: 1, to: 10 },
+  { id: 2, title: 'Pardon', arabic: 'المغفرة', range: 'Jours 11 à 20', from: 11, to: 20 },
+  { id: 3, title: 'Affranchissement du Feu', arabic: 'العتق من النار', range: 'Jours 21 à 30', from: 21, to: 30 },
 ] as const;
 
 export function blockOf(days: RamadanDay[], from: number, to: number): RamadanDay[] {
@@ -60,4 +64,56 @@ const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDat
 /** Jours entiers entre `from` et `to` (négatif si `to` est passé). */
 export function daysBetween(from: Date, to: Date): number {
   return Math.round((startOfDay(to) - startOfDay(from)) / MS_DAY);
+}
+
+const KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+const pad = (n: number) => String(n).padStart(2, '0');
+export const toKey = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+/** Date « AAAA-MM-JJ » -> Date locale, ou `null` si invalide. */
+export function parseStartKey(key: unknown): Date | null {
+  if (typeof key !== 'string' || !KEY_RE.test(key)) return null;
+  const [y, m, d] = key.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d ? date : null;
+}
+
+/** Écart maximal accepté entre la date saisie et celle du calendrier (la lune varie d'un jour ou deux). */
+export const MAX_START_SHIFT_DAYS = 3;
+
+/**
+ * Ramadan à afficher : celui du calendrier, dont le premier jour peut être décalé par l'utilisateur
+ * (observation de la lune dans son pays). Une date trop éloignée du calendrier est ignorée.
+ */
+export function resolveRamadan(
+  today: Date,
+  override: string | null,
+): { hijriYear: number; start: Date; overridden: boolean; calendarStart: Date } | null {
+  const auto = currentOrNextRamadan(today);
+  if (!auto) return null;
+  const custom = parseStartKey(override);
+  if (custom && Math.abs(daysBetween(auto.start, custom)) <= MAX_START_SHIFT_DAYS) {
+    return { hijriYear: auto.hijriYear, start: custom, overridden: daysBetween(auto.start, custom) !== 0, calendarStart: auto.start };
+  }
+  return { ...auto, overridden: false, calendarStart: auto.start };
+}
+
+export type DayState = 'past' | 'today' | 'upcoming';
+
+export function dayState(day: RamadanDay, today: Date): DayState {
+  const diff = daysBetween(today, day.date);
+  return diff < 0 ? 'past' : diff === 0 ? 'today' : 'upcoming';
+}
+
+export type BlockState = 'done' | 'current' | 'upcoming';
+
+/** Avancement d'un bloc : terminé, en cours ou à venir, et nombre de jours déjà écoulés ou en cours. */
+export function blockProgress(days: RamadanDay[], today: Date): { state: BlockState; elapsed: number; total: number } {
+  const real = days.filter((d) => d.exists);
+  const elapsed = real.filter((d) => dayState(d, today) !== 'upcoming').length;
+  const total = real.length;
+  const finished = real.length > 0 && real.every((d) => dayState(d, today) === 'past');
+  const state: BlockState = finished ? 'done' : elapsed > 0 ? 'current' : 'upcoming';
+  return { state, elapsed, total };
 }

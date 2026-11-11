@@ -5,7 +5,9 @@ import {
   computePrayerTimes,
   computeTimeHours,
   defaultMethodForCountry,
+  currentPrayerWindow,
   formatTime,
+  prayerWindows,
   isMethodId,
   nextPrayer,
 } from '../../src/utils/prayerTimes';
@@ -186,5 +188,35 @@ describe('méthodes', () => {
     expect(METHOD_IDS.every(isMethodId)).toBe(true);
     expect(isMethodId('XXX')).toBe(false);
     expect(isMethodId(undefined)).toBe(false);
+  });
+});
+
+describe('temps de validité', () => {
+  const coords = { lat: 14.6928, lon: -17.4467 };
+  const opts = { method: 'MWL' as const };
+  const day = new Date(2026, 10, 10);
+  const times = computePrayerTimes(day, coords, opts);
+  const windows = prayerWindows(day, coords, opts);
+
+  it('chaque prière dure jusqu\'au début de la suivante (Soubh jusqu\'au lever)', () => {
+    expect(windows.fajr!.end.getTime()).toBe(times.sunrise!.getTime());
+    expect(windows.dhuhr!.end.getTime()).toBe(times.asr!.getTime());
+    expect(windows.asr!.end.getTime()).toBe(times.maghrib!.getTime());
+    expect(windows.maghrib!.end.getTime()).toBe(times.isha!.getTime());
+  });
+  it('Isha va jusqu\'au Soubh du lendemain', () => {
+    const tomorrow = computePrayerTimes(new Date(2026, 10, 11), coords, opts);
+    expect(windows.isha!.end.getTime()).toBe(tomorrow.fajr!.getTime());
+  });
+  it('trouve la prière en cours', () => {
+    const at = new Date(times.dhuhr!.getTime() + 60000);
+    expect(currentPrayerWindow(at, coords, opts)?.id).toBe('dhuhr');
+    // Entre le lever du soleil et Dhuhr : aucune prière obligatoire en cours.
+    const gap = new Date(times.sunrise!.getTime() + 60000);
+    expect(currentPrayerWindow(gap, coords, opts)).toBeNull();
+  });
+  it('après minuit, Isha de la veille est encore en cours', () => {
+    const lateNight = new Date(2026, 10, 11, 0, 30);
+    expect(currentPrayerWindow(lateNight, coords, opts)?.id).toBe('isha');
   });
 });

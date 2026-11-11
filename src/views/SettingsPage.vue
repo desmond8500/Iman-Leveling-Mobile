@@ -56,6 +56,12 @@
                   {{ m === 0 ? 'Désactivé' : `${m} min avant la prière` }}
                 </ion-select-option>
               </ion-select>
+              <span class="label">Rappel avant la fin du temps de la prière</span>
+              <ion-select interface="popover" :value="settings.notifications.endMinutes" @ionChange="onEnd">
+                <ion-select-option v-for="m in END_CHOICES" :key="m" :value="m">
+                  {{ m === 0 ? 'Désactivé' : `${m} min avant la fin` }}
+                </ion-select-option>
+              </ion-select>
             </template>
             <p v-if="!settings.location" class="hint">
               Détecte d'abord ta position : les rappels en dépendent.
@@ -249,7 +255,7 @@ import { countryName } from '@/data/countries';
 import { LocationError } from '@/services/geolocation';
 import { useSettingsStore } from '@/stores/settings';
 import { requestNotificationPermission, notificationsSupported } from '@/services/notifications';
-import { ABLUTION_CHOICES } from '@/utils/notifications';
+import { ABLUTION_CHOICES, END_CHOICES } from '@/utils/notifications';
 import { isThemeSetting } from '@/utils/theme';
 import { METHODS, METHOD_IDS, isMethodId } from '@/utils/prayerTimes';
 
@@ -284,6 +290,11 @@ async function onNotifToggle(event: CustomEvent) {
 function onAblution(event: CustomEvent) {
   const minutes = Number(event.detail.value);
   void settings.setNotifications({ ...settings.notifications, ablutionMinutes: minutes });
+}
+
+function onEnd(event: CustomEvent) {
+  const minutes = Number(event.detail.value);
+  void settings.setNotifications({ ...settings.notifications, endMinutes: minutes });
 }
 
 // --- Apparence ---

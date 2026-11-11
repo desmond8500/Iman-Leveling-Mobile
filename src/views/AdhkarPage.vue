@@ -32,7 +32,7 @@
           </p>
           <section v-for="cat in CITADELLE" :key="cat.id" class="cat">
             <h3>{{ cat.title }}</h3>
-            <InvocationItem v-for="dua in cat.duas" :key="dua.id" :item="dua" />
+            <InvocationItem v-for="dua in cat.duas" :key="dua.id" :item="dua" :counter-key="`citadelle:${dua.id}`" />
           </section>
         </template>
 
@@ -48,6 +48,7 @@
             :key="period + dhikr.id"
             :dhikr="dhikr"
             :done="store.isDhikrDone(period, dhikr.id)"
+            :counter-key="adhkarKey(period, dhikr.id)"
             @toggle="onToggle(dhikr.id)"
           />
         </div>
@@ -86,7 +87,7 @@ import {
 import DhikrCard from '@/components/DhikrCard.vue';
 import InvocationItem from '@/components/InvocationItem.vue';
 import { CITADELLE, CITADELLE_COUNT } from '@/data/citadelle';
-import { adhkarFor } from '@/data/adhkar';
+import { adhkarFor, adhkarKey } from '@/data/adhkar';
 import { useProgressStore } from '@/stores/progress';
 import type { Period } from '@/types';
 import { ADHKAR_HASANAT } from '@/utils/hasanat';

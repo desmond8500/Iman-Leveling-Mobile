@@ -11,7 +11,7 @@
 
 ## Prière
 
-- [] Prendre en compte le temps de validité de la prière faire un rappel
+- [x] Prendre en compte le temps de validité de la prière faire un rappel
 
 ## Rappels
 
@@ -20,15 +20,15 @@
 
 ## Ramadan
 
-- [] Modifier la date de début
-- [] lorsqu'on clique sur une date rediriger vers une page ou on liste des prière surrérogatoires à faire
-- [] modifier l'affichage des dates selon l'avancement dans le mois
-- [] les 10 jours  seront séparées en trois phases qui seront aussi mise en titre (misericorde, pardon et afranchissement de l'enfer)
+- [x] Modifier la date de début
+- [x] lorsqu'on clique sur une date rediriger vers une page ou on liste des prière surrérogatoires à faire
+- [x] modifier l'affichage des dates selon l'avancement dans le mois
+- [x] les 10 jours  seront séparées en trois phases qui seront aussi mise en titre (misericorde, pardon et afranchissement de l'enfer)
 
 ## Zakat
 
 - [] Créer une page avec des sous sections, détails et calculs
-- [] Zakat al-Fitr
+- [x] Zakat al-Fitr
 - [] Zakat al-Maal
 
 ## Héritage en islam
@@ -37,8 +37,8 @@
 
 ## Invocations
 
-- [] Ajouter en bas de chaque invocation un bouton + et - afin de décompter chaque récitation
-- [] ajouter amana rassoul, les deux derniers versets de la sourate 2
+- [x] Ajouter en bas de chaque invocation un bouton + et - afin de décompter chaque récitation
+- [x] ajouter amana rassoul, les deux derniers versets de la sourate 2
 
 ## Authentification
 

@@ -2,6 +2,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import type { ProgressRepository } from '@/services/progressRepository';
 import { setProgressRepository, useProgressStore } from '@/stores/progress';
 import type { ProgressData } from '@/types';
+import { adhkarKey } from '@/data/adhkar';
 import { addDays, toDateKey } from '@/utils/date';
 
 function memoryRepository(initial?: ProgressData) {
@@ -319,5 +320,36 @@ describe('progress store', () => {
       await store.load();
       expect(store.streak).toBe(1);
     });
+  });
+});
+
+describe('compteurs de récitations', () => {
+  async function freshStore() {
+    setProgressRepository(memoryRepository());
+    setActivePinia(createPinia());
+    const store = useProgressStore();
+    await store.load();
+    return store;
+  }
+
+  it('ajoute, retire et ne descend pas sous 0', async () => {
+    const store = await freshStore();
+    await store.bumpCount('citadelle:x', 1);
+    await store.bumpCount('citadelle:x', 1);
+    expect(store.countOf('citadelle:x')).toBe(2);
+    await store.bumpCount('citadelle:x', -1);
+    await store.bumpCount('citadelle:x', -1);
+    await store.bumpCount('citadelle:x', -1);
+    expect(store.countOf('citadelle:x')).toBe(0);
+  });
+  it('atteindre le nombre recommandé coche l\'invocation une seule fois', async () => {
+    const store = await freshStore();
+    const key = adhkarKey('morning', 'kursi');
+    await store.bumpCount(key, 1, 2, key);
+    expect(store.isDhikrDone('morning', 'kursi')).toBe(false);
+    await store.bumpCount(key, 1, 2, key);
+    expect(store.isDhikrDone('morning', 'kursi')).toBe(true);
+    await store.bumpCount(key, -1, 2, key); // décrémenter ne décoche pas
+    expect(store.isDhikrDone('morning', 'kursi')).toBe(true);
   });
 });

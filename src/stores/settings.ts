@@ -9,6 +9,7 @@ import type { Gender, SettingsData } from '@/types';
 import { mergeProgress } from '@/utils/merge';
 import { normalizeNotificationSettings, defaultNotificationSettings, type NotificationSettings } from '@/utils/notifications';
 import { isThemeSetting, type ThemeSetting } from '@/utils/theme';
+import { parseStartKey } from '@/utils/ramadan';
 import { defaultMethodForCountry, isMethodId, type MethodId } from '@/utils/prayerTimes';
 
 const STORAGE_KEY = 'iman.settings.v1';
@@ -21,6 +22,7 @@ export const defaultSettings = (): SettingsData => ({
   prayerMethod: null,
   theme: 'auto',
   notifications: defaultNotificationSettings(),
+  ramadanStart: null,
   server: { url: '', token: null, user: null, lastSync: null },
 });
 
@@ -47,6 +49,7 @@ export function normalizeSettings(stored: unknown): SettingsData {
     prayerMethod: isMethodId(s.prayerMethod) ? s.prayerMethod : null,
     theme: isThemeSetting(s.theme) ? s.theme : 'auto',
     notifications: normalizeNotificationSettings(s.notifications),
+    ramadanStart: parseStartKey(s.ramadanStart) ? (s.ramadanStart as string) : null,
     server: {
       url: typeof server.url === 'string' ? server.url : '',
       token: typeof server.token === 'string' && server.token ? server.token : null,
@@ -69,6 +72,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const countryCode = computed(() => data.value.countryCode);
   const theme = computed(() => data.value.theme);
   const notifications = computed(() => data.value.notifications);
+  const ramadanStart = computed(() => data.value.ramadanStart);
   const location = computed(() => data.value.location);
   /** Méthode choisie, ou celle du pays à défaut. */
   const prayerMethod = computed<MethodId>(() =>
@@ -109,6 +113,13 @@ export const useSettingsStore = defineStore('settings', () => {
 
   async function setNotifications(value: NotificationSettings) {
     data.value = { ...data.value, notifications: normalizeNotificationSettings(value) };
+    await persist();
+  }
+
+  /** Premier jour du Ramadan choisi à la main ; `null` revient au calendrier. */
+  async function setRamadanStart(value: string | null) {
+    if (value !== null && !parseStartKey(value)) return;
+    data.value = { ...data.value, ramadanStart: value };
     await persist();
   }
 
@@ -233,6 +244,7 @@ export const useSettingsStore = defineStore('settings', () => {
     prayerMethod,
     theme,
     notifications,
+    ramadanStart,
     serverUrl,
     user,
     lastSync,
@@ -243,6 +255,7 @@ export const useSettingsStore = defineStore('settings', () => {
     setPrayerMethod,
     setTheme,
     setNotifications,
+    setRamadanStart,
     detectAndSetCountry,
     setServerUrl,
     authenticate,
