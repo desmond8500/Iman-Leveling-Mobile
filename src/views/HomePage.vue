@@ -24,6 +24,10 @@
           @open-calendar="calendarOpen = true"
         />
 
+        <p v-if="ongoing" class="next-prayer ongoing" :class="{ urgent: ongoing.urgent }">
+          <ion-icon :icon="alarmOutline" />
+          {{ ongoing.name }} en cours, non faite : il reste <strong>{{ ongoing.left }}</strong>
+        </p>
         <p v-if="next" class="next-prayer">
           <ion-icon :icon="timeOutline" />
           Prochaine prière : <strong>{{ next.name }}</strong> à {{ next.at }}
@@ -62,6 +66,7 @@
             :readonly="!store.isToday"
             :show-place="store.gender === 'male'"
             :time="timeOf(prayer.id)"
+            :until="untilOf(prayer.id)"
             @toggle-prayer="onTogglePrayer"
             @toggle-place="onTogglePlace"
             @toggle-sunnah="onToggleSunnah"
@@ -119,7 +124,7 @@ import {
   IonToast,
   IonToolbar,
 } from '@ionic/vue';
-import { lockClosedOutline, locationOutline, timeOutline } from 'ionicons/icons';
+import { alarmOutline, lockClosedOutline, locationOutline, timeOutline } from 'ionicons/icons';
 import MonthCalendar from '@/components/MonthCalendar.vue';
 import PlayerHeader from '@/components/PlayerHeader.vue';
 import PrayerGroup from '@/components/PrayerGroup.vue';
@@ -129,7 +134,7 @@ import { useSettingsStore } from '@/stores/settings';
 import type { PrayerId, SunnahId } from '@/types';
 import { formatLong, parseKey } from '@/utils/calendar';
 import { formatHijri, toHijri } from '@/utils/hijri';
-import { computePrayerTimes, formatTime, nextPrayer, type PrayerKey } from '@/utils/prayerTimes';
+import { computePrayerTimes, currentPrayerWindow, formatTime, nextPrayer, prayerWindows, type PrayerKey } from '@/utils/prayerTimes';
 import {
   ALL_PRAYERS_BONUS,
   PRAYER_HOME_HASANAT,
@@ -168,6 +173,27 @@ const timeOf = (id: PrayerKey): string | null => {
   const date = dayTimes.value?.[id];
   return date ? formatTime(date) : null;
 };
+
+const dayWindows = computed(() =>
+  settings.location ? prayerWindows(parseKey(store.selectedDate), settings.location, calcOptions.value) : null,
+);
+const untilOf = (id: PrayerId): string | null => {
+  const w = dayWindows.value?.[id];
+  return w ? formatTime(w.end) : null;
+};
+
+/** Prière en cours : temps restant avant la fin. */
+const ongoing = computed(() => {
+  if (!settings.location || !store.isToday) return null;
+  const c = currentPrayerWindow(now.value, settings.location, calcOptions.value);
+  if (!c) return null;
+  const done = store.dayPrayers.find((p) => p.id === c.id)?.done ?? false;
+  if (done) return null;
+  const minutes = Math.max(1, Math.round((c.window.end.getTime() - now.value.getTime()) / 60000));
+  const h = Math.floor(minutes / 60);
+  const name = store.dayPrayers.find((p) => p.id === c.id)?.name ?? c.id;
+  return { name, left: h > 0 ? `${h} h ${String(minutes % 60).padStart(2, '0')}` : `${minutes} min`, urgent: minutes <= 30 };
+});
 
 const next = computed(() => {
   if (!settings.location) return null;
@@ -231,6 +257,14 @@ async function onToggleSunnah(id: SunnahId) {
   margin-left: auto;
   color: var(--iman-gold);
   font-weight: 700;
+}
+.next-prayer.ongoing {
+  margin-top: 8px;
+  border: 1px solid rgba(242, 201, 76, 0.4);
+}
+.next-prayer.ongoing.urgent {
+  border-color: #ff9f43;
+  color: #ff9f43;
 }
 .next-prayer.muted {
   color: var(--iman-text-soft);

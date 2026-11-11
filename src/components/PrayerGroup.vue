@@ -12,6 +12,7 @@
     <PrayerCard
       :prayer="prayer"
       :time="time"
+      :until="until"
       :disabled="readonly"
       @toggle="$emit('toggle-prayer', prayer.id)"
     />
@@ -48,6 +49,8 @@ defineProps<{
   showPlace?: boolean;
   /** Heure de la prière, déjà formatée. */
   time?: string | null;
+  /** Fin du temps de la prière, déjà formatée. */
+  until?: string | null;
 }>();
 defineEmits<{
   (e: 'toggle-prayer', id: PrayerId): void;

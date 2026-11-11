@@ -10,7 +10,7 @@
 
 ## Prière
 
-- [] Prendre en compte le temps de validité de la prière faire un rappel
+- [x] Prendre en compte le temps de validité de la prière faire un rappel
 
 ## Rappels
 

@@ -14,7 +14,10 @@
       </span>
       <span class="prayer-hint">{{ prayer.hint }}</span>
     </span>
-    <span v-if="time" class="prayer-time">{{ time }}</span>
+    <span v-if="time" class="prayer-time">
+      {{ time }}
+      <small v-if="until" class="until">jusqu'à {{ until }}</small>
+    </span>
     <span class="reward">+{{ prayer.reward }}</span>
     <ion-icon class="check" :icon="prayer.done ? checkmarkCircle : ellipseOutline" />
   </button>
@@ -44,6 +47,8 @@ defineProps<{
   };
   /** Heure de la prière (« 05:48 »), quand la position est connue. */
   time?: string | null;
+  /** Fin du temps de la prière, déjà formatée. */
+  until?: string | null;
   disabled?: boolean;
 }>();
 defineEmits<{ (e: 'toggle'): void }>();
@@ -113,6 +118,16 @@ const icons: Record<PrayerId, string> = {
   font-size: 18px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+.prayer-time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.until {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--iman-text-soft);
 }
 .reward {
   flex: none;

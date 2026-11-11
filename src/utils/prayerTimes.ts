@@ -223,3 +223,47 @@ export function nextPrayer(now: Date, coords: Coordinates, options: CalcOptions)
   }
   return null;
 }
+
+export type PrayerWindow = { start: Date; end: Date };
+
+/**
+ * Temps de validité de chaque prière pour la journée de `date` :
+ * Soubh jusqu'au lever du soleil, Dhuhr jusqu'à Asr, Asr jusqu'au coucher du soleil,
+ * Maghrib jusqu'à Isha, Isha jusqu'à l'aube suivante. `null` si une heure est indéterminée.
+ * Ce sont les limites généralement retenues ; certaines écoles précisent des temps préférables
+ * plus courts (par exemple Asr avant que le soleil ne jaunisse, Isha avant minuit).
+ */
+export function prayerWindows(
+  date: Date,
+  coords: Coordinates,
+  options: CalcOptions,
+): Record<Exclude<PrayerKey, 'sunrise'>, PrayerWindow | null> {
+  const today = computePrayerTimes(date, coords, options);
+  const tomorrow = computePrayerTimes(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1), coords, options);
+  const make = (start: Date | null, end: Date | null): PrayerWindow | null =>
+    start && end && end.getTime() > start.getTime() ? { start, end } : null;
+  return {
+    fajr: make(today.fajr, today.sunrise),
+    dhuhr: make(today.dhuhr, today.asr),
+    asr: make(today.asr, today.maghrib),
+    maghrib: make(today.maghrib, today.isha),
+    isha: make(today.isha, tomorrow.fajr),
+  };
+}
+
+/** Prière dont le temps est en cours à l'instant `now` (la veille est regardée pour Isha après minuit). */
+export function currentPrayerWindow(
+  now: Date,
+  coords: Coordinates,
+  options: CalcOptions,
+): { id: Exclude<PrayerKey, 'sunrise'>; window: PrayerWindow } | null {
+  for (const offset of [0, -1]) {
+    const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+    const windows = prayerWindows(day, coords, options);
+    for (const id of PRAYER_KEYS) {
+      const w = windows[id];
+      if (w && now.getTime() >= w.start.getTime() && now.getTime() < w.end.getTime()) return { id, window: w };
+    }
+  }
+  return null;
+}
