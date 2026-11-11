@@ -7,7 +7,7 @@ import type { Prayer, Sunnah } from '@/types';
 export const PRAYERS: Prayer[] = [
   {
     id: 'fajr',
-    name: 'Fajr',
+    name: 'Soubh',
     arabic: 'الفجر',
     hint: 'Aube',
     before: [{ id: 'fajr-before', name: 'Sunna de Fajr', rakaat: 2 }],

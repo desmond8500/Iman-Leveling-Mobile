@@ -30,7 +30,7 @@ export interface PlannedNotification {
 }
 
 export const PRAYER_LABELS: Record<Exclude<PrayerKey, 'sunrise'>, string> = {
-  fajr: 'Fajr',
+  fajr: 'Soubh',
   dhuhr: 'Dhuhr',
   asr: 'Asr',
   maghrib: 'Maghrib',

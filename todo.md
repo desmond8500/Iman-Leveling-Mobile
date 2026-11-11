@@ -6,7 +6,7 @@
 
 ## Home page
 
-- [] Modifier le mot fajr par soubh et garder Sunna de Fajr
+- [x] Modifier le mot fajr par soubh et garder Sunna de Fajr
 
 ## Invocations
 
