@@ -45,11 +45,11 @@
 
 ## Authentification
 
-- [] Intégrer le code pour s'authentifier à iman server
+- [x] Intégrer le code pour s'authentifier à iman server
 
 ## Coran
 
-- [] Créer une page coran
+- [x] Créer une page coran
 - [] utiliser l'api quran.com
 - [] Marque page
 - [] suivi de la lecture mensuelle
