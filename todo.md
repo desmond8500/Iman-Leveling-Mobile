@@ -27,7 +27,7 @@
 ## Zakat
 
 - [] Créer une page avec des sous sections, détails et calculs
-- [] Zakat al-Fitr
+- [x] Zakat al-Fitr
 - [] Zakat al-Maal
 
 ## Héritage en islam
