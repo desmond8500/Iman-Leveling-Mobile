@@ -23,6 +23,54 @@
           <p v-if="!settings.gender" class="hint">Non renseigné.</p>
         </section>
 
+        <!-- Apparence -->
+        <section class="card">
+          <h2>Apparence</h2>
+          <ion-segment :value="settings.theme" @ionChange="onTheme">
+            <ion-segment-button value="auto"><ion-label>Auto</ion-label></ion-segment-button>
+            <ion-segment-button value="emerald"><ion-label>Émeraude</ion-label></ion-segment-button>
+            <ion-segment-button value="blue"><ion-label>Bleu</ion-label></ion-segment-button>
+          </ion-segment>
+          <p class="hint">En mode auto, l'application passe au bleu le vendredi.</p>
+        </section>
+
+        <!-- Notifications -->
+        <section class="card">
+          <h2>Rappels</h2>
+          <template v-if="canNotify">
+            <ion-toggle
+              :checked="settings.notifications.enabled"
+              :disabled="!settings.location"
+              @ionChange="onNotifToggle"
+            >
+              Notifications de prière
+            </ion-toggle>
+            <template v-if="settings.notifications.enabled">
+              <span class="label">Rappel des ablutions</span>
+              <ion-select
+                interface="popover"
+                :value="settings.notifications.ablutionMinutes"
+                @ionChange="onAblution"
+              >
+                <ion-select-option v-for="m in ABLUTION_CHOICES" :key="m" :value="m">
+                  {{ m === 0 ? 'Désactivé' : `${m} min avant la prière` }}
+                </ion-select-option>
+              </ion-select>
+            </template>
+            <p v-if="!settings.location" class="hint">
+              Détecte d'abord ta position : les rappels en dépendent.
+            </p>
+          </template>
+          <p v-else class="hint">
+            Les rappels sont disponibles dans l'application mobile (Android). Ils ne fonctionnent
+            pas dans le navigateur.
+          </p>
+          <p class="hint">
+            L'appel du muezzin (son de l'adhan) n'est pas encore inclus : il demande un fichier
+            audio que tu dois fournir (voir le README).
+          </p>
+        </section>
+
         <!-- Pays -->
         <section class="card">
           <h2>Pays</h2>
@@ -39,8 +87,34 @@
           </div>
           <p class="hint">
             La détection utilise ta position approximative, arrondie à environ 11 km, envoyée au
-            service de géocodage BigDataCloud pour trouver le pays. Rien n'est enregistré à part le
-            pays. Tu peux aussi le choisir à la main.
+            service de géocodage BigDataCloud pour trouver le pays. L'appareil conserve aussi cette
+            position (arrondie à environ 1 km) pour calculer les heures de prière ; elle n'est
+            jamais envoyée à nos serveurs ni à ton compte en ligne.
+          </p>
+          <p v-if="settings.location" class="hint">
+            Position enregistrée : {{ settings.location.lat }}, {{ settings.location.lon }}
+          </p>
+        </section>
+
+        <!-- Heures de prière -->
+        <section class="card">
+          <h2>Heures de prière</h2>
+          <span class="label">Méthode de calcul</span>
+          <ion-select
+            interface="popover"
+            :value="settings.data.prayerMethod ?? 'auto'"
+            @ionChange="onMethod"
+          >
+            <ion-select-option value="auto">
+              Selon mon pays ({{ METHODS[settings.prayerMethod].name }})
+            </ion-select-option>
+            <ion-select-option v-for="id in METHOD_IDS" :key="id" :value="id">
+              {{ METHODS[id].name }}
+            </ion-select-option>
+          </ion-select>
+          <p class="hint">
+            Les heures sont calculées sur l'appareil à partir de ta position. Elles peuvent différer
+            de quelques minutes de celles de ta mosquée : en cas de doute, suis son calendrier.
           </p>
         </section>
 
@@ -161,7 +235,10 @@ import {
   IonPage,
   IonSegment,
   IonSegmentButton,
+  IonSelect,
+  IonSelectOption,
   IonSpinner,
+  IonToggle,
   IonTitle,
   IonToast,
   IonToolbar,
@@ -171,6 +248,10 @@ import CountryPicker from '@/components/CountryPicker.vue';
 import { countryName } from '@/data/countries';
 import { LocationError } from '@/services/geolocation';
 import { useSettingsStore } from '@/stores/settings';
+import { requestNotificationPermission, notificationsSupported } from '@/services/notifications';
+import { ABLUTION_CHOICES } from '@/utils/notifications';
+import { isThemeSetting } from '@/utils/theme';
+import { METHODS, METHOD_IDS, isMethodId } from '@/utils/prayerTimes';
 
 const settings = useSettingsStore();
 
@@ -184,6 +265,38 @@ const say = (message: string) => {
 function onGender(event: CustomEvent) {
   const value = event.detail.value;
   if (value === 'male' || value === 'female') void settings.setGender(value);
+}
+
+// --- Rappels ---
+const canNotify = notificationsSupported();
+
+async function onNotifToggle(event: CustomEvent) {
+  const enabled = !!event.detail.checked;
+  if (enabled === settings.notifications.enabled) return;
+  if (enabled && !(await requestNotificationPermission())) {
+    say("Autorise les notifications dans les réglages du téléphone pour activer les rappels.");
+    await settings.setNotifications({ ...settings.notifications, enabled: false });
+    return;
+  }
+  await settings.setNotifications({ ...settings.notifications, enabled });
+}
+
+function onAblution(event: CustomEvent) {
+  const minutes = Number(event.detail.value);
+  void settings.setNotifications({ ...settings.notifications, ablutionMinutes: minutes });
+}
+
+// --- Apparence ---
+function onTheme(event: CustomEvent) {
+  const value = event.detail.value;
+  if (isThemeSetting(value)) void settings.setTheme(value);
+}
+
+// --- Méthode de calcul ---
+function onMethod(event: CustomEvent) {
+  const value = event.detail.value;
+  if (value === 'auto') void settings.setPrayerMethod(null);
+  else if (isMethodId(value)) void settings.setPrayerMethod(value);
 }
 
 // --- Pays ---

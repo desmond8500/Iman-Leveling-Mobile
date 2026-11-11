@@ -11,6 +11,7 @@ import type {
   DayLevel,
   DayRecord,
   DayStats,
+  Gender,
   Period,
   PrayerId,
   PrayerView,
@@ -18,7 +19,7 @@ import type {
   SunnahId,
 } from '@/types';
 import { toDateKey } from '@/utils/date';
-import { hasanatForDay, levelFromHasanat, sunnahReward } from '@/utils/hasanat';
+import { hasanatForDay, levelFromHasanat, prayerReward } from '@/utils/hasanat';
 import { computeStreak } from '@/utils/streak';
 
 let repository: ProgressRepository = new LocalProgressRepository();
@@ -32,13 +33,17 @@ const countPrayers = (day?: DayRecord) => PRAYERS.filter((p) => day?.prayers[p.i
 
 const countSunnah = (day?: DayRecord) => ALL_SUNNAH.filter((s) => day?.sunnah?.[s.id]).length;
 
-const sunnahTotal = (day?: DayRecord) =>
-  ALL_SUNNAH.reduce((sum, s) => (day?.sunnah?.[s.id] ? sum + sunnahReward(s.emphasized) : sum), 0);
-
 // On ne compte que les invocations connues : une clé obsolète n'apporte pas de Hasanat.
 const countAdhkar = (day?: DayRecord) => ADHKAR_KEYS.filter((k) => day?.adhkar?.[k]).length;
 
-function statsOf(day?: DayRecord): DayStats {
+/** Hasanat des prières obligatoires faites : dépend du genre et, pour les hommes, du lieu. */
+const prayerHasanatOf = (day: DayRecord | undefined, gender: Gender | null) =>
+  PRAYERS.reduce(
+    (sum, p) => (day?.prayers[p.id] ? sum + prayerReward(gender, !!day.mosque?.[p.id]) : sum),
+    0,
+  );
+
+function statsOf(day: DayRecord | undefined, gender: Gender | null): DayStats {
   const prayers = countPrayers(day);
   const sunnah = countSunnah(day);
   const adhkar = countAdhkar(day);
@@ -48,7 +53,13 @@ function statsOf(day?: DayRecord): DayStats {
     prayers,
     sunnah,
     adhkar,
-    hasanat: hasanatForDay(prayers, PRAYERS.length, sunnahTotal(day), adhkar),
+    hasanat: hasanatForDay({
+      prayerHasanat: prayerHasanatOf(day, gender),
+      done: prayers,
+      total: PRAYERS.length,
+      sunnah,
+      adhkar,
+    }),
     level,
   };
 }
@@ -61,6 +72,8 @@ export const useProgressStore = defineStore('progress', () => {
   const today = ref(toDateKey(new Date()));
   /** Jour affiché sur l'accueil. Les jours passés sont en lecture seule. */
   const selectedDate = ref(today.value);
+  /** Genre de l'utilisateur (renseigné depuis les paramètres) : il détermine la valeur des prières. */
+  const gender = ref<Gender | null>(null);
 
   const isToday = computed(() => selectedDate.value === today.value);
 
@@ -69,19 +82,21 @@ export const useProgressStore = defineStore('progress', () => {
     return PRAYERS.map((prayer) => ({
       ...prayer,
       done: !!day?.prayers[prayer.id],
+      mosque: !!day?.mosque?.[prayer.id],
+      reward: prayerReward(gender.value, !!day?.mosque?.[prayer.id]),
       before: prayer.before.map((s) => ({ ...s, done: !!day?.sunnah?.[s.id] })),
       after: prayer.after.map((s) => ({ ...s, done: !!day?.sunnah?.[s.id] })),
     }));
   });
 
-  const selectedStats = computed(() => statsOf(days.value[selectedDate.value]));
+  const selectedStats = computed(() => statsOf(days.value[selectedDate.value], gender.value));
 
   /** Prières obligatoires faites le jour affiché. */
   const doneCount = computed(() => selectedStats.value.prayers);
 
   // Les Hasanat sont recalculés à partir des journées : impossible de les « farmer » en cochant/décochant.
   const totalHasanat = computed(() =>
-    Object.values(days.value).reduce((sum, day) => sum + statsOf(day).hasanat, 0),
+    Object.values(days.value).reduce((sum, day) => sum + statsOf(day, gender.value).hasanat, 0),
   );
 
   const levelInfo = computed(() => levelFromHasanat(totalHasanat.value));
@@ -92,7 +107,7 @@ export const useProgressStore = defineStore('progress', () => {
   );
 
   function dayStats(key: string): DayStats {
-    return statsOf(days.value[key]);
+    return statsOf(days.value[key], gender.value);
   }
 
   function isDhikrDone(period: Period, id: string): boolean {
@@ -104,6 +119,10 @@ export const useProgressStore = defineStore('progress', () => {
     const prefix = `${period}:`;
     return ADHKAR_KEYS.filter((k) => k.startsWith(prefix) && days.value[today.value]?.adhkar?.[k])
       .length;
+  }
+
+  function setGender(value: Gender | null) {
+    gender.value = value;
   }
 
   async function load() {
@@ -159,6 +178,12 @@ export const useProgressStore = defineStore('progress', () => {
     return commit((day) => ({ ...day, prayers: { ...day.prayers, [id]: !day.prayers[id] } }));
   }
 
+  /** Lieu d'une prière : mosquée ou maison. Ne compte que pour les hommes ; sans effet sinon. */
+  async function togglePlace(id: PrayerId) {
+    if (!isToday.value || gender.value !== 'male') return NOOP_RESULT;
+    return commit((day) => ({ ...day, mosque: { ...day.mosque, [id]: !day.mosque?.[id] } }));
+  }
+
   async function toggleSunnah(id: SunnahId) {
     if (!isToday.value) return NOOP_RESULT;
     return commit((day) => ({ ...day, sunnah: { ...day.sunnah, [id]: !day.sunnah?.[id] } }));
@@ -175,6 +200,7 @@ export const useProgressStore = defineStore('progress', () => {
     loaded,
     today,
     selectedDate,
+    gender,
     isToday,
     dayPrayers,
     selectedStats,
@@ -190,7 +216,9 @@ export const useProgressStore = defineStore('progress', () => {
     importData,
     refreshToday,
     selectDate,
+    setGender,
     togglePrayer,
+    togglePlace,
     toggleSunnah,
     toggleDhikr,
   };

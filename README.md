@@ -99,10 +99,15 @@ l'app en HTTPS, avec `index.html` renvoyé pour toute route inconnue.
 
 **Paramètres.** Onglet « Paramètres » :
 
-- *Genre* : homme ou femme (enregistré, pas encore utilisé pour le calcul des Hasanat).
+- *Genre* : homme ou femme. Il détermine les Hasanat des prières (voir « Règles des Hasanat »).
+- *Apparence* : auto (bleu le vendredi), émeraude ou bleu.
+- *Heures de prière* : méthode de calcul (celle du pays par défaut).
+- *Rappels* (mobile uniquement) : notification à l'heure de chaque prière et rappel des ablutions
+  10 à 30 min avant.
 - *Pays* : bouton « Détecter ma position » (position approximative arrondie à ~11 km, envoyée au
-  service BigDataCloud uniquement pour trouver le pays ; seul le code pays est enregistré), ou choix
-  manuel dans une liste avec recherche.
+  service BigDataCloud uniquement pour trouver le pays), ou choix manuel dans une liste avec
+  recherche. L'appareil garde aussi la position arrondie à ~1 km pour calculer les heures de prière ;
+  elle n'est ni envoyée au serveur de compte ni synchronisée.
 - *Sauvegarde en ligne* : adresse du serveur, puis connexion ou création de compte. La progression
   est synchronisée à la connexion, au lancement de l'app et via « Synchroniser maintenant ». Sans
   compte, tout reste sur l'appareil. Se déconnecter n'efface pas la progression locale. La fusion
@@ -113,9 +118,32 @@ l'app en HTTPS, avec `index.html` renvoyé pour toute route inconnue.
 Le serveur n'existe pas encore : le contrat d'API à implémenter est dans `docs/API.md` (Laravel 13
 avec Sanctum recommandé). Tant qu'il n'est pas en ligne, la liaison de compte ne peut pas aboutir.
 
-Pour la détection de position en natif, après `npm install` : `npx cap sync`, puis ajouter la
-permission Android `ACCESS_COARSE_LOCATION` dans `AndroidManifest.xml` et la clé
-`NSLocationWhenInUseUsageDescription` dans `Info.plist` (iOS).
+Pour la position et les rappels en natif, après `npm install` : `npx cap sync`. Le manifeste Android
+déclare `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS` et `SCHEDULE_EXACT_ALARM` ; pour iOS, ajouter
+la clé `NSLocationWhenInUseUsageDescription` dans `Info.plist`.
+
+**Règles des Hasanat.** Prière obligatoire : 27 à la mosquée ou 1 à la maison pour un homme (choix
+« Maison / Mosquée » sous la carte), 27 pour une femme (ou si le genre n'est pas renseigné).
+Chaque sunna : 27. Invocation : 5. Bonus de 50 si les 5 prières sont faites. Les Hasanat sont
+recalculés à partir des cases cochées de chaque jour : cocher/décocher ne permet pas d'en gagner
+plus. Ce sont des points de jeu, pas une promesse de récompense.
+
+**Grades.** Débutant (niv. 1), Persévérant (3), Assidu (6), Dévoué (10), Constant (15), Exemplaire
+(25), Lumière (40), affichés dans l'en-tête avec une pastille de couleur.
+
+**Noms d'Allah.** Onglet dédié : liste de 99 noms avec recherche, puis une page de détail par nom
+(arabe, translittération, traduction, explication, lien vers le verset 7:180). La liste suit
+l'énumération d'At-Tirmidhi, dont les savants discutent certains noms. À faire relire.
+
+**Heures de prière.** Calcul astronomique sur l'appareil (`src/utils/prayerTimes.ts`), affichées
+dans chaque carte avec la prochaine prière en haut. Méthodes : Ligue islamique mondiale, UOIF,
+ISNA, Égypte, Oumm al-Qora, Karachi. Les heures peuvent différer de quelques minutes de celles de
+ta mosquée : en cas de doute, suis son calendrier.
+
+**Rappels et appel du muezzin.** `@capacitor/local-notifications` programme 3 jours à l'avance, et
+reprogramme au lancement et à chaque changement de réglage. Le **son de l'adhan n'est pas fourni** :
+il faut un fichier audio libre de droits à placer dans `android/app/src/main/res/raw/` (puis le
+référencer dans `src/services/notifications.ts` via `sound`).
 
 **Icône et écran de démarrage.** Un croissant et une étoile dorés sur fond émeraude, avec des
 chevrons de niveau. Les sources sont dans `resources/` (SVG et PNG). L'app affiche un écran de
@@ -163,7 +191,11 @@ tests/unit/    tests Vitest
 
 ## Prochaines étapes prévues
 
-- Étape 2 : lecture du Coran (pages/sourates lues, objectifs, Hasanat)
+- Étape 2 : lecture du Coran (arabe, français, phonétique, marque-page automatique, progression) et
+  sourate Al-Kahf le vendredi (texte et audio). Les textes seront chargés depuis une API publique
+  (ex. alquran.cloud) ou depuis une source que tu fournis, pour éviter toute erreur de saisie.
+- Invocations de la Citadelle du musulman (même principe : source à valider)
+- Zakat et héritage (à décrire)
 - Étape 3 : hadiths et invocations selon les situations (après la prière, avant de dormir, ...)
 - Étape 4 : statistiques, historique et succès
 - Étape 5 : serveur Laravel 13 de sauvegarde (le client est déjà prêt, voir `docs/API.md`)

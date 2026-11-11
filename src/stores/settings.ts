@@ -2,11 +2,14 @@ import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { isCountryCode } from '@/data/countries';
 import { ApiClient, ApiError, normalizeServerUrl, type AuthResponse } from '@/services/api';
-import { detectCountry } from '@/services/geolocation';
+import { detectPlace } from '@/services/geolocation';
 import { loadJson, saveJson } from '@/services/storage';
 import { useProgressStore } from '@/stores/progress';
 import type { Gender, SettingsData } from '@/types';
 import { mergeProgress } from '@/utils/merge';
+import { normalizeNotificationSettings, defaultNotificationSettings, type NotificationSettings } from '@/utils/notifications';
+import { isThemeSetting, type ThemeSetting } from '@/utils/theme';
+import { defaultMethodForCountry, isMethodId, type MethodId } from '@/utils/prayerTimes';
 
 const STORAGE_KEY = 'iman.settings.v1';
 
@@ -14,8 +17,20 @@ export const defaultSettings = (): SettingsData => ({
   version: 1,
   gender: null,
   countryCode: null,
+  location: null,
+  prayerMethod: null,
+  theme: 'auto',
+  notifications: defaultNotificationSettings(),
   server: { url: '', token: null, user: null, lastSync: null },
 });
+
+function normalizeLocation(value: unknown): SettingsData['location'] {
+  if (typeof value !== 'object' || value === null) return null;
+  const { lat, lon } = value as { lat?: unknown; lon?: unknown };
+  if (typeof lat !== 'number' || typeof lon !== 'number') return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+  return { lat, lon };
+}
 
 /** Remet en forme des réglages lus sur l'appareil (anciennes versions, données altérées). */
 export function normalizeSettings(stored: unknown): SettingsData {
@@ -28,6 +43,10 @@ export function normalizeSettings(stored: unknown): SettingsData {
     version: 1,
     gender: s.gender === 'male' || s.gender === 'female' ? s.gender : null,
     countryCode: isCountryCode(s.countryCode) ? s.countryCode : null,
+    location: normalizeLocation(s.location),
+    prayerMethod: isMethodId(s.prayerMethod) ? s.prayerMethod : null,
+    theme: isThemeSetting(s.theme) ? s.theme : 'auto',
+    notifications: normalizeNotificationSettings(s.notifications),
     server: {
       url: typeof server.url === 'string' ? server.url : '',
       token: typeof server.token === 'string' && server.token ? server.token : null,
@@ -48,6 +67,13 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const gender = computed(() => data.value.gender);
   const countryCode = computed(() => data.value.countryCode);
+  const theme = computed(() => data.value.theme);
+  const notifications = computed(() => data.value.notifications);
+  const location = computed(() => data.value.location);
+  /** Méthode choisie, ou celle du pays à défaut. */
+  const prayerMethod = computed<MethodId>(() =>
+    isMethodId(data.value.prayerMethod) ? data.value.prayerMethod : defaultMethodForCountry(data.value.countryCode),
+  );
   const serverUrl = computed(() => data.value.server.url);
   const user = computed(() => data.value.server.user);
   const lastSync = computed(() => data.value.server.lastSync);
@@ -57,11 +83,13 @@ export const useSettingsStore = defineStore('settings', () => {
 
   async function load() {
     data.value = normalizeSettings(await loadJson<unknown>(STORAGE_KEY, null));
+    useProgressStore().setGender(data.value.gender);
     loaded.value = true;
   }
 
   async function setGender(value: Gender | null) {
     data.value = { ...data.value, gender: value };
+    useProgressStore().setGender(value);
     await persist();
   }
 
@@ -71,11 +99,29 @@ export const useSettingsStore = defineStore('settings', () => {
     await persist();
   }
 
-  /** Détecte le pays grâce à la position de l'appareil, puis l'enregistre. Lève une LocationError. */
+  /** Détecte le pays et la position de l'appareil, puis les enregistre. Lève une LocationError. */
   async function detectAndSetCountry(): Promise<string> {
-    const code = await detectCountry();
-    await setCountry(code);
+    const { code, lat, lon } = await detectPlace();
+    data.value = { ...data.value, countryCode: code, location: { lat, lon } };
+    await persist();
     return code;
+  }
+
+  async function setNotifications(value: NotificationSettings) {
+    data.value = { ...data.value, notifications: normalizeNotificationSettings(value) };
+    await persist();
+  }
+
+  async function setTheme(value: ThemeSetting) {
+    if (!isThemeSetting(value)) return;
+    data.value = { ...data.value, theme: value };
+    await persist();
+  }
+
+  async function setPrayerMethod(value: MethodId | null) {
+    if (value !== null && !isMethodId(value)) return;
+    data.value = { ...data.value, prayerMethod: value };
+    await persist();
   }
 
   /** Enregistre l'adresse du serveur. Renvoie `false` si elle est refusée (voir normalizeServerUrl). */
@@ -183,6 +229,10 @@ export const useSettingsStore = defineStore('settings', () => {
     syncError,
     gender,
     countryCode,
+    location,
+    prayerMethod,
+    theme,
+    notifications,
     serverUrl,
     user,
     lastSync,
@@ -190,6 +240,9 @@ export const useSettingsStore = defineStore('settings', () => {
     load,
     setGender,
     setCountry,
+    setPrayerMethod,
+    setTheme,
+    setNotifications,
     detectAndSetCountry,
     setServerUrl,
     authenticate,

@@ -10,7 +10,7 @@ export const PRAYERS: Prayer[] = [
     name: 'Fajr',
     arabic: 'الفجر',
     hint: 'Aube',
-    before: [{ id: 'fajr-before', name: 'Sunna de Fajr', rakaat: 2, emphasized: true }],
+    before: [{ id: 'fajr-before', name: 'Sunna de Fajr', rakaat: 2 }],
     after: [],
   },
   {
@@ -18,15 +18,15 @@ export const PRAYERS: Prayer[] = [
     name: 'Dhuhr',
     arabic: 'الظهر',
     hint: 'Midi',
-    before: [{ id: 'dhuhr-before', name: 'Sunna avant Dhuhr', rakaat: 4, emphasized: true }],
-    after: [{ id: 'dhuhr-after', name: 'Sunna après Dhuhr', rakaat: 2, emphasized: true }],
+    before: [{ id: 'dhuhr-before', name: 'Sunna avant Dhuhr', rakaat: 4 }],
+    after: [{ id: 'dhuhr-after', name: 'Sunna après Dhuhr', rakaat: 2 }],
   },
   {
     id: 'asr',
     name: 'Asr',
     arabic: 'العصر',
     hint: 'Après-midi',
-    before: [{ id: 'asr-before', name: 'Sunna avant Asr', rakaat: 4, emphasized: false }],
+    before: [{ id: 'asr-before', name: 'Sunna avant Asr', rakaat: 4 }],
     after: [],
   },
   {
@@ -35,7 +35,7 @@ export const PRAYERS: Prayer[] = [
     arabic: 'المغرب',
     hint: 'Coucher du soleil',
     before: [],
-    after: [{ id: 'maghrib-after', name: 'Sunna après Maghrib', rakaat: 2, emphasized: true }],
+    after: [{ id: 'maghrib-after', name: 'Sunna après Maghrib', rakaat: 2 }],
   },
   {
     id: 'isha',
@@ -44,8 +44,8 @@ export const PRAYERS: Prayer[] = [
     hint: 'Nuit',
     before: [],
     after: [
-      { id: 'isha-after', name: 'Sunna après Isha', rakaat: 2, emphasized: true },
-      { id: 'witr', name: 'Witr', rakaat: 1, emphasized: true },
+      { id: 'isha-after', name: 'Sunna après Isha', rakaat: 2 },
+      { id: 'witr', name: 'Witr', rakaat: 1 },
     ],
   },
 ];

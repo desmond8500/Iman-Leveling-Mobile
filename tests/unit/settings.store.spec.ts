@@ -121,6 +121,34 @@ describe('settings store', () => {
     });
   });
 
+  describe('position et méthode de calcul', () => {
+    it('ignore une position ou une méthode invalide', () => {
+      const s = normalizeSettings({ location: { lat: 99, lon: 0 }, prayerMethod: 'XXX' });
+      expect(s.location).toBeNull();
+      expect(s.prayerMethod).toBeNull();
+      expect(normalizeSettings({ location: { lat: '1', lon: 2 } }).location).toBeNull();
+      expect(normalizeSettings({ location: { lat: 14.69, lon: -17.45 } }).location).toEqual({ lat: 14.69, lon: -17.45 });
+    });
+
+    it('propose la méthode du pays, sauf choix explicite', async () => {
+      const { settings } = await freshStores();
+      expect(settings.prayerMethod).toBe('MWL');
+      await settings.setCountry('SA');
+      expect(settings.prayerMethod).toBe('MAKKAH');
+      await settings.setPrayerMethod('UOIF');
+      expect(settings.prayerMethod).toBe('UOIF');
+      await settings.setPrayerMethod(null);
+      expect(settings.prayerMethod).toBe('MAKKAH');
+    });
+
+    it('refuse une méthode inconnue', async () => {
+      const { settings } = await freshStores();
+      await settings.setPrayerMethod('ISNA');
+      await settings.setPrayerMethod('XXX' as never);
+      expect(settings.prayerMethod).toBe('ISNA');
+    });
+  });
+
   describe('adresse du serveur', () => {
     it('refuse http hors localhost et accepte https', async () => {
       const { settings } = await freshStores();

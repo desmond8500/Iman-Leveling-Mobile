@@ -9,7 +9,20 @@
       @toggle="$emit('toggle-sunnah', s.id)"
     />
 
-    <PrayerCard :prayer="prayer" :disabled="readonly" @toggle="$emit('toggle-prayer', prayer.id)" />
+    <PrayerCard
+      :prayer="prayer"
+      :time="time"
+      :disabled="readonly"
+      @toggle="$emit('toggle-prayer', prayer.id)"
+    />
+
+    <!-- Lieu de la prière : mosquée ou maison (hommes uniquement) -->
+    <PlaceToggle
+      v-if="showPlace"
+      :mosque="prayer.mosque"
+      :disabled="readonly"
+      @toggle="$emit('toggle-place', prayer.id)"
+    />
 
     <!-- Sunnas à faire après la prière : en dessous -->
     <SunnahRow
@@ -23,13 +36,22 @@
 </template>
 
 <script setup lang="ts">
+import PlaceToggle from './PlaceToggle.vue';
 import PrayerCard from './PrayerCard.vue';
 import SunnahRow from './SunnahRow.vue';
 import type { PrayerId, PrayerView, SunnahId } from '@/types';
 
-defineProps<{ prayer: PrayerView; readonly?: boolean }>();
+defineProps<{
+  prayer: PrayerView;
+  readonly?: boolean;
+  /** Afficher le choix mosquée / maison (hommes). */
+  showPlace?: boolean;
+  /** Heure de la prière, déjà formatée. */
+  time?: string | null;
+}>();
 defineEmits<{
   (e: 'toggle-prayer', id: PrayerId): void;
+  (e: 'toggle-place', id: PrayerId): void;
   (e: 'toggle-sunnah', id: SunnahId): void;
 }>();
 </script>

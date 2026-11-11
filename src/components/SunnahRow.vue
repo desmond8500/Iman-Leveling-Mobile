@@ -17,16 +17,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import { IonIcon } from '@ionic/vue';
 import { checkmarkCircle, ellipseOutline } from 'ionicons/icons';
 import type { SunnahView } from '@/types';
-import { sunnahReward } from '@/utils/hasanat';
+import { SUNNAH_HASANAT } from '@/utils/hasanat';
 
-const props = defineProps<{ sunnah: SunnahView; disabled?: boolean }>();
+defineProps<{ sunnah: SunnahView; disabled?: boolean }>();
 defineEmits<{ (e: 'toggle'): void }>();
 
-const reward = computed(() => sunnahReward(props.sunnah.emphasized));
+const reward = SUNNAH_HASANAT;
 </script>
 
 <style scoped>

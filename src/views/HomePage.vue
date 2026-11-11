@@ -24,6 +24,16 @@
           @open-calendar="calendarOpen = true"
         />
 
+        <p v-if="next" class="next-prayer">
+          <ion-icon :icon="timeOutline" />
+          Prochaine prière : <strong>{{ next.name }}</strong> à {{ next.at }}
+          <span class="in">dans {{ next.in }}</span>
+        </p>
+        <p v-else-if="!settings.location" class="next-prayer muted">
+          <ion-icon :icon="locationOutline" />
+          Active ta position dans les Paramètres pour afficher les heures de prière.
+        </p>
+
         <div class="section-title">
           <h2>{{ store.isToday ? 'Prières du jour' : capitalize(formatLong(store.selectedDate)) }}</h2>
           <span class="count">{{ store.doneCount }} / {{ store.dayPrayers.length }}</span>
@@ -48,14 +58,16 @@
             :key="prayer.id"
             :prayer="prayer"
             :readonly="!store.isToday"
+            :show-place="store.gender === 'male'"
+            :time="timeOf(prayer.id)"
             @toggle-prayer="onTogglePrayer"
+            @toggle-place="onTogglePlace"
             @toggle-sunnah="onToggleSunnah"
           />
         </div>
 
         <p class="tip">
-          Les 5 prières accomplies rapportent un bonus de 50 Hasanat. Les prières surérogatoires
-          (sunnas) rapportent 10 ou 5 Hasanat.
+          {{ rulesText }}
         </p>
       </div>
 
@@ -92,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import {
   IonButton,
   IonButtons,
@@ -105,20 +117,65 @@ import {
   IonToast,
   IonToolbar,
 } from '@ionic/vue';
-import { lockClosedOutline } from 'ionicons/icons';
+import { lockClosedOutline, locationOutline, timeOutline } from 'ionicons/icons';
 import MonthCalendar from '@/components/MonthCalendar.vue';
 import PlayerHeader from '@/components/PlayerHeader.vue';
 import PrayerGroup from '@/components/PrayerGroup.vue';
 import WeekStrip from '@/components/WeekStrip.vue';
 import { useProgressStore } from '@/stores/progress';
+import { useSettingsStore } from '@/stores/settings';
 import type { PrayerId, SunnahId } from '@/types';
-import { formatLong } from '@/utils/calendar';
+import { formatLong, parseKey } from '@/utils/calendar';
+import { computePrayerTimes, formatTime, nextPrayer, type PrayerKey } from '@/utils/prayerTimes';
+import {
+  ALL_PRAYERS_BONUS,
+  PRAYER_HOME_HASANAT,
+  PRAYER_MOSQUE_HASANAT,
+  SUNNAH_HASANAT,
+} from '@/utils/hasanat';
 
 const store = useProgressStore();
+const settings = useSettingsStore();
 const toast = reactive({ open: false, message: '' });
 const calendarOpen = ref(false);
 
 const levelOf = (key: string) => store.dayStats(key).level;
+
+const rulesText = computed(() =>
+  store.gender === 'male'
+    ? `Chaque prière obligatoire rapporte ${PRAYER_MOSQUE_HASANAT} Hasanat à la mosquée et ${PRAYER_HOME_HASANAT} à la maison. Chaque sunna rapporte ${SUNNAH_HASANAT} Hasanat. Les 5 prières accomplies donnent un bonus de ${ALL_PRAYERS_BONUS}.`
+    : `Chaque prière obligatoire et chaque sunna rapportent ${SUNNAH_HASANAT} Hasanat. Les 5 prières accomplies donnent un bonus de ${ALL_PRAYERS_BONUS}. Renseigne ton genre dans les Paramètres.`,
+);
+// --- Heures de prière ---
+const now = ref(new Date());
+let timer: ReturnType<typeof setInterval> | undefined;
+onMounted(() => {
+  now.value = new Date();
+  timer = setInterval(() => (now.value = new Date()), 30000);
+});
+onBeforeUnmount(() => clearInterval(timer));
+
+const calcOptions = computed(() => ({ method: settings.prayerMethod }));
+
+/** Heures du jour affiché (les jours passés aussi, pour retrouver les horaires). */
+const dayTimes = computed(() =>
+  settings.location ? computePrayerTimes(parseKey(store.selectedDate), settings.location, calcOptions.value) : null,
+);
+const timeOf = (id: PrayerKey): string | null => {
+  const date = dayTimes.value?.[id];
+  return date ? formatTime(date) : null;
+};
+
+const next = computed(() => {
+  if (!settings.location) return null;
+  const n = nextPrayer(now.value, settings.location, calcOptions.value);
+  if (!n) return null;
+  const minutes = Math.max(1, Math.round((n.time.getTime() - now.value.getTime()) / 60000));
+  const h = Math.floor(minutes / 60);
+  const name = store.dayPrayers.find((p) => p.id === n.id)?.name ?? n.id;
+  return { name, at: formatTime(n.time), in: h > 0 ? `${h} h ${String(minutes % 60).padStart(2, '0')}` : `${minutes} min` };
+});
+
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 function onPickDate(key: string) {
@@ -141,6 +198,10 @@ async function onTogglePrayer(id: PrayerId) {
   notify(await store.togglePrayer(id));
 }
 
+async function onTogglePlace(id: PrayerId) {
+  notify(await store.togglePlace(id));
+}
+
 async function onToggleSunnah(id: SunnahId) {
   notify(await store.toggleSunnah(id));
 }
@@ -151,6 +212,25 @@ async function onToggleSunnah(id: SunnahId) {
   max-width: 560px;
   margin: 0 auto;
   padding: 16px;
+}
+.next-prayer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--iman-card);
+  font-size: 13px;
+}
+.next-prayer .in {
+  margin-left: auto;
+  color: var(--iman-gold);
+  font-weight: 700;
+}
+.next-prayer.muted {
+  color: var(--iman-text-soft);
 }
 .section-title {
   display: flex;
