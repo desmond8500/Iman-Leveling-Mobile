@@ -1,7 +1,7 @@
 {
   "name": "iman-leveling-mobile",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Iman Leveling : suivi des pratiques religieuses sous forme de jeu mobile",
   "engines": {

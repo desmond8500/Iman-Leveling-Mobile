@@ -218,6 +218,8 @@
             </form>
           </template>
         </section>
+
+        <p class="app-version">Iman Leveling {{ versionLabel() }}</p>
       </div>
 
       <ion-toast
@@ -266,6 +268,7 @@ import { DEFAULT_SERVER_URL } from '@/services/api';
 import { requestNotificationPermission, notificationsSupported } from '@/services/notifications';
 import { ABLUTION_CHOICES, END_CHOICES } from '@/utils/notifications';
 import { isThemeSetting } from '@/utils/theme';
+import { versionLabel } from '@/utils/version';
 import { METHODS, METHOD_IDS, isMethodId } from '@/utils/prayerTimes';
 
 const settings = useSettingsStore();
@@ -418,6 +421,12 @@ const lastSyncLabel = computed(() => {
 </script>
 
 <style scoped>
+.app-version {
+  margin: 24px 0 8px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--iman-text-soft);
+}
 .link-button {
   align-self: flex-start;
   padding: 4px 0;
