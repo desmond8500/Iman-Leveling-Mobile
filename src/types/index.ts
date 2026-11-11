@@ -14,8 +14,6 @@ export interface Sunnah {
   id: SunnahId;
   name: string;
   rakaat: number;
-  /** Sunna confirmée (mu'akkada) : récompense plus élevée. */
-  emphasized: boolean;
 }
 
 export interface Prayer {
@@ -33,6 +31,10 @@ export type SunnahView = Sunnah & { done: boolean };
 
 export interface PrayerView extends Prayer {
   done: boolean;
+  /** Faite à la mosquée (compte pour les hommes). */
+  mosque: boolean;
+  /** Hasanat que rapporte cette prière, selon le genre et le lieu. */
+  reward: number;
   before: SunnahView[];
   after: SunnahView[];
 }
@@ -53,6 +55,8 @@ export interface Dhikr {
 
 export interface DayRecord {
   prayers: Partial<Record<PrayerId, boolean>>;
+  /** Prières faites à la mosquée. Absent avant l'ajout du choix du lieu. */
+  mosque?: Partial<Record<PrayerId, boolean>>;
   /** Absent dans les données enregistrées avant l'ajout des sunnas. */
   sunnah?: Partial<Record<SunnahId, boolean>>;
   /** Clés « période:id » (voir adhkarKey). Absent avant l'ajout des invocations. */
@@ -104,5 +108,13 @@ export interface SettingsData {
   gender: Gender | null;
   /** Code pays ISO 3166-1 alpha-2 (ex. « FR »). */
   countryCode: string | null;
+  /** Position approximative (arrondie à 0,01°, environ 1 km), pour calculer les heures de prière. */
+  location: { lat: number; lon: number } | null;
+  /** Méthode de calcul des heures ; `null` = celle qui correspond au pays. */
+  prayerMethod: string | null;
+  /** Apparence : automatique (bleu le vendredi), émeraude ou bleu. */
+  theme: 'auto' | 'emerald' | 'blue';
+  /** Rappels d'ablutions et de prière (application mobile uniquement). */
+  notifications: { enabled: boolean; ablutionMinutes: number };
   server: ServerSettings;
 }

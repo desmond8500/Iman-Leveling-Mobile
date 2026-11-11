@@ -33,11 +33,11 @@ describe('progress store', () => {
     expect(store.levelInfo.level).toBe(1);
   });
 
-  it('cocher une prière donne 20 Hasanat et sauvegarde', async () => {
+  it('cocher une prière donne 27 Hasanat (genre non renseigné) et sauvegarde', async () => {
     const store = useProgressStore();
     await store.load();
     const result = await store.togglePrayer('fajr');
-    expect(result.hasanatDelta).toBe(20);
+    expect(result.hasanatDelta).toBe(27);
     expect(store.doneCount).toBe(1);
     expect(repo.saved().days[toDateKey(new Date())].prayers.fajr).toBe(true);
   });
@@ -47,20 +47,19 @@ describe('progress store', () => {
     await store.load();
     await store.togglePrayer('fajr');
     const result = await store.togglePrayer('fajr');
-    expect(result.hasanatDelta).toBe(-20);
+    expect(result.hasanatDelta).toBe(-27);
     expect(store.totalHasanat).toBe(0);
   });
 
-  it('les 5 prières donnent 150 Hasanat, un niveau et une série de 1 jour', async () => {
+  it('les 5 prières donnent 185 Hasanat (135 + 50 de bonus), le niveau 2 et une série de 1 jour', async () => {
     const store = useProgressStore();
     await store.load();
     for (const id of ['fajr', 'dhuhr', 'asr', 'maghrib'] as const) {
       await store.togglePrayer(id);
     }
     const last = await store.togglePrayer('isha');
-    expect(last.hasanatDelta).toBe(70); // 20 + 50 de bonus
-    expect(last.leveledUp).toBe(true);
-    expect(store.totalHasanat).toBe(150);
+    expect(last.hasanatDelta).toBe(77); // 27 + 50 de bonus
+    expect(store.totalHasanat).toBe(185);
     expect(store.levelInfo.level).toBe(2);
     expect(store.streak).toBe(1);
   });
@@ -73,16 +72,16 @@ describe('progress store', () => {
     const store = useProgressStore();
     await store.load();
     expect(store.doneCount).toBe(2);
-    expect(store.totalHasanat).toBe(40);
+    expect(store.totalHasanat).toBe(54);
   });
 
   describe('prières surérogatoires', () => {
-    it('une sunna confirmée donne 10 Hasanat, une autre 5', async () => {
+    it('chaque sunna donne 27 Hasanat', async () => {
       const store = useProgressStore();
       await store.load();
-      expect((await store.toggleSunnah('fajr-before')).hasanatDelta).toBe(10);
-      expect((await store.toggleSunnah('asr-before')).hasanatDelta).toBe(5);
-      expect(store.totalHasanat).toBe(15);
+      expect((await store.toggleSunnah('fajr-before')).hasanatDelta).toBe(27);
+      expect((await store.toggleSunnah('asr-before')).hasanatDelta).toBe(27);
+      expect(store.totalHasanat).toBe(54);
     });
 
     it('décocher une sunna retire ses Hasanat', async () => {
@@ -90,7 +89,7 @@ describe('progress store', () => {
       await store.load();
       await store.toggleSunnah('witr');
       const result = await store.toggleSunnah('witr');
-      expect(result.hasanatDelta).toBe(-10);
+      expect(result.hasanatDelta).toBe(-27);
       expect(store.totalHasanat).toBe(0);
     });
 
@@ -119,7 +118,7 @@ describe('progress store', () => {
       setActivePinia(createPinia());
       const reloaded = useProgressStore();
       await reloaded.load();
-      expect(reloaded.totalHasanat).toBe(10);
+      expect(reloaded.totalHasanat).toBe(27);
     });
   });
 
@@ -164,6 +163,95 @@ describe('progress store', () => {
     });
   });
 
+  describe('genre et lieu de la prière', () => {
+    it('femme ou genre non renseigné : 27 Hasanat par prière, sans choix du lieu', async () => {
+      const store = useProgressStore();
+      await store.load();
+      store.setGender('female');
+      expect((await store.togglePrayer('fajr')).hasanatDelta).toBe(27);
+      expect((await store.togglePlace('fajr')).hasanatDelta).toBe(0);
+      expect(store.dayPrayers[0].mosque).toBe(false);
+      expect(store.dayPrayers[0].reward).toBe(27);
+    });
+
+    it('homme : 1 Hasanat à la maison (par défaut), 27 à la mosquée', async () => {
+      const store = useProgressStore();
+      await store.load();
+      store.setGender('male');
+      expect((await store.togglePrayer('dhuhr')).hasanatDelta).toBe(1);
+      expect(store.dayPrayers[1].reward).toBe(1);
+
+      expect((await store.togglePlace('dhuhr')).hasanatDelta).toBe(26);
+      expect(store.dayPrayers[1].mosque).toBe(true);
+      expect(store.dayPrayers[1].reward).toBe(27);
+      expect(store.totalHasanat).toBe(27);
+
+      expect((await store.togglePlace('dhuhr')).hasanatDelta).toBe(-26);
+      expect(store.totalHasanat).toBe(1);
+    });
+
+    it('le lieu n\'ajoute rien tant que la prière n\'est pas faite', async () => {
+      const store = useProgressStore();
+      await store.load();
+      store.setGender('male');
+      await store.togglePlace('asr');
+      expect(store.totalHasanat).toBe(0);
+      await store.togglePrayer('asr');
+      expect(store.totalHasanat).toBe(27);
+    });
+
+    it('homme : 5 prières à la maison = 5 + 50 de bonus, toutes à la mosquée = 135 + 50', async () => {
+      const store = useProgressStore();
+      await store.load();
+      store.setGender('male');
+      const ids = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'] as const;
+      for (const id of ids) await store.togglePrayer(id);
+      expect(store.totalHasanat).toBe(55);
+      for (const id of ids) await store.togglePlace(id);
+      expect(store.totalHasanat).toBe(185);
+    });
+
+    it('les sunnas valent 27 pour les hommes comme pour les femmes', async () => {
+      const store = useProgressStore();
+      await store.load();
+      for (const g of ['male', 'female'] as const) {
+        store.setGender(g);
+        const before = store.totalHasanat;
+        const d = (await store.toggleSunnah(g === 'male' ? 'witr' : 'isha-after')).hasanatDelta;
+        expect(d).toBe(27);
+        expect(store.totalHasanat).toBe(before + 27);
+      }
+    });
+
+    it('recalcule tout l\'historique quand le genre change', async () => {
+      const key = toDateKey(new Date());
+      setProgressRepository(
+        memoryRepository({ version: 1, days: { [key]: { prayers: { fajr: true, dhuhr: true } } } }),
+      );
+      const store = useProgressStore();
+      await store.load();
+      store.setGender('female');
+      expect(store.totalHasanat).toBe(54);
+      store.setGender('male');
+      expect(store.totalHasanat).toBe(2);
+    });
+
+    it('conserve le lieu au rechargement', async () => {
+      const store = useProgressStore();
+      await store.load();
+      store.setGender('male');
+      await store.togglePrayer('isha');
+      await store.togglePlace('isha');
+
+      setActivePinia(createPinia());
+      const reloaded = useProgressStore();
+      await reloaded.load();
+      reloaded.setGender('male');
+      expect(reloaded.dayPrayers[4].mosque).toBe(true);
+      expect(reloaded.totalHasanat).toBe(27);
+    });
+  });
+
   describe('calendrier et jours passés', () => {
     const yesterday = () => addDays(toDateKey(new Date()), -1);
 
@@ -193,7 +281,7 @@ describe('progress store', () => {
       expect(store.isToday).toBe(false);
       expect(store.doneCount).toBe(5);
       expect(store.dayPrayers.every((p) => p.done)).toBe(true);
-      expect(store.selectedStats.hasanat).toBe(150);
+      expect(store.selectedStats.hasanat).toBe(185);
     });
 
     it('refuse de modifier un jour passé', async () => {

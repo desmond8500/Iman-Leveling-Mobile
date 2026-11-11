@@ -8,10 +8,14 @@
   >
     <ion-icon class="prayer-icon" :icon="icons[prayer.id]" />
     <span class="prayer-text">
-      <span class="prayer-name">{{ prayer.name }}</span>
+      <span class="prayer-name">
+        {{ prayer.name }}
+        <span class="prayer-arabic" dir="rtl" lang="ar">{{ prayer.arabic }}</span>
+      </span>
       <span class="prayer-hint">{{ prayer.hint }}</span>
     </span>
-    <span class="prayer-arabic" dir="rtl" lang="ar">{{ prayer.arabic }}</span>
+    <span v-if="time" class="prayer-time">{{ time }}</span>
+    <span class="reward">+{{ prayer.reward }}</span>
     <ion-icon class="check" :icon="prayer.done ? checkmarkCircle : ellipseOutline" />
   </button>
 </template>
@@ -30,7 +34,16 @@ import {
 import type { PrayerId } from '@/types';
 
 defineProps<{
-  prayer: { id: PrayerId; name: string; arabic: string; hint: string; done: boolean };
+  prayer: {
+    id: PrayerId;
+    name: string;
+    arabic: string;
+    hint: string;
+    done: boolean;
+    reward: number;
+  };
+  /** Heure de la prière (« 05:48 »), quand la position est connue. */
+  time?: string | null;
   disabled?: boolean;
 }>();
 defineEmits<{ (e: 'toggle'): void }>();
@@ -49,7 +62,7 @@ const icons: Record<PrayerId, string> = {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
@@ -71,11 +84,13 @@ const icons: Record<PrayerId, string> = {
   border-color: var(--iman-emerald);
 }
 .prayer-icon {
+  flex: none;
   font-size: 26px;
   color: var(--iman-gold);
 }
 .prayer-text {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -83,15 +98,30 @@ const icons: Record<PrayerId, string> = {
   font-size: 17px;
   font-weight: 700;
 }
+.prayer-arabic {
+  margin-left: 6px;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--iman-text-soft);
+}
 .prayer-hint {
   font-size: 12px;
   color: var(--iman-text-soft);
 }
-.prayer-arabic {
-  font-size: 20px;
-  color: var(--iman-text-soft);
+.prayer-time {
+  flex: none;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.reward {
+  flex: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--iman-gold);
 }
 .check {
+  flex: none;
   font-size: 28px;
   color: var(--iman-text-soft);
 }

@@ -67,3 +67,13 @@ export async function detectCountry(): Promise<string> {
   const { latitude, longitude } = await getCoordinates();
   return reverseGeocodeCountry(latitude, longitude);
 }
+
+/** Arrondit une coordonnée à 0,01° (environ 1 km) : assez précis pour les heures de prière. */
+export const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/** Détecte le pays et renvoie aussi la position arrondie (conservée sur l'appareil). */
+export async function detectPlace(): Promise<{ code: string; lat: number; lon: number }> {
+  const { latitude, longitude } = await getCoordinates();
+  const code = await reverseGeocodeCountry(latitude, longitude);
+  return { code, lat: round2(latitude), lon: round2(longitude) };
+}

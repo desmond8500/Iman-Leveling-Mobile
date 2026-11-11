@@ -18,6 +18,7 @@ export function sanitizeProgress(input: unknown): ProgressData {
   for (const [key, day] of Object.entries(raw)) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(key) || !isObject(day)) continue;
     const record: DayRecord = { prayers: cleanFlags(day.prayers) };
+    if (isObject(day.mosque)) record.mosque = cleanFlags(day.mosque);
     if (isObject(day.sunnah)) record.sunnah = cleanFlags(day.sunnah);
     if (isObject(day.adhkar)) record.adhkar = cleanFlags(day.adhkar);
     days[key] = record;
@@ -33,6 +34,7 @@ const orFlags = (a?: Record<string, boolean>, b?: Record<string, boolean>) => {
 
 function mergeDay(a?: DayRecord, b?: DayRecord): DayRecord {
   const merged: DayRecord = { prayers: orFlags(a?.prayers, b?.prayers) };
+  if (a?.mosque || b?.mosque) merged.mosque = orFlags(a?.mosque, b?.mosque);
   if (a?.sunnah || b?.sunnah) merged.sunnah = orFlags(a?.sunnah, b?.sunnah);
   if (a?.adhkar || b?.adhkar) merged.adhkar = orFlags(a?.adhkar, b?.adhkar);
   return merged;

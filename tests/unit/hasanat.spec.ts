@@ -1,35 +1,53 @@
 import {
+  ADHKAR_HASANAT,
+  ALL_PRAYERS_BONUS,
+  SUNNAH_HASANAT,
   hasanatForDay,
   hasanatToNextLevel,
   levelFromHasanat,
-  sunnahReward,
+  prayerReward,
 } from '../../src/utils/hasanat';
 
-describe('hasanatForDay', () => {
-  it('donne 20 Hasanat par prière', () => {
-    expect(hasanatForDay(0, 5)).toBe(0);
-    expect(hasanatForDay(3, 5)).toBe(60);
+describe('prayerReward', () => {
+  it('homme : 27 à la mosquée, 1 à la maison', () => {
+    expect(prayerReward('male', true)).toBe(27);
+    expect(prayerReward('male', false)).toBe(1);
   });
 
-  it('ajoute 50 Hasanat de bonus quand les 5 prières sont faites', () => {
-    expect(hasanatForDay(5, 5)).toBe(150);
+  it('femme : 27, quel que soit le lieu', () => {
+    expect(prayerReward('female', false)).toBe(27);
+    expect(prayerReward('female', true)).toBe(27);
   });
 
-  it('ajoute les Hasanat des sunnas', () => {
-    expect(hasanatForDay(1, 5, 15)).toBe(35);
-    expect(hasanatForDay(5, 5, 60)).toBe(210);
-  });
-
-  it('ajoute 5 Hasanat par invocation', () => {
-    expect(hasanatForDay(0, 5, 0, 3)).toBe(15);
-    expect(hasanatForDay(5, 5, 10, 2)).toBe(170);
+  it('genre non renseigné : 27', () => {
+    expect(prayerReward(null, false)).toBe(27);
   });
 });
 
-describe('sunnahReward', () => {
-  it('10 pour une sunna confirmée, 5 sinon', () => {
-    expect(sunnahReward(true)).toBe(10);
-    expect(sunnahReward(false)).toBe(5);
+describe('hasanatForDay', () => {
+  const base = { prayerHasanat: 0, done: 0, total: 5, sunnah: 0, adhkar: 0 };
+
+  it('vaut 0 sans rien de fait', () => {
+    expect(hasanatForDay(base)).toBe(0);
+  });
+
+  it('additionne les Hasanat des prières', () => {
+    expect(hasanatForDay({ ...base, prayerHasanat: 54, done: 2 })).toBe(54);
+  });
+
+  it(`ajoute ${ALL_PRAYERS_BONUS} de bonus quand les 5 prières sont faites`, () => {
+    expect(hasanatForDay({ ...base, prayerHasanat: 135, done: 5 })).toBe(185);
+    expect(hasanatForDay({ ...base, prayerHasanat: 5, done: 5 })).toBe(55);
+  });
+
+  it('pas de bonus si une prière manque', () => {
+    expect(hasanatForDay({ ...base, prayerHasanat: 108, done: 4 })).toBe(108);
+  });
+
+  it(`compte ${SUNNAH_HASANAT} par sunna et ${ADHKAR_HASANAT} par invocation`, () => {
+    expect(hasanatForDay({ ...base, sunnah: 2 })).toBe(54);
+    expect(hasanatForDay({ ...base, adhkar: 3 })).toBe(15);
+    expect(hasanatForDay({ prayerHasanat: 27, done: 1, total: 5, sunnah: 1, adhkar: 1 })).toBe(59);
   });
 });
 
