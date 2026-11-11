@@ -3,6 +3,7 @@
 ## Server
 
 - [] Ajouter swagger pour les API
+- [] intégrer le lien du serveur à l'aplication [imanserver.yonkou.info](https://imanserver.yonkou.info/)
 
 ## Interface
 
@@ -64,3 +65,16 @@
 ## Jeune
 
 - [] Cocher les jours jeunés
+
+## Widgets
+
+- [] Crée un widget pour l'application mobile qui affiche la date, la prière valide dans l'heure en cours et les prière surrérogatoires
+- [] ajouter la possibilité de valider directement les taches faites
+- [] Widget des invocations du matin et du soir,
+  - une invocation à la fois
+  - bascule sur la suivante quand c'est validé
+- [] Widget ramadan
+  - Jours fait et jours restants
+  - heure de la rupture
+- Widget hadith aléaoire
+- Widget nom d'allah aléaoire
