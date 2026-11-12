@@ -1,8 +1,13 @@
 # [Todo](readme.md)
 
+## Autres
+
+- [] donner la possibilité de modifier les éléments du jour précédent jusqu'a la prière de fajr
+- [] écrire soubh en arabe sur la home page 
+
 ## Server
 
-- [x] Ajouter swagger pour les API (dépôt serveur : /docs)
+- [x] Ajouter swagger pour les API (dépôt serveur : /docs) je ne le vois pas
 
 ## Rappels (pause)
 
