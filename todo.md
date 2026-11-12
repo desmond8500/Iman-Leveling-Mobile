@@ -3,20 +3,15 @@
 ## Autres
 
 - [] donner la possibilité de modifier les éléments du jour précédent jusqu'a la prière de fajr
-- [] écrire soubh en arabe sur la home page 
+- [] écrire soubh en arabe sur la home page
 
-## Server
-
-- [x] Ajouter swagger pour les API (dépôt serveur : /docs) je ne le vois pas
-
-## Rappels (pause)
+## Rappels 
 
 - [] ajouter une page
 - [] utiliser l'api HadeethEnc 
 
 ## Zakat (pause)
 
-- [] Créer une page avec des sous sections, détails et calculs
 - [] Zakat al-Maal
 
 ## Héritage en islam (pause)
@@ -30,7 +25,7 @@
 
 ## Coran
 
-- [] Marque page (pause)
+- [] Marque page (ne semble pas marcher)
 
 ## Evenements  (pause)
 
@@ -41,7 +36,7 @@
 - [] Bapteme
 - [] decès
 
-## Widgets (pause)
+## Widgets
 
 - [] Crée un widget pour l'application mobile qui affiche la date, la prière valide dans l'heure en cours et les prière surrérogatoires
 - [] ajouter la possibilité de valider directement les taches faites
@@ -52,4 +47,4 @@
   - Jours fait et jours restants
   - heure de la rupture
 - [] Widget hadith aléaoire
-- [] Widget nom d'allah aléaoire 
+- [] Widget nom d'allah aléatoire
