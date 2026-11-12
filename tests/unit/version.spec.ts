@@ -17,10 +17,12 @@ describe('version', () => {
     expect(androidVersionCode('abc')).toBeNull();
     expect(androidVersionCode('1.100.0')).toBeNull();
   });
-  it('le projet Android déclare une version valide', () => {
+  it('package.json et Android restent alignés', () => {
+    const version = JSON.parse(readFileSync('package.json', 'utf8')).version as string;
     const gradle = readFileSync('android/app/build.gradle', 'utf8');
-    expect(gradle).toMatch(/versionCode \d+/);
-    expect(gradle).toMatch(/versionName "[^"]+"/);
+    expect(gradle).toContain(`versionName "${version}"`);
+    expect(gradle).toContain(`versionCode ${androidVersionCode(version)}`);
   });
+
 
 });
