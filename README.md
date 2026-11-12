@@ -182,6 +182,19 @@ pour toute mise à jour. La commande vérifie la version de Java : si Gradle aff
 `invalid source release: 21`, c'est que le JDK utilisé est trop ancien. Installe un JDK 21 (ou
 utilise celui d'Android Studio, dossier `jbr`) et définis `JAVA_HOME`.
 
+## Widgets Android
+
+Quatre widgets s'ajoutent depuis l'écran d'accueil du téléphone (appui long > Widgets > Iman Leveling) :
+
+- **Prière en cours** : date (grégorienne et hégirienne), prière dont le temps est valable maintenant, ses sunnas ; on les valide d'une touche. Après minuit, Isha de la veille reste validable jusqu'à Fajr.
+- **Invocations** : matin (avant 15 h) ou soir ; une invocation à la fois, la suivante apparaît à la validation.
+- **Ramadan** : jours jeûnés, jours à venir, heure de la rupture (avant le mois : compte à rebours).
+- **Nom d'Allah** : un nom au hasard ; « Autre nom » en tire un autre.
+
+Fonctionnement : l'application envoie un instantané JSON aux widgets (`src/utils/widgetSnapshot.ts`, plugin natif `WidgetBridge`). Une validation faite dans un widget est enregistrée dans une file puis appliquée par l'application à son prochain passage au premier plan (idempotent, aujourd'hui et hier avant Fajr seulement). **Ouvre l'application au moins une fois** pour que les widgets aient des données, et après chaque changement de position ou de méthode.
+
+Limites connues : les widgets se redessinent au début et à la fin de chaque prière (alarme inexacte) et au plus toutes les 30 min sinon, selon les économies d'énergie du téléphone ; le widget hadith n'existe pas encore (source de hadiths à valider) ; ce code natif n'a pas été compilé ni essayé sur appareil au moment de l'écriture.
+
 ## Scénario de test (navigateur)
 
 1. L'écran de démarrage s'affiche environ 2 secondes, puis l'accueil : niveau 1, 0 Hasanat, série 0.

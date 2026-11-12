@@ -4,4 +4,8 @@
     <string name="title_activity_main">Iman Leveling</string>
     <string name="package_name">com.iman.leveling</string>
     <string name="custom_url_scheme">com.iman.leveling</string>
+    <string name="widget_prayer_desc">Date, prière en cours et sunnas, à valider d\'une touche</string>
+    <string name="widget_dhikr_desc">Invocations du matin et du soir, une à la fois</string>
+    <string name="widget_ramadan_desc">Jours jeûnés, jours à venir et heure de la rupture</string>
+    <string name="widget_name_desc">Un nom d\'Allah au hasard</string>
 </resources>

@@ -38,16 +38,18 @@
 
 ## Widgets
 
-- [] Crée un widget pour l'application mobile qui affiche la date, la prière valide dans l'heure en cours et les prière surrérogatoires
-- [] ajouter la possibilité de valider directement les taches faites
-- [] Widget des invocations du matin et du soir,
+> Code natif non compilé ni testé sur téléphone à ce stade : cases cochées = implémenté, à vérifier sur appareil. Le widget hadith attend une source de hadiths vérifiée.
+
+- [x] Crée un widget pour l'application mobile qui affiche la date, la prière valide dans l'heure en cours et les prière surrérogatoires
+- [x] ajouter la possibilité de valider directement les taches faites
+- [x] Widget des invocations du matin et du soir,
   - une invocation à la fois
   - bascule sur la suivante quand c'est validé
-- [] Widget ramadan
+- [x] Widget ramadan
   - Jours fait et jours restants
   - heure de la rupture
 - [] Widget hadith aléaoire
-- [] Widget nom d'allah aléatoire
+- [x] Widget nom d'allah aléatoire
 
 ## Erreurs
 
