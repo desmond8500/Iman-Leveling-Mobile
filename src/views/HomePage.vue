@@ -260,6 +260,9 @@ async function onToggleSunnah(id: SunnahId) {
 
 <style scoped>
 .wrap {
+  /* Disposition « mobile » sur tous les écrans : une colonne de 560 px maximum, centrée.
+     (Les autres pages s'élargissent sur tablette et ordinateur, voir theme/variables.css.) */
+  max-width: 560px;
   margin: 0 auto;
   padding: 16px;
 }
@@ -338,14 +341,6 @@ async function onToggleSunnah(id: SunnahId) {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-/* Tablette et ordinateur : les cartes de prière sur deux colonnes. */
-@media (min-width: 900px) {
-  .list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
 }
 .tip {
   margin-top: 20px;
