@@ -2,7 +2,7 @@
 
 ## Autres
 
-- [] donner la possibilité de modifier les éléments du jour précédent jusqu'a la prière de fajr
+- [x] donner la possibilité de modifier les éléments du jour précédent jusqu'a la prière de fajr
 - [x] écrire soubh en arabe sur la home page 
 
 ## Server
