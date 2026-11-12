@@ -12,9 +12,8 @@
     "skipLibCheck": true,
     "noEmit": true,
     "types": ["vite/client", "vite-plugin-pwa/client", "vitest/globals"],
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "tests/**/*.ts", "vite.config.ts", "pwa.manifest.ts", "capacitor.config.ts"]

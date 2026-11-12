@@ -18,27 +18,27 @@
   "dependencies": {
     "@capacitor/android": "^8.6.0",
     "@capacitor/core": "^8.6.0",
-    "@capacitor/geolocation": "^8.0.0",
-    "@capacitor/local-notifications": "^8.0.0",
+    "@capacitor/geolocation": "^8.2.4",
+    "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/preferences": "^8.0.1",
-    "@capacitor/splash-screen": "^8.0.0",
-    "@ionic/vue": "^8.5.0",
-    "@ionic/vue-router": "^8.5.0",
-    "ionicons": "^7.4.0",
-    "pinia": "^2.3.0",
-    "vue": "^3.5.13",
-    "vue-router": "^4.5.0"
+    "@capacitor/splash-screen": "^8.0.2",
+    "@ionic/vue": "^9.0.11",
+    "@ionic/vue-router": "^9.0.11",
+    "ionicons": "^8.1.0",
+    "pinia": "^4.1.0",
+    "vue": "^3.5.45",
+    "vue-router": "^5.5.0"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
+    "@capacitor/assets": "^4.0.0",
     "@capacitor/cli": "^8.6.0",
-    "@vitejs/plugin-vue": "^5.2.0",
-    "@vue/test-utils": "^2.4.6",
-    "jsdom": "^25.0.0",
-    "typescript": "~5.7.0",
-    "vite": "^6.0.0",
-    "vite-plugin-pwa": "^1.0.0",
-    "vitest": "^3.0.0",
-    "vue-tsc": "^2.2.0"
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/test-utils": "^2.5.1",
+    "jsdom": "^31.0.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.8",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.1.0",
+    "vue-tsc": "^3.3.14"
   }
 }
