@@ -1,14 +1,13 @@
 # [Todo](readme.md)
 
-## Autres
-
-- [x] donner la possibilité de modifier les éléments du jour précédent jusqu'a la prière de fajr
-- [x] écrire soubh en arabe sur la home page 
-
 ## Rappels 
 
 - [] ajouter une page
 - [] utiliser l'api HadeethEnc 
+
+## Zikr (pause)
+
+- [inspiration pour soubhannalah, al hamdou lilah alahou akbar](https://www.youtube.com/shorts/vHzrPW9kh1c)
 
 ## Zakat (pause)
 
@@ -26,6 +25,7 @@
 ## Coran
 
 - [] Marque page (ne semble pas marcher)
+- [] Valider manuellement les versets
 
 ## Evenements  (pause)
 
@@ -48,3 +48,7 @@
   - heure de la rupture
 - [] Widget hadith aléaoire
 - [] Widget nom d'allah aléatoire
+
+## Erreurs
+
+- [] paramètres, j'ai une erreur "Les cases du jour 2026-11-11 (counts) doivent être des booléens".
