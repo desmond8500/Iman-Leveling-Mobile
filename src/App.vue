@@ -15,6 +15,8 @@ import { useSettingsStore } from '@/stores/settings';
 import { editCutoff } from '@/utils/editWindow';
 import { rescheduleNotifications } from '@/services/notifications';
 import { applyTheme, resolveTheme } from '@/utils/theme';
+import { pushWidgetSnapshot, takeWidgetActions, widgetsSupported } from '@/services/widgetBridge';
+import { buildWidgetSnapshot } from '@/utils/widgetSnapshot';
 
 const store = useProgressStore();
 const settings = useSettingsStore();
@@ -49,6 +51,31 @@ watch(
   { deep: true },
 );
 
+// Widgets Android : on applique d'abord ce qui a été validé depuis un widget, puis on leur renvoie
+// l'état à jour. Une erreur ne doit jamais bloquer l'application.
+async function syncWidgets() {
+  if (!widgetsSupported() || !store.loaded || !settings.loaded) return;
+  try {
+    await store.applyWidgetActions(await takeWidgetActions());
+    await pushWidgetSnapshot(
+      buildWidgetSnapshot({
+        now: new Date(),
+        days: store.days,
+        location: settings.location,
+        options: { method: settings.prayerMethod },
+        ramadanStart: settings.ramadanStart,
+      }),
+    );
+  } catch {
+    // Les widgets sont un confort.
+  }
+}
+watch(
+  () => [store.days, settings.location, settings.prayerMethod, settings.ramadanStart],
+  () => void syncWidgets(),
+  { deep: true },
+);
+
 // Si l'app reste ouverte au-delà de minuit, on repart sur la nouvelle journée.
 function onVisible() {
   if (document.visibilityState === 'visible') {
@@ -56,6 +83,7 @@ function onVisible() {
     refreshTheme();
     refreshEditWindow();
     void refreshNotifications();
+    void syncWidgets();
   }
 }
 
@@ -66,6 +94,7 @@ onMounted(async () => {
   refreshTheme();
   refreshEditWindow();
   void refreshNotifications();
+  void syncWidgets();
   // Compte lié : on resynchronise au lancement (sans bloquer l'affichage, erreurs gérées par le store).
   if (settings.isLinked) void settings.syncNow();
 });

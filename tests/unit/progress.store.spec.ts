@@ -441,3 +441,55 @@ describe('modification de la veille jusqu\'à Fajr', () => {
     expect((await store.togglePrayer('fajr')).hasanatDelta).toBe(0);
   });
 });
+
+describe('validations venues des widgets', () => {
+  async function setup() {
+    setProgressRepository(memoryRepository());
+    setActivePinia(createPinia());
+    const store = useProgressStore();
+    await store.load();
+    return store;
+  }
+
+  it('coche sans basculer : rejouer une action ne change rien', async () => {
+    const store = await setup();
+    const action = { type: 'prayer' as const, id: 'dhuhr', dateKey: store.today };
+    expect(await store.applyWidgetActions([action])).toBe(1);
+    expect(await store.applyWidgetActions([action])).toBe(0);
+    expect(store.days[store.today].prayers.dhuhr).toBe(true);
+  });
+
+  it('prend en charge sunnas et invocations du jour', async () => {
+    const store = await setup();
+    const n = await store.applyWidgetActions([
+      { type: 'sunnah', id: 'fajr-before', dateKey: store.today },
+      { type: 'dhikr', id: 'kursi', period: 'morning', dateKey: store.today },
+    ]);
+    expect(n).toBe(2);
+    expect(store.days[store.today].sunnah?.['fajr-before']).toBe(true);
+    expect(store.days[store.today].adhkar?.['morning:kursi']).toBe(true);
+  });
+
+  it('hier : accepté avant Fajr seulement ; invocations jamais pour hier', async () => {
+    const store = await setup();
+    const yesterday = addDays(store.today, -1);
+    const isha = { type: 'prayer' as const, id: 'isha', dateKey: yesterday };
+    expect(await store.applyWidgetActions([isha])).toBe(0);
+    store.setEditCutoff(Date.now() + 3600_000);
+    expect(await store.applyWidgetActions([isha])).toBe(1);
+    expect(
+      await store.applyWidgetActions([{ type: 'dhikr', id: 'kursi', period: 'evening', dateKey: yesterday }]),
+    ).toBe(0);
+    expect(store.days[yesterday].prayers.isha).toBe(true);
+  });
+
+  it('ignore les jours trop anciens ou futurs', async () => {
+    const store = await setup();
+    store.setEditCutoff(Date.now() + 3600_000);
+    const n = await store.applyWidgetActions([
+      { type: 'prayer', id: 'fajr', dateKey: addDays(store.today, -2) },
+      { type: 'prayer', id: 'fajr', dateKey: addDays(store.today, 1) },
+    ]);
+    expect(n).toBe(0);
+  });
+});

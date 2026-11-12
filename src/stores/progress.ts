@@ -25,6 +25,7 @@ import { fastingInfo } from '@/utils/fasting';
 import { parseKey } from '@/utils/calendar';
 import { hasanatForDay, levelFromHasanat, prayerReward } from '@/utils/hasanat';
 import { computeStreak } from '@/utils/streak';
+import type { WidgetAction } from '@/utils/widgetSnapshot';
 
 let repository: ProgressRepository = new LocalProgressRepository();
 
@@ -254,6 +255,34 @@ export const useProgressStore = defineStore('progress', () => {
     });
   }
 
+  /**
+   * Applique les validations faites depuis un widget. Chaque action « coche » (jamais de bascule) :
+   * la rejouer ne change rien. Seuls aujourd'hui et la veille (jusqu'à Fajr) sont acceptés.
+   * Les invocations ne se cochent que pour aujourd'hui, comme dans l'application.
+   * Retourne le nombre d'actions qui ont réellement modifié la progression.
+   */
+  async function applyWidgetActions(actions: WidgetAction[]): Promise<number> {
+    let changed = 0;
+    for (const action of actions) {
+      const key = action.dateKey;
+      if (!canEditDay(key, today.value, Date.now(), editCutoff.value)) continue;
+      const record = days.value[key];
+      if (action.type === 'prayer') {
+        if (record?.prayers?.[action.id as PrayerId]) continue;
+        await commit((d) => ({ ...d, prayers: { ...d.prayers, [action.id]: true } }), key);
+      } else if (action.type === 'sunnah') {
+        if (record?.sunnah?.[action.id as SunnahId]) continue;
+        await commit((d) => ({ ...d, sunnah: { ...d.sunnah, [action.id]: true } }), key);
+      } else {
+        const k = adhkarKey(action.period, action.id);
+        if (key !== today.value || record?.adhkar?.[k]) continue;
+        await commit((d) => ({ ...d, adhkar: { ...d.adhkar, [k]: true } }), key);
+      }
+      changed++;
+    }
+    return changed;
+  }
+
   return {
     days,
     loaded,
@@ -280,6 +309,7 @@ export const useProgressStore = defineStore('progress', () => {
     refreshToday,
     selectDate,
     setGender,
+    applyWidgetActions,
     togglePrayer,
     togglePlace,
     toggleSunnah,
