@@ -25,8 +25,8 @@
 
 ## Invocations
 
-- [] Ajouter en bas de chaque invocation un bouton + et - afin de décompter chaque récitation sauf pour ceux de la citadelle des musulmans
-- [] Ajouter une recherche à la citadelle
+- [x] Ajouter en bas de chaque invocation un bouton + et - afin de décompter chaque récitation sauf pour ceux de la citadelle des musulmans
+- [x] Ajouter une recherche à la citadelle
 
 ## Coran
 
