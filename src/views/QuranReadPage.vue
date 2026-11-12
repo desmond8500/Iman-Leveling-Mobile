@@ -66,10 +66,22 @@
 <script setup lang="ts">
 import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonPage, IonSpinner, IonTitle, IonToolbar } from '@ionic/vue';
+import {
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonSpinner,
+  IonTitle,
+  IonToolbar,
+  onIonViewWillLeave,
+} from '@ionic/vue';
 import { surahByNumber } from '@/data/surahs';
 import { loadSurah, QuranError, type Verse } from '@/services/quran';
 import { useReadingStore } from '@/stores/reading';
+import { createReadingTracker } from '@/utils/readingTracker';
 
 // Le numéro arrive par la route (props: true) : plus fiable que useRoute dans les onglets Ionic.
 const props = defineProps<{ n: string | number; v?: string | number }>();
@@ -103,6 +115,9 @@ async function load() {
     const result = await loadSurah(s.number, s.verses);
     if (requested === number.value) {
       verses.value = result.verses;
+      // La liste n'est affichée (v-else) qu'une fois `loading` à faux : sinon `listEl` est encore
+      // vide et ni le suivi ni la reprise au marque-page ne démarrent.
+      loading.value = false;
       await nextTick();
       resumeAtBookmark();
       startTracking();
@@ -117,15 +132,12 @@ async function load() {
 }
 
 // --- Marque-page automatique et suivi de lecture ---
-// Le marque-page suit le premier verset visible. Un verset compte comme lu quand il est sorti
-// de l'écran par le haut (on a défilé au-delà), ou quand on atteint la fin de la sourate.
+// La logique (premier verset visible = marque-page ; verset dépassé par le haut = lu) est dans
+// utils/readingTracker.ts ; ici on ne fait que lui transmettre ce que voit le navigateur.
 let observer: IntersectionObserver | null = null;
 let saveTimer: ReturnType<typeof setTimeout> | undefined;
-const visible = new Set<number>();
-let sessionFrom = 0;
-let readUpTo = 0;
-let lastBookmark = 0;
-let lastRead = 0;
+let tracker = createReadingTracker(0);
+let lastSaved = '';
 
 function resumeAtBookmark() {
   const target = Number(props.v);
@@ -133,30 +145,22 @@ function resumeAtBookmark() {
   listEl.value?.querySelector(`li[data-n="${target}"]`)?.scrollIntoView({ block: 'start' });
 }
 
+/** Enregistre le marque-page et les versets lus, si quelque chose a changé. */
 function flush() {
   clearTimeout(saveTimer);
   const s = surah.value;
-  if (!s || !visible.size || !sessionFrom) return;
-  const first = Math.min(...visible);
-  if (first === lastBookmark && readUpTo === lastRead) return;
-  lastBookmark = first;
-  lastRead = readUpTo;
-  void reading.record(s.number, first, sessionFrom, readUpTo);
+  const snap = tracker.snapshot();
+  if (!s || snap.bookmark === null) return;
+  const signature = `${s.number}:${snap.bookmark}:${snap.from}:${snap.to}`;
+  if (signature === lastSaved) return;
+  lastSaved = signature;
+  void reading.record(s.number, snap.bookmark, snap.from, snap.to);
 }
 
 function onEntries(entries: IntersectionObserverEntry[]) {
-  const last = verses.value.length;
   for (const entry of entries) {
     const n = Number((entry.target as HTMLElement).dataset.n);
-    if (!Number.isInteger(n)) continue;
-    if (entry.isIntersecting) {
-      visible.add(n);
-      if (!sessionFrom || n < sessionFrom) sessionFrom = n;
-      if (n === last) readUpTo = last;
-    } else {
-      visible.delete(n);
-      if (entry.boundingClientRect.top < 0) readUpTo = Math.max(readUpTo, n);
-    }
+    tracker.update(n, entry.isIntersecting, entry.boundingClientRect.top < 0);
   }
   clearTimeout(saveTimer);
   saveTimer = setTimeout(flush, 800);
@@ -166,19 +170,20 @@ function stopTracking() {
   flush();
   observer?.disconnect();
   observer = null;
-  visible.clear();
-  sessionFrom = 0;
-  readUpTo = 0;
-  lastBookmark = 0;
-  lastRead = 0;
+  tracker.reset();
+  lastSaved = '';
 }
 
 function startTracking() {
   stopTracking();
+  tracker = createReadingTracker(verses.value.length);
   if (typeof IntersectionObserver === 'undefined' || !listEl.value) return;
   observer = new IntersectionObserver(onEntries, { threshold: 0 });
   listEl.value.querySelectorAll('li[data-n]').forEach((el) => observer?.observe(el));
 }
+
+// La page reste en mémoire quand on change d'onglet : on enregistre dès qu'on la quitte.
+onIonViewWillLeave(flush);
 
 watch(number, () => {
   stopTracking();
