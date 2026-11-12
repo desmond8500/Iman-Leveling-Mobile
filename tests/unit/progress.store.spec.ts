@@ -388,3 +388,56 @@ describe('compteurs de récitations', () => {
     });
   });
 });
+
+describe('modification de la veille jusqu\'à Fajr', () => {
+  async function setup() {
+    setProgressRepository(memoryRepository());
+    setActivePinia(createPinia());
+    const store = useProgressStore();
+    await store.load();
+    return store;
+  }
+
+  it('hier est en lecture seule tant que l\'heure limite n\'est pas connue', async () => {
+    const store = await setup();
+    store.selectDate(addDays(store.today, -1));
+    expect(store.editable).toBe(false);
+    expect((await store.togglePrayer('fajr')).hasanatDelta).toBe(0);
+  });
+
+  it('avant la limite, on modifie hier (et pas aujourd\'hui)', async () => {
+    const store = await setup();
+    const yesterday = addDays(store.today, -1);
+    store.setEditCutoff(Date.now() + 3600_000);
+    store.tick();
+    store.selectDate(yesterday);
+    expect(store.editable).toBe(true);
+
+    const result = await store.togglePrayer('fajr');
+    expect(result.hasanatDelta).toBeGreaterThan(0);
+    expect(store.days[yesterday].prayers.fajr).toBe(true);
+    expect(store.days[store.today]?.prayers?.fajr).toBeUndefined();
+    expect(store.doneCount).toBe(1);
+
+    await store.toggleSunnah('fajr-before');
+    expect(store.days[yesterday].sunnah?.['fajr-before']).toBe(true);
+  });
+
+  it('après la limite, hier redevient en lecture seule', async () => {
+    const store = await setup();
+    store.setEditCutoff(Date.now() - 1000);
+    store.tick();
+    store.selectDate(addDays(store.today, -1));
+    expect(store.editable).toBe(false);
+    expect((await store.togglePrayer('dhuhr')).hasanatDelta).toBe(0);
+  });
+
+  it('avant-hier n\'est jamais modifiable', async () => {
+    const store = await setup();
+    store.setEditCutoff(Date.now() + 3600_000);
+    store.tick();
+    store.selectDate(addDays(store.today, -2));
+    expect(store.editable).toBe(false);
+    expect((await store.togglePrayer('fajr')).hasanatDelta).toBe(0);
+  });
+});

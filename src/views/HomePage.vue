@@ -50,9 +50,16 @@
           {{ store.selectedStats.adhkar }} invocations
         </p>
 
-        <p v-if="!store.isToday" class="readonly-note">
+        <p v-if="!store.isToday && store.editable" class="readonly-note open">
+          <ion-icon :icon="timeOutline" />
+          Tu peux encore modifier ce jour jusqu'à Fajr{{ cutoffText ? ` (${cutoffText})` : '' }}.
+          <button type="button" class="link" @click="store.selectDate(store.today)">
+            Revenir à aujourd'hui
+          </button>
+        </p>
+        <p v-else-if="!store.isToday" class="readonly-note">
           <ion-icon :icon="lockClosedOutline" />
-          Consultation seule : seul le jour en cours peut être modifié.
+          Consultation seule : seuls aujourd'hui, et hier jusqu'à Fajr, peuvent être modifiés.
           <button type="button" class="link" @click="store.selectDate(store.today)">
             Revenir à aujourd'hui
           </button>
@@ -63,7 +70,7 @@
             v-for="prayer in store.dayPrayers"
             :key="prayer.id"
             :prayer="prayer"
-            :readonly="!store.isToday"
+            :readonly="!store.editable"
             :show-place="store.gender === 'male' && !settings.simpleMode"
             :simple="settings.simpleMode"
             :time="timeOf(prayer.id)"
@@ -78,7 +85,7 @@
           v-if="!settings.simpleMode || fastInfo.ramadan"
           :info="fastInfo"
           :fasted="store.isFasted(store.selectedDate)"
-          :disabled="!store.isToday"
+          :disabled="!store.editable"
           @toggle="onToggleFast"
         />
 
@@ -174,7 +181,10 @@ const now = ref(new Date());
 let timer: ReturnType<typeof setInterval> | undefined;
 onMounted(() => {
   now.value = new Date();
-  timer = setInterval(() => (now.value = new Date()), 30000);
+  timer = setInterval(() => {
+    now.value = new Date();
+    store.tick();
+  }, 30000);
 });
 onBeforeUnmount(() => clearInterval(timer));
 
@@ -225,6 +235,11 @@ const fastInfo = computed(() => fastingInfo(parseKey(store.selectedDate)));
 async function onToggleFast() {
   await store.toggleFast();
 }
+
+const cutoffText = computed(() => {
+  const ms = store.editCutoff;
+  return ms === null ? '' : formatTime(new Date(ms));
+});
 
 const hijriText = computed(() => formatHijri(toHijri(parseKey(store.selectedDate))));
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

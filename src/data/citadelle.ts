@@ -180,3 +180,33 @@ export const CITADELLE: CitadelleCategory[] = [
 ];
 
 export const CITADELLE_COUNT = CITADELLE.reduce((n, c) => n + c.duas.length, 0);
+
+/** Simplifie un texte pour la recherche : sans accents, voyelles arabes, apostrophes ni tirets. */
+export function foldForSearch(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[̀-ًͯ-ٰٟـ]/g, '') // accents latins, voyelles arabes, tatweel
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .toLowerCase()
+    .replace(/['’`\-\s]+/g, ' ')
+    .trim();
+}
+
+/**
+ * Filtre la Citadelle : garde les invocations dont le titre, le texte (arabe, phonétique,
+ * français), la source ou la catégorie contient tous les mots recherchés. Catégories vides retirées.
+ */
+export function searchCitadelle(query: string, categories: CitadelleCategory[] = CITADELLE): CitadelleCategory[] {
+  const words = foldForSearch(query).split(' ').filter(Boolean);
+  if (!words.length) return categories;
+  return categories
+    .map((cat) => ({
+      ...cat,
+      duas: cat.duas.filter((d) => {
+        const haystack = foldForSearch(`${cat.title} ${d.title} ${d.arabic} ${d.phonetic} ${d.french} ${d.source}`);
+        return words.every((w) => haystack.includes(w));
+      }),
+    }))
+    .filter((cat) => cat.duas.length > 0);
+}

@@ -2,8 +2,8 @@
 
 ## Autres
 
-- [] donner la possibilité de modifier les éléments du jour précédent jusqu'a la prière de fajr
-- [] écrire soubh en arabe sur la home page
+- [x] donner la possibilité de modifier les éléments du jour précédent jusqu'a la prière de fajr
+- [x] écrire soubh en arabe sur la home page 
 
 ## Rappels 
 
@@ -20,8 +20,8 @@
 
 ## Invocations
 
-- [] Ajouter en bas de chaque invocation un bouton + et - afin de décompter chaque récitation sauf pour ceux de la citadelle des musulmans
-- [] Ajouter une recherche à la citadelle
+- [x] Ajouter en bas de chaque invocation un bouton + et - afin de décompter chaque récitation sauf pour ceux de la citadelle des musulmans
+- [x] Ajouter une recherche à la citadelle
 
 ## Coran
 

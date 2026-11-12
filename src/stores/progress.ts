@@ -19,6 +19,7 @@ import type {
   SunnahId,
 } from '@/types';
 import { toDateKey } from '@/utils/date';
+import { canEditDay } from '@/utils/editWindow';
 import { MAX_COUNT } from '@/utils/merge';
 import { fastingInfo } from '@/utils/fasting';
 import { parseKey } from '@/utils/calendar';
@@ -82,6 +83,24 @@ export const useProgressStore = defineStore('progress', () => {
   const gender = ref<Gender | null>(null);
 
   const isToday = computed(() => selectedDate.value === today.value);
+
+  /** Moment (ms) où la veille cesse d'être modifiable : l'heure de Fajr (voir App.vue). */
+  const editCutoff = ref<number | null>(null);
+  const clock = ref(Date.now());
+
+  /** Le jour affiché est-il modifiable ? Aujourd'hui, ou hier jusqu'à Fajr. */
+  const editable = computed(() => canEditDay(selectedDate.value, today.value, clock.value, editCutoff.value));
+
+  const canEditNow = () => canEditDay(selectedDate.value, today.value, Date.now(), editCutoff.value);
+
+  function setEditCutoff(ms: number | null) {
+    editCutoff.value = ms;
+  }
+
+  /** Fait avancer l'horloge utilisée pour savoir si la veille est encore modifiable. */
+  function tick() {
+    clock.value = Date.now();
+  }
 
   const dayPrayers = computed<PrayerView[]>(() => {
     const day = days.value[selectedDate.value];
@@ -154,6 +173,7 @@ export const useProgressStore = defineStore('progress', () => {
   function refreshToday() {
     const wasToday = selectedDate.value === today.value;
     today.value = toDateKey(new Date());
+    clock.value = Date.now();
     if (wasToday) selectedDate.value = today.value;
   }
 
@@ -162,8 +182,7 @@ export const useProgressStore = defineStore('progress', () => {
     if (key <= today.value) selectedDate.value = key;
   }
 
-  async function commit(update: (day: DayRecord) => DayRecord) {
-    const key = today.value;
+  async function commit(update: (day: DayRecord) => DayRecord, key: string = today.value) {
     const levelBefore = levelInfo.value.level;
     const hasanatBefore = totalHasanat.value;
     const current = days.value[key] ?? { prayers: {} };
@@ -178,27 +197,28 @@ export const useProgressStore = defineStore('progress', () => {
     };
   }
 
-  // Seul le jour en cours est modifiable.
+  // Modifiables : aujourd'hui, et hier jusqu'à Fajr. Les autres jours sont en lecture seule.
   async function togglePrayer(id: PrayerId) {
-    if (!isToday.value) return NOOP_RESULT;
-    return commit((day) => ({ ...day, prayers: { ...day.prayers, [id]: !day.prayers[id] } }));
+    if (!canEditNow()) return NOOP_RESULT;
+    const key = selectedDate.value;
+    return commit((day) => ({ ...day, prayers: { ...day.prayers, [id]: !day.prayers[id] } }), key);
   }
 
   /** Lieu d'une prière : mosquée ou maison. Ne compte que pour les hommes ; sans effet sinon. */
   async function togglePlace(id: PrayerId) {
-    if (!isToday.value || gender.value !== 'male') return NOOP_RESULT;
-    return commit((day) => ({ ...day, mosque: { ...day.mosque, [id]: !day.mosque?.[id] } }));
+    if (!canEditNow() || gender.value !== 'male') return NOOP_RESULT;
+    return commit((day) => ({ ...day, mosque: { ...day.mosque, [id]: !day.mosque?.[id] } }), selectedDate.value);
   }
 
   async function toggleSunnah(id: SunnahId) {
-    if (!isToday.value) return NOOP_RESULT;
-    return commit((day) => ({ ...day, sunnah: { ...day.sunnah, [id]: !day.sunnah?.[id] } }));
+    if (!canEditNow()) return NOOP_RESULT;
+    return commit((day) => ({ ...day, sunnah: { ...day.sunnah, [id]: !day.sunnah?.[id] } }), selectedDate.value);
   }
 
-  /** Jeûne du jour. Modifiable pour aujourd'hui seulement, et pas un jour où le jeûne est interdit. */
+  /** Jeûne du jour affiché (aujourd'hui, ou hier jusqu'à Fajr), sauf un jour où le jeûne est interdit. */
   async function toggleFast() {
-    if (!isToday.value || fastingInfo(parseKey(today.value)).forbidden) return NOOP_RESULT;
-    return commit((day) => ({ ...day, fasting: { fast: !day.fasting?.fast } }));
+    if (!canEditNow() || fastingInfo(parseKey(selectedDate.value)).forbidden) return NOOP_RESULT;
+    return commit((day) => ({ ...day, fasting: { fast: !day.fasting?.fast } }), selectedDate.value);
   }
 
   function isFasted(key: string): boolean {
@@ -241,6 +261,10 @@ export const useProgressStore = defineStore('progress', () => {
     selectedDate,
     gender,
     isToday,
+    editable,
+    editCutoff,
+    setEditCutoff,
+    tick,
     dayPrayers,
     selectedStats,
     doneCount,

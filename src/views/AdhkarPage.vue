@@ -30,9 +30,16 @@
             Sélection d'invocations du quotidien, par situation. Ce n'est pas le recueil complet ;
             d'autres invocations seront ajoutées.
           </p>
-          <section v-for="cat in CITADELLE" :key="cat.id" class="cat">
+          <ion-searchbar
+            :value="query"
+            placeholder="Rechercher une invocation (français, phonétique, arabe)"
+            :debounce="100"
+            @ionInput="query = String($event.detail.value ?? '')"
+          />
+          <p v-if="!citadelleResults.length" class="tip">Aucune invocation trouvée.</p>
+          <section v-for="cat in citadelleResults" :key="cat.id" class="cat">
             <h3>{{ cat.title }}</h3>
-            <InvocationItem v-for="dua in cat.duas" :key="dua.id" :item="dua" :counter-key="`citadelle:${dua.id}`" />
+            <InvocationItem v-for="dua in cat.duas" :key="dua.id" :item="dua" />
           </section>
         </template>
 
@@ -81,6 +88,7 @@ import {
   IonHeader,
   IonLabel,
   IonPage,
+  IonSearchbar,
   IonSegment,
   IonSegmentButton,
   IonTitle,
@@ -89,7 +97,7 @@ import {
 } from '@ionic/vue';
 import DhikrCard from '@/components/DhikrCard.vue';
 import InvocationItem from '@/components/InvocationItem.vue';
-import { CITADELLE, CITADELLE_COUNT } from '@/data/citadelle';
+import { CITADELLE_COUNT, searchCitadelle } from '@/data/citadelle';
 import { adhkarFor, adhkarKey } from '@/data/adhkar';
 import { useProgressStore } from '@/stores/progress';
 import type { Period } from '@/types';
@@ -99,6 +107,8 @@ const store = useProgressStore();
 
 // Matin avant 15 h, soir ensuite.
 const tab = ref<'morning' | 'evening' | 'citadelle'>(new Date().getHours() < 15 ? 'morning' : 'evening');
+const query = ref('');
+const citadelleResults = computed(() => searchCitadelle(query.value));
 const period = computed<Period>(() => (tab.value === 'evening' ? 'evening' : 'morning'));
 const items = computed(() => adhkarFor(period.value));
 const done = computed(() => store.adhkarDoneCount(period.value));

@@ -8,7 +8,7 @@ export const PRAYERS: Prayer[] = [
   {
     id: 'fajr',
     name: 'Soubh',
-    arabic: 'الفجر',
+    arabic: 'الصبح',
     hint: 'Aube',
     before: [{ id: 'fajr-before', name: 'Sunna de Fajr', rakaat: 2 }],
     after: [],
