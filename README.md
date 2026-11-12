@@ -190,10 +190,19 @@ Quatre widgets s'ajoutent depuis l'écran d'accueil du téléphone (appui long >
 - **Invocations** : matin (avant 15 h) ou soir ; une invocation à la fois, la suivante apparaît à la validation.
 - **Ramadan** : jours jeûnés, jours à venir, heure de la rupture (avant le mois : compte à rebours).
 - **Nom d'Allah** : un nom au hasard ; « Autre nom » en tire un autre.
+- **Hadith du jour** : texte, attribution et degré d'authenticité, tirés de HadeethEnc ; il change chaque jour (pas de tirage à la demande dans le widget : il faut une connexion, que le widget n'a pas).
 
 Fonctionnement : l'application envoie un instantané JSON aux widgets (`src/utils/widgetSnapshot.ts`, plugin natif `WidgetBridge`). Une validation faite dans un widget est enregistrée dans une file puis appliquée par l'application à son prochain passage au premier plan (idempotent, aujourd'hui et hier avant Fajr seulement). **Ouvre l'application au moins une fois** pour que les widgets aient des données, et après chaque changement de position ou de méthode.
 
-Limites connues : les widgets se redessinent au début et à la fin de chaque prière (alarme inexacte) et au plus toutes les 30 min sinon, selon les économies d'énergie du téléphone ; le widget hadith n'existe pas encore (source de hadiths à valider) ; ce code natif n'a pas été compilé ni essayé sur appareil au moment de l'écriture.
+Limites connues : les widgets se redessinent au début et à la fin de chaque prière (alarme inexacte) et au plus toutes les 30 min sinon, selon les économies d'énergie du téléphone ; le hadith du jour n'apparaît qu'après un premier chargement dans l'application (connexion requise) ; ce code natif n'a pas été compilé ni essayé sur appareil au moment de l'écriture.
+
+## Rappels (hadiths)
+
+Menu **Plus > Rappels** : hadith du jour (« Un autre hadith » pour en tirer un autre), parcours par catégorie avec explication, et favoris. Les textes viennent de l'API HadeethEnc (`src/services/hadeeth.ts`), chargés à la demande puis gardés sur l'appareil pour lire hors ligne. **Le format de l'API n'a pas pu être essayé depuis l'environnement de développement** : l'analyse est tolérante et décrite par les tests ; à confirmer sur le téléphone.
+
+## Notifications de prière
+
+Les permissions `POST_NOTIFICATIONS` (Android 13+) et `SCHEDULE_EXACT_ALARM` sont de nouveau déclarées dans le manifeste ; l'autorisation se demande en activant les rappels dans Paramètres. Sur Android 12 et plus, l'alarme exacte peut aussi se régler dans les réglages du téléphone (Applications > Alarmes et rappels).
 
 ## Scénario de test (navigateur)
 

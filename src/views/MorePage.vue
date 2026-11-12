@@ -27,12 +27,13 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
-import { bookmarkOutline, cashOutline, libraryOutline, chevronForward, moonOutline } from 'ionicons/icons';
+import { bookmarkOutline, chatbubbleEllipsesOutline, cashOutline, libraryOutline, chevronForward, moonOutline } from 'ionicons/icons';
 
 const items = [
   { href: '/tabs/zakat', title: 'Zakat', subtitle: 'Comprendre, calculer al-Maal et al-Fitr', icon: cashOutline },
   { href: '/tabs/quran', title: 'Coran', subtitle: 'Les 114 sourates, arabe, phonétique et français', icon: libraryOutline },
   { href: '/tabs/prayer', title: 'Prière', subtitle: 'Les 5 prières, ablutions, déroulement', icon: bookmarkOutline },
+  { href: '/tabs/reminders', title: 'Rappels', subtitle: 'Hadiths du jour, par thème, favoris', icon: chatbubbleEllipsesOutline },
   { href: '/tabs/ramadan', title: 'Ramadan', subtitle: 'Calendrier des 30 jours', icon: moonOutline },
 ];
 </script>
