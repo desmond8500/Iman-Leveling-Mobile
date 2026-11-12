@@ -149,8 +149,8 @@ du mois affiche la date hégirienne (Oumm al-Qora, ±1 jour selon la lune), les 
 traduction française Hamidullah, translittération) est chargé depuis `api.alquran.cloud` à la
 première ouverture d'une sourate, puis gardé sur l'appareil. **Le format de réponse n'a pas pu être
 vérifié depuis l'environnement de développement** : teste une sourate avec une connexion et corrige
-`src/services/quran.ts` au besoin. Le marque-page automatique et la progression de lecture ne sont
-pas encore faits.
+`src/services/quran.ts` au besoin. Un marque-page automatique et le suivi de la lecture du mois
+(objectif : tout le Coran) sont gardés sur l'appareil.
 
 **Citadelle du musulman.** Onglet de la page Invocations : une sélection de 15 invocations, pas le
 recueil complet.
@@ -165,6 +165,22 @@ chevrons de niveau. Les sources sont dans `resources/` (SVG et PNG). L'app affic
 démarrage animé au lancement ; sur mobile, `npm run assets` génère l'icône et le splash natifs
 (iOS et Android) à partir de `resources/` une fois les plateformes ajoutées
 (`npx cap add android`, `npx cap add ios`).
+
+## Fabriquer l'APK Android
+
+Prérequis : Node 22+, **JDK 21 ou plus**, Android SDK (plateforme 36) et `ANDROID_HOME`.
+
+```sh
+npm install
+npm run apk:debug     # APK de test : android/app/build/outputs/apk/debug/app-debug.apk
+npm run apk:release   # APK non signé : android/app/build/outputs/apk/release/app-release-unsigned.apk
+```
+
+L'APK de test s'installe avec `adb install -r <fichier>`. L'APK de publication doit être signé
+(`keytool` pour créer la clé, puis `apksigner`) ; garde la clé précieusement, elle est nécessaire
+pour toute mise à jour. La commande vérifie la version de Java : si Gradle affiche
+`invalid source release: 21`, c'est que le JDK utilisé est trop ancien. Installe un JDK 21 (ou
+utilise celui d'Android Studio, dossier `jbr`) et définis `JAVA_HOME`.
 
 ## Scénario de test (navigateur)
 

@@ -13,7 +13,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "assets": "capacitor-assets generate --iconBackgroundColor '#0f3a31' --splashBackgroundColor '#0f3a31'"
+    "assets": "capacitor-assets generate --iconBackgroundColor '#0f3a31' --splashBackgroundColor '#0f3a31'",
+    "apk:debug": "npm run build && cap sync android && node scripts/gradle.mjs assembleDebug",
+    "apk:release": "npm run build && cap sync android && node scripts/gradle.mjs assembleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",
