@@ -42,12 +42,19 @@ export interface PrayerView extends Prayer {
 export type Period = 'morning' | 'evening';
 
 /** Invocation prête à afficher pour une période donnée. */
+/** Mérite attaché à une invocation, avec le texte qui le rapporte. */
+export interface Reward {
+  text: string;
+  source: string;
+}
+
 export interface Dhikr {
   id: string;
   title: string;
   /** Nombre de répétitions recommandé. */
   count: number;
   source: string;
+  reward?: Reward;
   arabic: string;
   phonetic: string;
   french: string;

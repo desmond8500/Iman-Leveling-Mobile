@@ -65,3 +65,14 @@ describe('recherche dans la Citadelle', () => {
     expect(foldForSearch('أَعُوذُ')).toBe('اعوذ');
   });
 });
+
+describe('mérites de la Citadelle', () => {
+  it('quelques invocations ont un mérite sourcé', () => {
+    const duas = CITADELLE.flatMap((c) => c.duas).filter((d) => d.reward);
+    expect(duas.length).toBeGreaterThanOrEqual(3);
+    for (const d of duas) {
+      expect(d.reward!.text.length).toBeGreaterThan(10);
+      expect(d.reward!.source.length).toBeGreaterThan(3);
+    }
+  });
+});

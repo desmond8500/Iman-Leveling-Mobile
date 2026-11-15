@@ -1,4 +1,4 @@
-import type { Dhikr, Period } from '@/types';
+import type { Dhikr, Period, Reward } from '@/types';
 
 /*
  * Invocations du matin et du soir (adhkar as-sabah wa al-masa').
@@ -15,6 +15,7 @@ interface DhikrSource {
   /** Nombre de répétitions recommandé. */
   count: number;
   source: string;
+  reward?: Reward;
   arabic: string | PerPeriod;
   phonetic: string | PerPeriod;
   french: string | PerPeriod;
@@ -30,6 +31,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['morning', 'evening'],
     count: 1,
     source: 'Coran 2:255 ; An-Nasa’i',
+    reward: { text: "Celui qui la récite le matin est protégé des djinns jusqu'au soir, et celui qui la récite le soir l'est jusqu'au matin.", source: "Rapporté par al-Hakim ; jugé authentique par al-Albani" },
     arabic:
       'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ',
     phonetic:
@@ -43,6 +45,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['morning', 'evening'],
     count: 3,
     source: 'Abu Dawud ; At-Tirmidhi',
+    reward: { text: "Récitée trois fois le matin et le soir, elle te suffit contre toute chose.", source: "Abu Dawud 5082, at-Tirmidhi 3575" },
     arabic:
       'قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ',
     phonetic:
@@ -56,6 +59,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['morning', 'evening'],
     count: 3,
     source: 'Abu Dawud ; At-Tirmidhi',
+    reward: { text: "Récitée trois fois le matin et le soir, elle te suffit contre toute chose.", source: "Abu Dawud 5082, at-Tirmidhi 3575" },
     arabic:
       'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝ مِن شَرِّ مَا خَلَقَ ۝ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ',
     phonetic:
@@ -69,6 +73,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['morning', 'evening'],
     count: 3,
     source: 'Abu Dawud ; At-Tirmidhi',
+    reward: { text: "Récitée trois fois le matin et le soir, elle te suffit contre toute chose.", source: "Abu Dawud 5082, at-Tirmidhi 3575" },
     arabic:
       'قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَٰهِ النَّاسِ ۝ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ',
     phonetic:
@@ -132,6 +137,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['morning', 'evening'],
     count: 1,
     source: 'Al-Bukhari',
+    reward: { text: "Celui qui le dit le jour avec certitude et meurt avant le soir est des gens du Paradis ; de même pour celui qui le dit la nuit et meurt avant le matin.", source: "al-Bukhari 6306" },
     arabic:
       'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ',
     phonetic:
@@ -158,6 +164,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['morning', 'evening'],
     count: 3,
     source: 'Abu Dawud ; At-Tirmidhi',
+    reward: { text: "Rien ne lui nuira soudainement, ni sur terre ni dans le ciel.", source: "Abu Dawud 5088, at-Tirmidhi 3388" },
     arabic:
       'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',
     phonetic:
@@ -171,6 +178,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['morning', 'evening'],
     count: 3,
     source: 'Abu Dawud ; At-Tirmidhi',
+    reward: { text: "Allah se doit de le satisfaire le Jour de la résurrection.", source: "Abu Dawud 5072, at-Tirmidhi 3389" },
     arabic: 'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا',
     phonetic: "Raditu billahi rabba, wa bil-Islami dina, wa bi-Muhammadin nabiyya.",
     french:
@@ -182,6 +190,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['evening'],
     count: 3,
     source: 'Muslim ; At-Tirmidhi',
+    reward: { text: "Dit trois fois le soir, aucune piqûre ou morsure venimeuse ne lui nuira cette nuit-là.", source: "at-Tirmidhi 3604" },
     arabic: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
     phonetic: "A'udhu bikalimatillahit-tammati min sharri ma khalaq.",
     french:
@@ -193,6 +202,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['morning', 'evening'],
     count: 100,
     source: 'Muslim',
+    reward: { text: "Nul ne viendra le Jour de la résurrection avec mieux, sauf celui qui aura dit autant ou plus ; ses péchés sont effacés, fussent-ils comme l'écume de la mer.", source: "Muslim 2692, al-Bukhari 6405" },
     arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',
     phonetic: 'Subhanallahi wa bihamdih.',
     french: 'Gloire et pureté à Allah, et louange à Lui.',
@@ -203,6 +213,7 @@ const SOURCES: DhikrSource[] = [
     periods: ['morning'],
     count: 100,
     source: 'Al-Bukhari ; Muslim',
+    reward: { text: "Dit cent fois dans la journée : équivalent à affranchir dix esclaves, cent bonnes actions inscrites, cent mauvaises effacées, et protection contre le diable jusqu'au soir.", source: "al-Bukhari 3293, Muslim 2691" },
     arabic:
       'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',
     phonetic:
@@ -219,6 +230,7 @@ export function adhkarFor(period: Period): Dhikr[] {
     title: s.title,
     count: s.count,
     source: s.source,
+    reward: s.reward,
     arabic: pick(s.arabic, period),
     phonetic: pick(s.phonetic, period),
     french: pick(s.french, period),

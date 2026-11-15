@@ -54,3 +54,18 @@ describe('invocations', () => {
     expect(ADHKAR_KEYS).toContain('evening:kursi');
   });
 });
+
+describe('mérites des invocations', () => {
+  it('chaque mérite a un texte et une source ; plusieurs invocations en ont', () => {
+    const withReward = PERIODS.flatMap((p) => adhkarFor(p)).filter((d) => d.reward);
+    expect(withReward.length).toBeGreaterThanOrEqual(10);
+    for (const d of withReward) {
+      expect(d.reward!.text.trim().length).toBeGreaterThan(15);
+      expect(d.reward!.source.trim().length).toBeGreaterThan(5);
+    }
+  });
+  it('sans source fiable, pas de mérite affiché', () => {
+    const mulk = adhkarFor('morning').find((d) => d.id === 'mulk')!;
+    expect(mulk.reward).toBeUndefined();
+  });
+});

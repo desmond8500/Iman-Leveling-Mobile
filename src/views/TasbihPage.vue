@@ -56,6 +56,12 @@
           <button type="button" class="ghost" @click="store.reset()">Remettre à zéro</button>
         </div>
 
+        <section v-if="store.preset.reward" class="reward">
+          <strong>Mérite</strong>
+          <p>{{ store.preset.reward.text }}</p>
+          <small>{{ store.preset.reward.source }}</small>
+        </section>
+
         <p v-if="store.preset.source" class="note">{{ store.preset.source }}</p>
       </div>
     </ion-content>
@@ -201,5 +207,19 @@ onMounted(() => {
   border-radius: 12px;
   background: transparent;
   color: inherit;
+}
+.reward {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(242, 201, 76, 0.1);
+  font-size: 14px;
+}
+.reward p {
+  margin: 4px 0;
+}
+.reward small {
+  color: var(--iman-text-soft);
+  font-size: 11px;
 }
 </style>

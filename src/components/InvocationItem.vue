@@ -4,6 +4,10 @@
     <p class="arabic" dir="rtl" lang="ar">{{ item.arabic }}</p>
     <p class="phonetic">{{ item.phonetic }}</p>
     <p class="french">{{ item.french }}</p>
+    <p v-if="item.reward" class="reward">
+      <strong>Mérite :</strong> {{ item.reward.text }}
+      <small>{{ item.reward.source }}</small>
+    </p>
     <span class="source">{{ item.source }}</span>
     <CountControl v-if="counterKey" :counter-key="counterKey" :target="item.count" />
   </article>
@@ -13,7 +17,7 @@
 import CountControl from '@/components/CountControl.vue';
 
 defineProps<{
-  item: { title: string; arabic: string; phonetic: string; french: string; source: string; count?: number };
+  item: { title: string; arabic: string; phonetic: string; french: string; source: string; count?: number; reward?: { text: string; source: string } };
   /** Si renseignée, affiche le compteur + / − (clé propre à l'invocation). */
   counterKey?: string;
 }>();
@@ -47,5 +51,17 @@ h4 {
 .source {
   font-size: 12px;
   color: var(--iman-text-soft);
+}
+.reward {
+  margin: 6px 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(242, 201, 76, 0.1);
+  font-size: 14px;
+}
+.reward small {
+  display: block;
+  color: var(--iman-text-soft);
+  font-size: 11px;
 }
 </style>

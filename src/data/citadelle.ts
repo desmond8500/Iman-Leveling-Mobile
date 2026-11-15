@@ -5,6 +5,8 @@
  * qualifiée (voyelles, traduction, authenticité) avant toute diffusion large.
  */
 
+import type { Reward } from '@/types';
+
 export interface CitadelleDua {
   id: string;
   title: string;
@@ -12,6 +14,8 @@ export interface CitadelleDua {
   phonetic: string;
   french: string;
   source: string;
+  /** Mérite rapporté, s'il y en a un. */
+  reward?: Reward;
   /** Nombre de récitations recommandé, s'il y en a un. */
   count?: number;
 }
@@ -37,6 +41,7 @@ export const CITADELLE: CitadelleCategory[] = [
         french:
           "Le Messager a cru en ce qui lui a été révélé de la part de son Seigneur, et les croyants aussi. Tous ont cru en Allah, en Ses anges, en Ses livres et en Ses messagers : « Nous ne faisons aucune distinction entre Ses messagers. » Et ils ont dit : « Nous avons entendu et nous avons obéi. Pardonne-nous, notre Seigneur, et c'est vers Toi que sera le retour. » Allah n'impose à aucune âme une charge supérieure à sa capacité : elle aura ce qu'elle a acquis et subira ce qu'elle a acquis. « Notre Seigneur, ne nous châtie pas si nous oublions ou commettons une erreur. Notre Seigneur, ne nous charge pas d'un fardeau comme Tu en as chargé ceux qui nous ont précédés. Notre Seigneur, ne nous impose pas ce que nous ne pouvons supporter. Efface nos fautes, pardonne-nous et fais-nous miséricorde. Tu es notre Maître : donne-nous la victoire sur le peuple des mécréants. » (traduction du sens)",
         source: "Coran 2:285-286 ; Al-Boukhari 5009, Mouslim 807 (celui qui les récite la nuit, elles lui suffiront)",
+        reward: { text: "Celui qui les récite la nuit, elles lui suffisent.", source: "al-Bukhari 5009, Muslim 807" },
         count: 1,
       },
       {
@@ -68,6 +73,7 @@ export const CITADELLE: CitadelleCategory[] = [
         phonetic: "Bismillah, tawakkaltu 'alallah, wa la hawla wa la quwwata illa billah.",
         french: "Au nom d'Allah, je m'en remets à Allah. Il n'y a de force ni de puissance qu'en Allah.",
         source: 'Abou Daoud 5095, At-Tirmidhi 3426',
+        reward: { text: "On lui dit : « Tu es guidé, tu es suffi et tu es protégé », et le diable s'éloigne de lui.", source: "Abu Dawud 5095, at-Tirmidhi 3426" },
       },
       {
         id: 'voyage',
@@ -136,6 +142,7 @@ export const CITADELLE: CitadelleCategory[] = [
         phonetic: "Alhamdu lillahil-ladhi at'amani hadha wa razaqanihi min ghayri hawlin minni wa la quwwah.",
         french: "Louange à Allah qui m'a nourri de cela et me l'a accordé sans force ni puissance de ma part.",
         source: 'Abou Daoud 4023, At-Tirmidhi 3458',
+        reward: { text: "Ses péchés passés lui sont pardonnés (hadith jugé bon).", source: "Abu Dawud 4023, at-Tirmidhi 3458" },
       },
     ],
   },

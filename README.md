@@ -222,6 +222,10 @@ Menu **Plus > Héritage** : on choisit le sexe du défunt, on saisit les hériti
 
 **Non pris en charge** : grands-parents, oncles, cousins et héritiers éloignés, enfants d'une fille, héritiers incertains (disparu, enfant à naître). Les écoles divergent sur certains cas ; le calcul suit l'avis majoritaire et le signale. Estimation indicative : pour une succession réelle, notaire et savant sont indispensables. Les données saisies restent sur l'appareil.
 
+## Mérites des invocations
+
+Les invocations du matin et du soir, trois invocations de la Citadelle et les modèles du chapelet affichent leur **mérite** (bloc doré) avec la référence du hadith ou du verset. Seuls les mérites rapportés par un texte authentique sont indiqués ; une invocation sans source fiable n'en affiche pas. Tout fonctionne hors ligne. À faire relire par une personne qualifiée (références et degrés d'authenticité).
+
 ## Rubriques de culture islamique
 
 Menu **Plus** : Piliers de l'islam, Piliers de la foi, Portes du paradis, Portes de l'enfer. Le contenu est dans `src/data/topics.ts` (page générique `TopicPage`), avec la source de chaque texte ; à faire relire par une personne qualifiée avant diffusion large.

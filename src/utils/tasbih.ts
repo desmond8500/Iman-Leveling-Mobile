@@ -20,6 +20,8 @@ export interface TasbihPreset {
   title: string;
   /** Texte sur lequel s'appuie le modèle, s'il y en a un. */
   source?: string;
+  /** Mérite rapporté, s'il y en a un. */
+  reward?: { text: string; source: string };
   steps: TasbihStep[];
 }
 
@@ -30,9 +32,20 @@ const LA_ILAHA: TasbihPhrase = { arabic: 'لَا إِلَٰهَ إِلَّا ا�
 const ISTIGHFAR: TasbihPhrase = { arabic: 'أَسْتَغْفِرُ اللَّهَ', translit: 'Astaghfiru Llah', french: "Je demande pardon à Allah" };
 const SALAWAT: TasbihPhrase = { arabic: 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ', translit: 'Allahumma salli ʿala Muhammad', french: 'Ô Allah, prie sur Muhammad' };
 
+const TASBIH_REWARDS: Record<string, { text: string; source: string }> = {
+  "after-prayer": { text: "Qui glorifie Allah 33 fois, Le loue 33 fois et proclame Sa grandeur 33 fois après chaque prière, puis dit « La ilaha illa Llahu wahdahu la sharika lah… » pour compléter la centaine, ses péchés sont pardonnés, fussent-ils comme l'écume de la mer.", source: "Muslim 597" },
+  "subhanallah": { text: "Parmi les quatre paroles les plus aimées d'Allah ; avec al-hamdu li-Llah, elle remplit ce qui est entre le ciel et la terre.", source: "Muslim 2137, Muslim 223" },
+  "alhamdulillah": { text: "Al-hamdu li-Llah remplit la balance.", source: "Muslim 223" },
+  "allahu-akbar": { text: "L'une des quatre paroles les plus aimées d'Allah.", source: "Muslim 2137" },
+  "la-ilaha": { text: "Le meilleur dhikr est « La ilaha illa Llah ».", source: "at-Tirmidhi 3383 (hadith jugé bon)" },
+  "istighfar": { text: "Allah promet à ceux qui demandent pardon une pluie abondante, des biens et des enfants.", source: "Coran 71:10-12" },
+  "salawat": { text: "Celui qui prie une fois sur moi, Allah priera dix fois sur lui.", source: "Muslim 408" },
+};
+
 const free = (id: string, title: string, phrase: TasbihPhrase, target: number | null): TasbihPreset => ({
   id,
   title,
+  reward: TASBIH_REWARDS[id],
   steps: [{ ...phrase, target }],
 });
 
@@ -41,6 +54,7 @@ export const TASBIH_PRESETS: TasbihPreset[] = [
     id: 'after-prayer',
     title: 'Après la prière',
     source: 'Muslim 596 : 33 tasbih, 33 tahmid et 34 takbir',
+    reward: TASBIH_REWARDS['after-prayer'],
     steps: [
       { ...SUBHANALLAH, target: 33 },
       { ...ALHAMDULILLAH, target: 33 },

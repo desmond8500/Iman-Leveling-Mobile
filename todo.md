@@ -13,8 +13,8 @@
 
 - [x] Système de chapelet comme celui de la video en dessous, créer une page pour ça
 - [inspiration pour soubhannalah, al hamdou lilah alahou akbar](https://www.youtube.com/shorts/vHzrPW9kh1c)
-- [] Ajouter les récompenses de chaque zikr
-- [] Ajouter une interface coté backend d'en rajouter
+- [x] Ajouter les récompenses de chaque zikr (uniquement celles qui ont une source authentique ; sans source, rien n'est affiché)
+- [ ] Ajouter une interface coté backend d'en rajouter (reporté : l'application fonctionne 100 % hors ligne, seule la progression est sauvegardée en ligne)
 
 ## Zakat
 
@@ -50,11 +50,11 @@
 
 ## Erreurs
 
-- [] paramètres, j'ai une erreur "Les cases du jour 2026-11-11 (counts) doivent être des booléens".
+- [x] paramètres, j'ai une erreur "Les cases du jour 2026-11-11 (counts) doivent être des booléens".
 
 ## invocations
 
-- [] Ajouter une interface coté backend pour en rajouter pour les trois sections
+- [ ] Ajouter une interface coté backend pour en rajouter pour les trois sections (reporté, voir ci-dessus)
 
 ## RPG
 

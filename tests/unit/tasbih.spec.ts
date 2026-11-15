@@ -110,3 +110,15 @@ describe('store', () => {
     expect(again.state.count).toBe(0);
   });
 });
+
+describe('mérites des modèles', () => {
+  it('les modèles avec un mérite ont aussi une source', () => {
+    const rewarded = TASBIH_PRESETS.filter((p) => p.reward);
+    expect(rewarded.length).toBeGreaterThanOrEqual(7);
+    for (const p of rewarded) {
+      expect(p.reward!.text.length).toBeGreaterThan(10);
+      expect(p.reward!.source.length).toBeGreaterThan(3);
+    }
+    expect(presetById('libre')!.reward).toBeUndefined();
+  });
+});

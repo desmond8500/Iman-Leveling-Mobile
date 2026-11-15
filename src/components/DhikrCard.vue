@@ -17,6 +17,12 @@
       <p class="french">{{ dhikr.french }}</p>
     </section>
 
+    <section v-if="dhikr.reward" class="reward">
+      <span class="label">Mérite</span>
+      <p>{{ dhikr.reward.text }}</p>
+      <small>{{ dhikr.reward.source }}</small>
+    </section>
+
     <CountControl :counter-key="counterKey" :target="dhikr.count" :complete-key="counterKey" />
 
     <footer class="foot">
@@ -125,5 +131,19 @@ defineEmits<{ (e: 'toggle'): void }>();
   border-color: var(--iman-emerald);
   background: var(--iman-emerald);
   color: #06100e;
+}
+.reward {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(242, 201, 76, 0.1);
+}
+.reward p {
+  margin: 2px 0;
+  font-size: 14px;
+}
+.reward small {
+  color: var(--iman-text-soft);
+  font-size: 11px;
 }
 </style>
