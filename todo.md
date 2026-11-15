@@ -58,6 +58,9 @@
 
 ## RPG
 
+- [x] Moteur du parcours (carte, lieux, questions, leçon en cas d'erreur, progression hors ligne) et trois lieux : maison, école, travail
+- [ ] Autres lieux et rencontres (mosquée, marché, voyage, voisinage…) : contenu à ajouter dans `src/data/rpg.ts`
+
 Je veux faire un mini rpg dans l'application ou l'utilisateur doit faire un parcours avec des obstacles ou on lui pose des questions à choix multiples Si la réponse est bonne il pourra avancer si non il sera redirigé vers une autre route pour qu'il puisse apprendre la bonne réponse.
 
 Le parcours commence à la maison. Il doit etre possible de poser des questions aux personnes occupant la maison sur des sujet se reportant à l'environnement. Par exemple à la maison des questions par rapport à la relation aux parents, la famille, le partage, les activitées religieuses.

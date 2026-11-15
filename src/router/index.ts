@@ -6,6 +6,10 @@ import MorePage from '@/views/MorePage.vue';
 import NameDetailPage from '@/views/NameDetailPage.vue';
 import NamesPage from '@/views/NamesPage.vue';
 import PrayerPage from '@/views/PrayerPage.vue';
+import RpgLessonPage from '@/views/RpgLessonPage.vue';
+import RpgPage from '@/views/RpgPage.vue';
+import RpgPlacePage from '@/views/RpgPlacePage.vue';
+import RpgQuestionPage from '@/views/RpgQuestionPage.vue';
 import HeritagePage from '@/views/HeritagePage.vue';
 import EventPage from '@/views/EventPage.vue';
 import EventsPage from '@/views/EventsPage.vue';
@@ -38,6 +42,10 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'ramadan', name: 'ramadan', component: RamadanPage },
       { path: 'ramadan/:n(\\d+)', name: 'ramadan-day', component: RamadanDayPage, props: true },
       { path: 'reminders', name: 'reminders', component: RemindersPage },
+      { path: 'rpg', name: 'rpg', component: RpgPage },
+      { path: 'rpg/place/:id', name: 'rpg-place', component: RpgPlacePage, props: true },
+      { path: 'rpg/q/:id', name: 'rpg-question', component: RpgQuestionPage, props: true },
+      { path: 'rpg/lesson/:id', name: 'rpg-lesson', component: RpgLessonPage, props: true },
       { path: 'heritage', name: 'heritage', component: HeritagePage },
       { path: 'events', name: 'events', component: EventsPage },
       { path: 'events/:id', name: 'event', component: EventPage, props: true },

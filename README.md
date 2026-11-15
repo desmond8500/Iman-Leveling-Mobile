@@ -226,6 +226,12 @@ Menu **Plus > Héritage** : on choisit le sexe du défunt, on saisit les hériti
 
 Les invocations du matin et du soir, trois invocations de la Citadelle et les modèles du chapelet affichent leur **mérite** (bloc doré) avec la référence du hadith ou du verset. Seuls les mérites rapportés par un texte authentique sont indiqués ; une invocation sans source fiable n'en affiche pas. Tout fonctionne hors ligne. À faire relire par une personne qualifiée (références et degrés d'authenticité).
 
+## Parcours (mini RPG)
+
+Menu **Plus > Parcours** : une carte avec des lieux à franchir dans l'ordre (maison, école, travail). Chaque lieu contient des rencontres : des questions à choix multiples (parents, famille, partage, pratique religieuse à la maison ; honnêteté, prière, patience à l'école ; patron qui empêche de prier, corruption, honnêteté au travail). Bonne réponse : la rencontre est validée ; mauvaise réponse : tu es redirigé vers une **leçon** (la bonne réponse expliquée, avec sa source), puis tu retentes (l'ordre des choix change). Un lieu s'ouvre quand le précédent est terminé. Seule la progression sur la carte compte (pas de Hasanat). Tout fonctionne hors ligne ; la progression est gardée sur l'appareil.
+
+Contenu dans `src/data/rpg.ts` (ajouter un lieu ou une rencontre suffit, les écrans s'adaptent) ; moteur dans `src/utils/rpg.ts`. Questions et sources à faire relire par une personne qualifiée.
+
 ## Rubriques de culture islamique
 
 Menu **Plus** : Piliers de l'islam, Piliers de la foi, Portes du paradis, Portes de l'enfer. Le contenu est dans `src/data/topics.ts` (page générique `TopicPage`), avec la source de chaque texte ; à faire relire par une personne qualifiée avant diffusion large.
