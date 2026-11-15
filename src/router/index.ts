@@ -6,6 +6,7 @@ import MorePage from '@/views/MorePage.vue';
 import NameDetailPage from '@/views/NameDetailPage.vue';
 import NamesPage from '@/views/NamesPage.vue';
 import PrayerPage from '@/views/PrayerPage.vue';
+import HeritagePage from '@/views/HeritagePage.vue';
 import EventPage from '@/views/EventPage.vue';
 import EventsPage from '@/views/EventsPage.vue';
 import TasbihPage from '@/views/TasbihPage.vue';
@@ -37,6 +38,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'ramadan', name: 'ramadan', component: RamadanPage },
       { path: 'ramadan/:n(\\d+)', name: 'ramadan-day', component: RamadanDayPage, props: true },
       { path: 'reminders', name: 'reminders', component: RemindersPage },
+      { path: 'heritage', name: 'heritage', component: HeritagePage },
       { path: 'events', name: 'events', component: EventsPage },
       { path: 'events/:id', name: 'event', component: EventPage, props: true },
       { path: 'tasbih', name: 'tasbih', component: TasbihPage },

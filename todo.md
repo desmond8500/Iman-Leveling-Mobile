@@ -20,7 +20,7 @@
 
 ## Héritage en islam
 
-- [] Créer une page ou l'on peut définer la généalogie de la personne, lister les biens avec leurs valeurs pour donner en fin la répartition
+- [x] Créer une page ou l'on peut définer la généalogie de la personne, lister les biens avec leurs valeurs pour donner en fin la répartition
 
 ## Evenements
 
