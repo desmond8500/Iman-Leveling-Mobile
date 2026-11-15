@@ -15,7 +15,7 @@
 
       <template v-else-if="found">
         <Confetti v-if="celebrate" />
-        <DialogueBox :key="solved ? 'ok' : 'q'" :name="found.encounter.who" :text="dialogue" :portrait="found.encounter.emoji" :terrain="found.place.terrain">
+        <DialogueBox :key="solved ? 'ok' : 'q'" :name="found.encounter.who" :text="dialogue" :portrait="found.encounter.emoji" :look="npcLook(found.encounter.id)" :terrain="found.place.terrain">
           <template v-if="solved">
             <small v-if="found.encounter.lesson.source" class="source">{{ found.encounter.lesson.source }}</small>
             <router-link class="choice go" :to="`/tabs/rpg/place/${found.place.id}`">▶ Continuer</router-link>
@@ -35,6 +35,7 @@ import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import Confetti from '@/components/Confetti.vue';
 import DialogueBox from '@/components/DialogueBox.vue';
+import { npcLook } from '@/data/sprites';
 import { useRpgStore } from '@/stores/rpg';
 import { findEncounter, shuffledChoices } from '@/utils/rpg';
 

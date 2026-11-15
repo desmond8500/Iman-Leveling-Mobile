@@ -66,7 +66,7 @@
             <!-- Ton avatar : il marche d'un lieu à l'autre -->
             <g class="avatar" :class="{ walking }" :transform="`translate(${pos.x} ${pos.y - 10})`" aria-hidden="true">
               <ellipse cx="0" cy="10" rx="4" ry="1.6" class="shadow" />
-              <g :transform="`scale(${facing} 1)`"><text class="hero" y="9">{{ avatar.emoji }}</text></g>
+              <PixelSprite :look="avatarLook(avatar.id)" :anim="walking ? 'walk' : 'idle'" :facing="facing" :px="0.46" :x="-3.7" y="-1" />
             </g>
           </svg>
 
@@ -98,7 +98,7 @@
           <ul class="avatars" role="radiogroup" aria-label="Choisir ton personnage">
             <li v-for="a in AVATARS" :key="a.id">
               <button type="button" class="pick" :class="{ on: avatar.id === a.id }" role="radio" :aria-checked="avatar.id === a.id" :aria-label="a.label" @click="avatar.choose(a.id)">
-                <span aria-hidden="true">{{ a.emoji }}</span>
+                <PixelSprite :look="avatarLook(a.id)" :px="1.8" aria-hidden="true" />
                 <small>{{ a.label }}</small>
               </button>
             </li>
@@ -124,6 +124,8 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import FftWindow from '@/components/FftWindow.vue';
+import PixelSprite from '@/components/PixelSprite.vue';
+import { avatarLook } from '@/data/sprites';
 import { useWalker } from '@/composables/useWalker';
 import { useAvatarStore } from '@/stores/avatar';
 import { useRpgStore } from '@/stores/rpg';
@@ -298,15 +300,8 @@ svg {
 .avatar {
   pointer-events: none;
 }
-.hero {
-  font-size: 9px;
-  text-anchor: middle;
-}
 .shadow {
   fill: rgba(0, 0, 0, 0.35);
-}
-.avatar.walking .hero {
-  animation: step 0.28s ease-in-out infinite;
 }
 .hud {
   position: absolute;
@@ -441,9 +436,6 @@ svg {
   color: #f4f6ff;
   font: inherit;
 }
-.pick span {
-  font-size: 26px;
-}
 .pick small {
   font-size: 11px;
   color: #b9c4ff;
@@ -482,21 +474,11 @@ svg {
     transform: translateX(120px);
   }
 }
-@keyframes step {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-1.2px);
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   .route,
   .pulse,
   .waves path,
-  .cloud,
-  .avatar.walking .hero {
+  .cloud {
     animation: none;
   }
 }

@@ -19,7 +19,7 @@
 
         <template v-else>
           <div class="stage">
-            <svg :viewBox="`0 0 ${stage.width} ${stage.height}`" role="group" :aria-label="`Terrain : ${place.title}`">
+            <svg :viewBox="`0 -24 ${stage.width} ${stage.height + 24}`" role="group" :aria-label="`Terrain : ${place.title}`">
               <g v-for="t in stage.tiles" :key="`${t.gx}-${t.gy}`" class="tile">
                 <polygon :points="leftFace(t.gx, t.gy, t.level, stage.cols)" :fill="side(t.level, 0.7)" />
                 <polygon :points="rightFace(t.gx, t.gy, t.level, stage.cols)" :fill="side(t.level, 0.55)" />
@@ -40,27 +40,27 @@
                 @keydown.enter.prevent="go(i)"
                 @keydown.space.prevent="go(i)"
               >
-                <circle :cx="u.point.x" :cy="u.point.y - 14" r="26" class="hit" />
+                <circle :cx="u.point.x" :cy="u.point.y - 22" r="30" class="hit" />
                 <ellipse :cx="u.point.x" :cy="u.point.y" rx="13" ry="6" class="shadow" />
-                <text :x="u.point.x" :y="u.point.y - 2" class="sprite">{{ u.encounter.emoji }}</text>
+                <PixelSprite :look="npcLook(u.encounter.id)" :px="1.8" :phase="i" :x="u.point.x - 14 * spriteK(u.encounter.id)" :y="u.point.y - 44 * spriteK(u.encounter.id)" />
                 <text :x="u.point.x" :y="u.point.y + 14" class="name">{{ u.encounter.who }}</text>
                 <g v-if="store.cleared(u.encounter.id)">
-                  <circle :cx="u.point.x + 13" :cy="u.point.y - 26" r="7" class="ok" />
-                  <text :x="u.point.x + 13" :y="u.point.y - 23" class="okmark">✓</text>
+                  <circle :cx="u.point.x + 15" :cy="u.point.y - 46" r="7" class="ok" />
+                  <text :x="u.point.x + 15" :y="u.point.y - 43" class="okmark">✓</text>
                 </g>
                 <g v-else>
-                  <rect :x="u.point.x - 7" :y="u.point.y - 40" width="14" height="14" rx="4" class="bubble" />
-                  <text :x="u.point.x" :y="u.point.y - 29" class="qmark">?</text>
+                  <rect :x="u.point.x - 7" :y="u.point.y - 62" width="14" height="14" rx="4" class="bubble" />
+                  <text :x="u.point.x" :y="u.point.y - 51" class="qmark">?</text>
                 </g>
               </g>
 
               <g class="unit player" :class="{ walking }" aria-hidden="true">
                 <ellipse :cx="pos.x" :cy="pos.y" rx="13" ry="6" class="shadow" />
-                <g :transform="`translate(${pos.x} 0) scale(${facing} 1)`"><text x="0" :y="pos.y - 2" class="sprite hero">{{ avatar.emoji }}</text></g>
+                <PixelSprite :look="avatarLook(avatar.id)" :anim="walking ? 'walk' : 'idle'" :facing="facing" :px="1.8" :x="pos.x - 14" :y="pos.y - 44" />
                 <text :x="pos.x" :y="pos.y + 14" class="name">Toi</text>
               </g>
 
-              <text v-if="target && !walking" :x="target.point.x" :y="target.point.y - 46" class="arrow" aria-hidden="true">▼</text>
+              <text v-if="target && !walking" :x="target.point.x" :y="target.point.y - 68" class="arrow" aria-hidden="true">▼</text>
             </svg>
           </div>
 
@@ -69,7 +69,7 @@
               <li v-for="e in place.encounters" :key="e.id">
                 <a href="#" class="row" :class="{ done: store.cleared(e.id) }" @click.prevent="go(place.encounters.indexOf(e))">
                   <span class="cursor-mark" aria-hidden="true">▶</span>
-                  <span class="emoji" aria-hidden="true">{{ e.emoji }}</span>
+                  <PixelSprite class="mini" :look="npcLook(e.id)" :px="1.3" aria-hidden="true" />
                   <span class="text"><strong>{{ e.who }}</strong><small>{{ e.topic }}</small></span>
                   <span class="state">{{ store.cleared(e.id) ? '✓' : '?' }}</span>
                 </a>
@@ -93,6 +93,8 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import FftWindow from '@/components/FftWindow.vue';
+import PixelSprite from '@/components/PixelSprite.vue';
+import { avatarLook, npcLook } from '@/data/sprites';
 import { useWalker } from '@/composables/useWalker';
 import { useAvatarStore } from '@/stores/avatar';
 import { useRpgStore } from '@/stores/rpg';
@@ -149,6 +151,8 @@ watch(
   },
 );
 
+const spriteK = (id: string) => npcLook(id).scale ?? 1;
+
 async function go(i: number) {
   const unit = units.value[i];
   if (!unit || walking.value) return;
@@ -199,9 +203,8 @@ svg {
 .shadow {
   fill: rgba(0, 0, 0, 0.35);
 }
-.sprite {
-  font-size: 26px;
-  text-anchor: middle;
+.mini {
+  flex: none;
 }
 .name {
   font-size: 10px;
@@ -211,14 +214,6 @@ svg {
   paint-order: stroke;
   stroke: #0c1337;
   stroke-width: 3px;
-}
-.player.walking .hero {
-  animation: hop 0.28s ease-in-out infinite;
-}
-@keyframes hop {
-  50% {
-    transform: translateY(-3px);
-  }
 }
 .npc {
   cursor: pointer;
@@ -274,8 +269,7 @@ svg {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .arrow,
-  .player.walking .hero {
+  .arrow {
     animation: none;
   }
 }

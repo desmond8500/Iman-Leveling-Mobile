@@ -7,7 +7,8 @@
     <!-- Grand portrait de la personne qui parle, qui dépasse sur le côté -->
     <div class="portrait" aria-hidden="true">
       <span class="glow" />
-      <span class="face">{{ portrait }}</span>
+      <PixelSprite v-if="look" class="sprite" :look="look" :px="8" />
+      <span v-else class="face">{{ portrait }}</span>
     </div>
 
     <div class="box" role="group" :aria-label="`${name} dit`">
@@ -25,9 +26,12 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import PixelSprite from '@/components/PixelSprite.vue';
+import type { Look } from '@/utils/sprite';
 import { revealLength } from '@/utils/typewriter';
 
-const props = withDefaults(defineProps<{ name: string; text: string; portrait: string; terrain?: string; speed?: number }>(), {
+const props = withDefaults(defineProps<{ name: string; text: string; portrait: string; look?: Look; terrain?: string; speed?: number }>(), {
+  look: undefined,
   terrain: 'grass',
   speed: 55,
 });
@@ -115,7 +119,7 @@ onBeforeUnmount(() => cancelAnimationFrame(frame));
   position: relative;
   align-self: flex-end;
   width: 200px;
-  height: 230px;
+  height: 240px;
   margin-bottom: -46px;
   display: grid;
   place-items: end center;
@@ -127,6 +131,10 @@ onBeforeUnmount(() => cancelAnimationFrame(frame));
   inset: 10% 0 0;
   border-radius: 50% 50% 0 0;
   background: radial-gradient(circle at 50% 40%, rgba(255, 190, 110, 0.55), transparent 70%);
+}
+.sprite {
+  position: relative;
+  filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.35));
 }
 .face {
   position: relative;
