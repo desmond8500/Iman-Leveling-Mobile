@@ -9,45 +9,22 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="iman-content" :fullscreen="true">
-      <div v-if="found" class="wrap">
-        <p v-if="!playable" class="warn">Ce lieu est verrouillé : termine d'abord le lieu précédent.</p>
+    <ion-content class="scene-content" :fullscreen="true">
+      <p v-if="found && !playable" class="warn">Ce lieu est verrouillé : termine d'abord le lieu précédent.</p>
+      <p v-else-if="!found" class="warn">Rencontre introuvable.</p>
 
-        <template v-else>
-          <FftWindow :title="found.encounter.who">
-            <div class="speaker">
-              <span class="portrait" aria-hidden="true">{{ found.encounter.emoji }}</span>
-              <div>
-                <p class="topic">{{ found.encounter.topic }}</p>
-                <p class="prompt">{{ found.encounter.prompt }}</p>
-              </div>
-            </div>
-          </FftWindow>
-
-          <Confetti v-if="celebrate" />
-
-          <FftWindow v-if="solved" title="Réussi" aria-live="polite">
-            <p class="good">✓ Bonne réponse</p>
-            <p class="correct">{{ correctText }}</p>
-            <p class="text">{{ found.encounter.lesson.text }}</p>
-            <small v-if="found.encounter.lesson.source">{{ found.encounter.lesson.source }}</small>
-            <router-link class="cmd" :to="`/tabs/rpg/place/${found.place.id}`">
-              <span class="cursor-mark" aria-hidden="true">▶</span> Continuer
-            </router-link>
-          </FftWindow>
-
-          <FftWindow v-else title="Commandes">
-            <ul class="menu">
-              <li v-for="c in choices" :key="c.id">
-                <button type="button" class="cmd" @click="onChoose(c.id)">
-                  <span class="cursor-mark" aria-hidden="true">▶</span> {{ c.text }}
-                </button>
-              </li>
-            </ul>
-          </FftWindow>
-        </template>
-      </div>
-      <div v-else class="wrap"><p class="warn">Rencontre introuvable.</p></div>
+      <template v-else-if="found">
+        <Confetti v-if="celebrate" />
+        <DialogueBox :key="solved ? 'ok' : 'q'" :name="found.encounter.who" :text="dialogue" :portrait="found.encounter.emoji" :terrain="found.place.terrain">
+          <template v-if="solved">
+            <small v-if="found.encounter.lesson.source" class="source">{{ found.encounter.lesson.source }}</small>
+            <router-link class="choice go" :to="`/tabs/rpg/place/${found.place.id}`">▶ Continuer</router-link>
+          </template>
+          <template v-else>
+            <button v-for="c in choices" :key="c.id" type="button" class="choice" @click="onChoose(c.id)">{{ c.text }}</button>
+          </template>
+        </DialogueBox>
+      </template>
     </ion-content>
   </ion-page>
 </template>
@@ -57,7 +34,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import Confetti from '@/components/Confetti.vue';
-import FftWindow from '@/components/FftWindow.vue';
+import DialogueBox from '@/components/DialogueBox.vue';
 import { useRpgStore } from '@/stores/rpg';
 import { findEncounter, shuffledChoices } from '@/utils/rpg';
 
@@ -70,6 +47,12 @@ const playable = computed(() => store.playable(props.id));
 const solved = computed(() => store.cleared(props.id));
 const choices = computed(() => (found.value ? shuffledChoices(found.value.encounter, store.mistakesOf(props.id)) : []));
 const correctText = computed(() => found.value?.encounter.choices.find((c) => c.id === found.value?.encounter.correct)?.text ?? '');
+
+/** Avant la réponse : la question. Après : la bonne réponse et la leçon. */
+const dialogue = computed(() => {
+  if (!found.value) return '';
+  return solved.value ? `✓ ${correctText.value}\n\n${found.value.encounter.lesson.text}` : found.value.encounter.prompt;
+});
 
 /** Les confettis ne partent qu'à la réponse juste, pas en revenant sur une rencontre déjà réussie. */
 const celebrate = ref(false);
@@ -95,101 +78,39 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.wrap {
-  margin: 0 auto;
+.scene-content {
+  --background: #0b1408;
+}
+.warn {
   padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+  color: var(--iman-gold);
 }
-.speaker {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-.portrait {
-  flex: none;
-  width: 56px;
-  height: 56px;
-  display: grid;
-  place-items: center;
-  font-size: 32px;
-  border-radius: 16px;
-  background: radial-gradient(circle at 30% 25%, #3b4fb8, #0c1337);
-  box-shadow: 0 0 0 1px rgba(201, 209, 255, 0.45), 0 0 14px rgba(120, 150, 255, 0.45);
-}
-.topic {
-  margin: 0 0 4px;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #ffe08a;
-}
-.prompt {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.5;
-}
-.menu {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.cmd {
+.choice {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 12px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: transparent;
-  color: #f4f6ff;
+  padding: 12px 16px;
+  border: 3px solid #3c4a68;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #f6eed8, #ebdfc0);
+  box-shadow: 0 0 0 2px #aab8cf, 0 5px 0 2px rgba(0, 0, 0, 0.35);
+  color: #3a2d2a;
   font: inherit;
+  font-weight: 600;
   text-align: left;
   text-decoration: none;
-  text-shadow: inherit;
 }
-.cmd:hover,
-.cmd:focus-visible,
-.cmd:active {
-  border-color: #c9d1ff;
-  background: rgba(255, 255, 255, 0.12);
+.choice:active,
+.choice:focus-visible {
+  background: #ffe9a8;
+  transform: translateY(2px);
 }
-.cursor-mark {
-  display: inline-block;
-  width: 1.2em;
-  color: #ffe08a;
-  visibility: hidden;
-}
-.cmd:hover .cursor-mark,
-.cmd:focus-visible .cursor-mark,
-.cmd:active .cursor-mark {
-  visibility: visible;
-}
-.good {
-  margin: 0 0 6px;
-  color: #8dffbd;
+.go {
+  text-align: center;
   font-weight: 800;
 }
-.correct {
-  margin: 0 0 8px;
-  font-weight: 700;
-}
-.text {
-  margin: 0 0 8px;
-  line-height: 1.5;
-}
-small {
-  display: block;
-  margin-bottom: 10px;
+.source {
   color: #b9c4ff;
   font-size: 11px;
-}
-.warn {
-  color: var(--iman-gold);
 }
 </style>
