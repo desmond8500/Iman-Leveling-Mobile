@@ -2,7 +2,7 @@
 
 ## Pages
 
-- [] Piliers de l'islam
+- [x] Piliers de l'islam
 - [] piliers de la foi
 - [] Portes du paradis
 - [] Portes de l'enfer
