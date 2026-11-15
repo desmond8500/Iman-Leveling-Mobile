@@ -101,3 +101,17 @@ describe('sanitizeWidgetActions', () => {
     expect(sanitizeWidgetActions(null)).toEqual([]);
   });
 });
+
+describe('hadith dans l\'instantané', () => {
+  it('absent par défaut, présent et raccourci sinon', () => {
+    expect(buildWidgetSnapshot(base).hadith).toBeNull();
+    const long = 'mot '.repeat(200);
+    const s = buildWidgetSnapshot({ ...base, hadith: { text: long, attribution: 'Rapporté par X', grade: 'Authentique' } });
+    expect(s.hadith!.text.length).toBeLessThanOrEqual(260);
+    expect(s.hadith!.text.endsWith('…')).toBe(true);
+    expect(s.hadith!.source).toBe('Rapporté par X · Authentique');
+  });
+  it('un texte court reste intact', () => {
+    expect(buildWidgetSnapshot({ ...base, hadith: { text: '  Les actes   valent par les intentions. ' } }).hadith!.text).toBe('Les actes valent par les intentions.');
+  });
+});

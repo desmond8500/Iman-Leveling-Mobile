@@ -52,6 +52,11 @@ export interface SnapshotRamadan {
   maghrib: number[];
 }
 
+export interface SnapshotHadith {
+  text: string;
+  source: string;
+}
+
 export interface WidgetSnapshot {
   version: number;
   generatedAt: number;
@@ -64,6 +69,8 @@ export interface WidgetSnapshot {
   slots: SnapshotSlot[];
   adhkar: Record<Period, SnapshotDhikr[]>;
   ramadan: SnapshotRamadan | null;
+  /** Hadith du jour (gardé sur l'appareil), ou `null` tant qu'il n'a pas pu être chargé. */
+  hadith: SnapshotHadith | null;
   /** [arabe, transcription, sens] des 99 noms, dans l'ordre. */
   names: [string, string, string][];
 }
@@ -74,6 +81,18 @@ export interface SnapshotInput {
   location: Coordinates | null;
   options: CalcOptions;
   ramadanStart: string | null;
+  hadith?: { text: string; attribution?: string; grade?: string } | null;
+}
+
+/** Longueur maximale du texte affiché dans un widget. */
+export const HADITH_MAX = 260;
+
+export function clip(text: string, max = HADITH_MAX): string {
+  const t = text.replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max - 1);
+  const space = cut.lastIndexOf(' ');
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
 }
 
 const DATE_FORMAT = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -154,6 +173,9 @@ export function buildWidgetSnapshot(input: SnapshotInput): WidgetSnapshot {
     slots,
     adhkar,
     ramadan: ramadanSnapshot(input),
+    hadith: input.hadith?.text
+      ? { text: clip(input.hadith.text), source: [input.hadith.attribution, input.hadith.grade].filter(Boolean).join(' · ') }
+      : null,
     names: NAMES.map((n) => [n.arabic, n.translit, n.french]),
   };
 }

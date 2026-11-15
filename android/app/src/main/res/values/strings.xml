@@ -8,4 +8,5 @@
     <string name="widget_dhikr_desc">Invocations du matin et du soir, une à la fois</string>
     <string name="widget_ramadan_desc">Jours jeûnés, jours à venir et heure de la rupture</string>
     <string name="widget_name_desc">Un nom d\'Allah au hasard</string>
+    <string name="widget_hadith_desc">Un hadith du jour, avec son degré d\'authenticité</string>
 </resources>

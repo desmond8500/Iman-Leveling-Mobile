@@ -38,7 +38,7 @@ final class WidgetCore {
     static final String ACTION_NEXT_NAME = "com.iman.leveling.widgets.NEXT_NAME";
 
     private static final Class<?>[] PROVIDERS = {
-        PrayerWidget.class, DhikrWidget.class, RamadanWidget.class, NameWidget.class
+        PrayerWidget.class, DhikrWidget.class, RamadanWidget.class, NameWidget.class, HadithWidget.class
     };
 
     private WidgetCore() {}

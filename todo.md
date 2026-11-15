@@ -6,6 +6,8 @@
 - [] piliers de la foi
 - [] Portes du paradis
 - [] Portes de l'enfer
+- [x] ajouter une page
+- [x] utiliser l'api HadeethEnc 
 
 ## Zikr
 
@@ -31,7 +33,7 @@
 
 ## Widgets
 
-> Code natif non compilé ni testé sur téléphone à ce stade : cases cochées = implémenté, à vérifier sur appareil. Le widget hadith attend une source de hadiths vérifiée.
+> Code natif non compilé ni testé sur téléphone à ce stade : cases cochées = implémenté, à vérifier sur appareil. Le widget hadith affiche le hadith du jour (HadeethEnc, non essayé en réel).
 
 - [x] Crée un widget pour l'application mobile qui affiche la date, la prière valide dans l'heure en cours et les prière surrérogatoires
 - [x] ajouter la possibilité de valider directement les taches faites
@@ -41,7 +43,7 @@
 - [x] Widget ramadan
   - Jours fait et jours restants
   - heure de la rupture
-- [] Widget hadith aléaoire
+- [x] Widget hadith aléaoire
 - [x] Widget nom d'allah aléatoire
 
 ## Erreurs

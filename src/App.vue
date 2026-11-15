@@ -17,6 +17,8 @@ import { rescheduleNotifications } from '@/services/notifications';
 import { applyTheme, resolveTheme } from '@/utils/theme';
 import { pushWidgetSnapshot, takeWidgetActions, widgetsSupported } from '@/services/widgetBridge';
 import { buildWidgetSnapshot } from '@/utils/widgetSnapshot';
+import { dailyHadeeth, savedDailyHadeeth } from '@/services/hadeeth';
+import { toDateKey } from '@/utils/date';
 
 const store = useProgressStore();
 const settings = useSettingsStore();
@@ -53,10 +55,18 @@ watch(
 
 // Widgets Android : on applique d'abord ce qui a été validé depuis un widget, puis on leur renvoie
 // l'état à jour. Une erreur ne doit jamais bloquer l'application.
+let hadithTriedFor = '';
 async function syncWidgets() {
   if (!widgetsSupported() || !store.loaded || !settings.loaded) return;
   try {
     await store.applyWidgetActions(await takeWidgetActions());
+    const dayKey = toDateKey(new Date());
+    const hadith = await savedDailyHadeeth(dayKey);
+    // Hadith du jour : un seul essai de chargement par jour, puis on redonne l'état aux widgets.
+    if (!hadith && hadithTriedFor !== dayKey) {
+      hadithTriedFor = dayKey;
+      void dailyHadeeth(dayKey).then(() => syncWidgets(), () => undefined);
+    }
     await pushWidgetSnapshot(
       buildWidgetSnapshot({
         now: new Date(),
@@ -64,6 +74,7 @@ async function syncWidgets() {
         location: settings.location,
         options: { method: settings.prayerMethod },
         ramadanStart: settings.ramadanStart,
+        hadith,
       }),
     );
   } catch {
