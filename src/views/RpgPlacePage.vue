@@ -27,23 +27,18 @@
               </g>
 
               <!-- Toi, au premier plan -->
-              <g class="unit player" aria-hidden="true">
-                <ellipse :cx="playerPoint.x" :cy="playerPoint.y" rx="13" ry="6" class="shadow" />
-                <text :x="playerPoint.x" :y="playerPoint.y - 2" class="sprite">🚶</text>
-                <text :x="playerPoint.x" :y="playerPoint.y + 14" class="name">Toi</text>
-              </g>
 
               <g
-                v-for="u in units"
+                v-for="(u, i) in units"
                 :key="u.encounter.id"
                 class="unit npc"
                 :class="{ cleared: store.cleared(u.encounter.id) }"
                 role="button"
                 tabindex="0"
                 :aria-label="`${u.encounter.who} : ${u.encounter.topic}${store.cleared(u.encounter.id) ? ' (réussi)' : ''}`"
-                @click="go(u.encounter.id)"
-                @keydown.enter.prevent="go(u.encounter.id)"
-                @keydown.space.prevent="go(u.encounter.id)"
+                @click="go(i)"
+                @keydown.enter.prevent="go(i)"
+                @keydown.space.prevent="go(i)"
               >
                 <circle :cx="u.point.x" :cy="u.point.y - 14" r="26" class="hit" />
                 <ellipse :cx="u.point.x" :cy="u.point.y" rx="13" ry="6" class="shadow" />
@@ -59,19 +54,25 @@
                 </g>
               </g>
 
-              <text v-if="target" :x="target.point.x" :y="target.point.y - 46" class="arrow" aria-hidden="true">▼</text>
+              <g class="unit player" :class="{ walking }" aria-hidden="true">
+                <ellipse :cx="pos.x" :cy="pos.y" rx="13" ry="6" class="shadow" />
+                <g :transform="`translate(${pos.x} 0) scale(${facing} 1)`"><text x="0" :y="pos.y - 2" class="sprite hero">🚶</text></g>
+                <text :x="pos.x" :y="pos.y + 14" class="name">Toi</text>
+              </g>
+
+              <text v-if="target && !walking" :x="target.point.x" :y="target.point.y - 46" class="arrow" aria-hidden="true">▼</text>
             </svg>
           </div>
 
           <FftWindow title="Rencontres">
             <ul class="menu">
               <li v-for="e in place.encounters" :key="e.id">
-                <router-link :to="`/tabs/rpg/q/${e.id}`" class="row" :class="{ done: store.cleared(e.id) }">
+                <a href="#" class="row" :class="{ done: store.cleared(e.id) }" @click.prevent="go(place.encounters.indexOf(e))">
                   <span class="cursor-mark" aria-hidden="true">▶</span>
                   <span class="emoji" aria-hidden="true">{{ e.emoji }}</span>
                   <span class="text"><strong>{{ e.who }}</strong><small>{{ e.topic }}</small></span>
                   <span class="state">{{ store.cleared(e.id) ? '✓' : '?' }}</span>
-                </router-link>
+                </a>
               </li>
             </ul>
           </FftWindow>
@@ -88,12 +89,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import FftWindow from '@/components/FftWindow.vue';
+import { useWalker } from '@/composables/useWalker';
 import { useRpgStore } from '@/stores/rpg';
-import { buildStage, leftFace, rightFace, topFace, unitPoint } from '@/utils/iso';
+import { buildStage, leftFace, rightFace, topFace, unitPoint, type GridPos } from '@/utils/iso';
+import { walkPath } from '@/utils/walk';
 import { isPlaceCleared, type Terrain } from '@/utils/rpg';
 
 const props = defineProps<{ id: string }>();
@@ -106,7 +109,6 @@ const locked = computed(() => index.value >= 0 && store.statusOf(index.value) ==
 const cleared = computed(() => !!place.value && isPlaceCleared(place.value, store.progress));
 
 const stage = computed(() => buildStage(props.id, place.value?.encounters.length ?? 0));
-const playerPoint = computed(() => unitPoint(stage.value, stage.value.start, props.id));
 const units = computed(() =>
   (place.value?.encounters ?? []).map((encounter, i) => ({
     encounter,
@@ -132,7 +134,30 @@ const terrain = computed<Terrain>(() => place.value?.terrain ?? 'grass');
 const top = (level: number) => BASE[terrain.value][Math.min(level, 2)];
 const side = (level: number, factor: number) => shade(BASE[terrain.value][Math.min(level, 2)], factor);
 
-const go = (id: string) => void router.push(`/tabs/rpg/q/${id}`);
+// --- Déplacement : l'avatar marche jusqu'à la personne, puis la conversation s'ouvre ---
+const at = ref<GridPos>({ ...stage.value.start });
+const first = unitPoint(stage.value, at.value, props.id);
+const { pos, walking, facing, walk, place: teleport } = useWalker(first);
+
+watch(
+  () => props.id,
+  () => {
+    at.value = { ...stage.value.start };
+    teleport(unitPoint(stage.value, at.value, props.id));
+  },
+);
+
+async function go(i: number) {
+  const unit = units.value[i];
+  if (!unit || walking.value) return;
+  const spot = stage.value.spots[i] ?? stage.value.start;
+  const path = walkPath(at.value, spot);
+  // On s'arrête juste devant la personne.
+  const steps = path.length > 1 ? path.slice(0, -1) : path;
+  await walk(steps.map((g) => unitPoint(stage.value, g, props.id)), 70);
+  at.value = steps[steps.length - 1];
+  void router.push(`/tabs/rpg/q/${unit.encounter.id}`);
+}
 
 onMounted(() => {
   if (!store.loaded) void store.load();
@@ -153,11 +178,10 @@ onMounted(() => {
   font-size: 14px;
 }
 .stage {
-  border: 3px solid #c9d1ff;
-  border-radius: 12px;
+  border-radius: 22px;
   overflow: hidden;
   background: radial-gradient(circle at 50% 30%, #2a3b8f, #0c1337);
-  box-shadow: 0 0 0 2px #25326f, 0 6px 16px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 0 1px rgba(201, 209, 255, 0.35), 0 0 26px rgba(90, 120, 255, 0.3), 0 12px 28px rgba(0, 0, 0, 0.5);
 }
 svg {
   display: block;
@@ -184,6 +208,14 @@ svg {
   paint-order: stroke;
   stroke: #0c1337;
   stroke-width: 3px;
+}
+.player.walking .hero {
+  animation: hop 0.28s ease-in-out infinite;
+}
+@keyframes hop {
+  50% {
+    transform: translateY(-3px);
+  }
 }
 .npc {
   cursor: pointer;
@@ -239,7 +271,8 @@ svg {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .arrow {
+  .arrow,
+  .player.walking .hero {
     animation: none;
   }
 }

@@ -72,9 +72,9 @@ const correctText = computed(() => found.value?.encounter.choices.find((c) => c.
   display: grid;
   place-items: center;
   font-size: 32px;
-  border: 2px solid #c9d1ff;
-  border-radius: 8px;
-  background: #0c1337;
+  border-radius: 16px;
+  background: radial-gradient(circle at 30% 25%, #3b4fb8, #0c1337);
+  box-shadow: 0 0 0 1px rgba(201, 209, 255, 0.45), 0 0 14px rgba(120, 150, 255, 0.45);
 }
 .miss {
   margin: 0 0 6px;

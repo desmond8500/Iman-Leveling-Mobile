@@ -10,35 +10,51 @@ defineProps<{ title?: string }>();
 </script>
 
 <style scoped>
-/* Fenêtre de jeu de rôle tactique : dégradé bleu nuit, double liseré clair, titre en onglet. */
+/* Panneau de jeu moderne : verre dépoli sombre, liseré dégradé lumineux, titre en pastille. */
 .win {
   position: relative;
-  padding: 16px 14px 14px;
-  border: 2px solid #c9d1ff;
-  border-radius: 10px;
-  background: linear-gradient(180deg, #2a3b8f 0%, #16215a 55%, #0c1337 100%);
+  padding: 18px 16px 16px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(40, 58, 140, 0.72), rgba(12, 19, 55, 0.82));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   box-shadow:
-    0 0 0 2px #25326f,
-    inset 0 0 0 2px rgba(255, 255, 255, 0.12),
-    0 6px 16px rgba(0, 0, 0, 0.45);
+    0 0 0 1px rgba(201, 209, 255, 0.35),
+    0 0 22px rgba(90, 120, 255, 0.28),
+    0 10px 24px rgba(0, 0, 0, 0.45);
   color: #f4f6ff;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+  animation: rise 0.35s ease-out both;
 }
 .plate {
   position: absolute;
-  top: -12px;
-  left: 14px;
-  padding: 1px 10px;
-  border: 2px solid #c9d1ff;
-  border-radius: 6px;
-  background: #16215a;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  top: -11px;
+  left: 16px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffe08a, #ffb84d);
+  box-shadow: 0 2px 8px rgba(255, 184, 77, 0.5);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #ffe08a;
+  color: #1a2150;
 }
 .body {
   position: relative;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .win {
+    animation: none;
+  }
 }
 </style>
