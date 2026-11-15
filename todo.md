@@ -13,6 +13,8 @@
 
 - [x] Système de chapelet comme celui de la video en dessous, créer une page pour ça
 - [inspiration pour soubhannalah, al hamdou lilah alahou akbar](https://www.youtube.com/shorts/vHzrPW9kh1c)
+- [] Ajouter les récompenses de chaque zikr
+- [] Ajouter une interface coté backend d'en rajouter
 
 ## Zakat
 
@@ -49,3 +51,15 @@
 ## Erreurs
 
 - [] paramètres, j'ai une erreur "Les cases du jour 2026-11-11 (counts) doivent être des booléens".
+
+## invocations
+
+- [] Ajouter une interface coté backend pour en rajouter pour les trois sections
+
+## RPG
+
+Je veux faire un mini rpg dans l'application ou l'utilisateur doit faire un parcours avec des obstacles ou on lui pose des questions à choix multiples Si la réponse est bonne il pourra avancer si non il sera redirigé vers une autre route pour qu'il puisse apprendre la bonne réponse.
+
+Le parcours commence à la maison. Il doit etre possible de poser des questions aux personnes occupant la maison sur des sujet se reportant à l'environnement. Par exemple à la maison des questions par rapport à la relation aux parents, la famille, le partage, les activitées religieuses.
+
+Sur le parcours il y aura l'école par exemple ou le boulot. Au boulot par exemple il faudra mettre des obstacles comme un patron qui t'empeche de prier au bureau et faire en sorte que le protagoniste trouve une solution parmis plusieurs à disposition.
