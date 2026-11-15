@@ -212,6 +212,16 @@ Menu **Plus > Chapelet** : un gros bouton rond qui compte à chaque touche (vibr
 
 Menu **Plus > Zakat > Al-Maal** : saisie de l'argent, de l'épargne, des placements, des marchandises, des créances, de l'or et de l'argent (avec leur prix au gramme) et des dettes ; seuil (nisab) selon l'or (85 g) ou l'argent (595 g) ; 2,5 % du patrimoine net une fois le seuil atteint. Une case demande si les biens sont détenus depuis une année lunaire complète : sinon la zakat est signalée comme « pas encore due ». Les montants restent sur l'appareil. Estimation indicative ; bijoux, commerce et placements varient selon les écoles.
 
+## Événements
+
+Menu **Plus > Événements** : Aïd al-Fitr, Aïd al-Adha, Mariage, Baptême (naissance : l'islam ne connaît pas de baptême, on y trouve le nom, l'aqiqa et les invocations) et Décès. Chaque page décrit le rituel, les bonnes pratiques et sunnas, et les invocations (arabe, transcription, français, source). Les deux Aïd affichent leur prochaine date d'après le calendrier hégirien (peut différer d'un jour de l'observation de la lune). Contenu dans `src/data/events.ts` ; références et invocations à faire relire par une personne qualifiée avant diffusion large.
+
+## Héritage
+
+Menu **Plus > Héritage** : on choisit le sexe du défunt, on saisit les héritiers (conjoint, parents, fils et filles, petits-enfants par un fils, frères et sœurs de toute origine), les biens avec leur valeur, les dettes, les frais d'obsèques et un éventuel legs (plafonné au tiers). La page affiche les parts exactes (fractions) et les montants, avec la raison des exclusions et les règles appliquées (parts fixes, reste, « awl », « radd »). Le moteur est dans `src/utils/inheritance.ts`, testé sur les cas classiques (dont al-Oumariyyatayn et al-Himariyya).
+
+**Non pris en charge** : grands-parents, oncles, cousins et héritiers éloignés, enfants d'une fille, héritiers incertains (disparu, enfant à naître). Les écoles divergent sur certains cas ; le calcul suit l'avis majoritaire et le signale. Estimation indicative : pour une succession réelle, notaire et savant sont indispensables. Les données saisies restent sur l'appareil.
+
 ## Rubriques de culture islamique
 
 Menu **Plus** : Piliers de l'islam, Piliers de la foi, Portes du paradis, Portes de l'enfer. Le contenu est dans `src/data/topics.ts` (page générique `TopicPage`), avec la source de chaque texte ; à faire relire par une personne qualifiée avant diffusion large.
