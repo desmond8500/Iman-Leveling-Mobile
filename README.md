@@ -204,6 +204,14 @@ Menu **Plus > Rappels** : hadith du jour (« Un autre hadith » pour en tirer un
 
 Les permissions `POST_NOTIFICATIONS` (Android 13+) et `SCHEDULE_EXACT_ALARM` sont de nouveau déclarées dans le manifeste ; l'autorisation se demande en activant les rappels dans Paramètres. Sur Android 12 et plus, l'alarme exacte peut aussi se régler dans les réglages du téléphone (Applications > Alarmes et rappels).
 
+## Chapelet (tasbih)
+
+Menu **Plus > Chapelet** : un gros bouton rond qui compte à chaque touche (vibration légère, plus longue en fin d'étape et de série). Modèles : « Après la prière » (33 Subhana Llah, 33 Al-hamdu li-Llah, 34 Allahu akbar, qui s'enchaînent tout seuls, d'après Muslim 596), des compteurs à objectif (33 ou 100) et un compteur libre. Boutons « Annuler » (reprend même au-delà d'une étape) et « Remettre à zéro ». L'état est gardé sur l'appareil ; il n'est pas synchronisé avec le serveur.
+
+## Rubriques de culture islamique
+
+Menu **Plus** : Piliers de l'islam, Piliers de la foi, Portes du paradis, Portes de l'enfer. Le contenu est dans `src/data/topics.ts` (page générique `TopicPage`), avec la source de chaque texte ; à faire relire par une personne qualifiée avant diffusion large.
+
 ## Scénario de test (navigateur)
 
 1. L'écran de démarrage s'affiche environ 2 secondes, puis l'accueil : niveau 1, 0 Hasanat, série 0.

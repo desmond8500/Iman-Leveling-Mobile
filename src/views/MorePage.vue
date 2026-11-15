@@ -28,13 +28,14 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { TOPICS } from '@/data/topics';
-import { bookmarkOutline, bookOutline, chatbubbleEllipsesOutline, cashOutline, libraryOutline, chevronForward, moonOutline } from 'ionicons/icons';
+import { bookmarkOutline, radioButtonOnOutline, bookOutline, chatbubbleEllipsesOutline, cashOutline, libraryOutline, chevronForward, moonOutline } from 'ionicons/icons';
 
 const items = [
   ...TOPICS.map((t) => ({ href: `/tabs/topics/${t.id}`, title: t.title, subtitle: t.subtitle, icon: bookOutline })),
   { href: '/tabs/zakat', title: 'Zakat', subtitle: 'Comprendre, calculer al-Maal et al-Fitr', icon: cashOutline },
   { href: '/tabs/quran', title: 'Coran', subtitle: 'Les 114 sourates, arabe, phonétique et français', icon: libraryOutline },
   { href: '/tabs/prayer', title: 'Prière', subtitle: 'Les 5 prières, ablutions, déroulement', icon: bookmarkOutline },
+  { href: '/tabs/tasbih', title: 'Chapelet', subtitle: 'Compter tes dhikr, 33-33-34 après la prière', icon: radioButtonOnOutline },
   { href: '/tabs/reminders', title: 'Rappels', subtitle: 'Hadiths du jour, par thème, favoris', icon: chatbubbleEllipsesOutline },
   { href: '/tabs/ramadan', title: 'Ramadan', subtitle: 'Calendrier des 30 jours', icon: moonOutline },
 ];

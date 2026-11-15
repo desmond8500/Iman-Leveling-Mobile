@@ -11,7 +11,7 @@
 
 ## Zikr
 
-- [] Système de chapelet comme celui de la video en dessous, créer une page pour ça
+- [x] Système de chapelet comme celui de la video en dessous, créer une page pour ça
 - [inspiration pour soubhannalah, al hamdou lilah alahou akbar](https://www.youtube.com/shorts/vHzrPW9kh1c)
 
 ## Zakat
