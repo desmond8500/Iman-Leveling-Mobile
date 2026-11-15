@@ -3,9 +3,9 @@
 ## Pages
 
 - [x] Piliers de l'islam
-- [] piliers de la foi
-- [] Portes du paradis
-- [] Portes de l'enfer
+- [x] piliers de la foi
+- [x] Portes du paradis
+- [x] Portes de l'enfer
 - [x] ajouter une page
 - [x] utiliser l'api HadeethEnc 
 
