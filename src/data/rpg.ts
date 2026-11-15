@@ -12,6 +12,8 @@ export const RPG_PLACES: RpgPlace[] = [
     id: 'maison',
     title: 'La maison',
     emoji: '🏠',
+    map: { x: 18, y: 72 },
+    terrain: 'grass',
     intro:
       "Tout commence chez toi. Les gens de la maison te posent des questions sur la famille, le partage et la pratique religieuse. Réponds juste pour sortir de la maison.",
     encounters: [
@@ -129,6 +131,8 @@ export const RPG_PLACES: RpgPlace[] = [
     id: 'ecole',
     title: "L'école",
     emoji: '🏫',
+    map: { x: 50, y: 36 },
+    terrain: 'stone',
     intro:
       "Te voilà dehors. À l'école, entre camarades, examens et pauses, ta foi se vit au quotidien. Traverse la journée sans te perdre.",
     encounters: [
@@ -210,6 +214,8 @@ export const RPG_PLACES: RpgPlace[] = [
     id: 'travail',
     title: 'Le travail',
     emoji: '💼',
+    map: { x: 82, y: 62 },
+    terrain: 'sand',
     intro:
       "Te voici adulte, au bureau. Ici les épreuves sont des situations réelles : choisis la solution qui respecte ta religion et reste sage.",
     encounters: [

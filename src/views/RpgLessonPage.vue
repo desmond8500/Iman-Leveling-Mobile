@@ -11,20 +11,27 @@
 
     <ion-content class="iman-content" :fullscreen="true">
       <div v-if="found" class="wrap">
-        <section class="card">
-          <p class="emoji" aria-hidden="true">📖</p>
-          <p class="miss">Ce n'était pas la bonne réponse. Voici ce qu'il faut retenir :</p>
-          <p class="prompt">{{ found.encounter.prompt }}</p>
-        </section>
+        <FftWindow title="Raté…">
+          <div class="speaker">
+            <span class="portrait" aria-hidden="true">📖</span>
+            <div>
+              <p class="miss">Ce n'était pas la bonne réponse. Voici ce qu'il faut retenir :</p>
+              <p class="prompt">{{ found.encounter.prompt }}</p>
+            </div>
+          </div>
+        </FftWindow>
 
-        <section class="card good">
-          <h2>La bonne réponse</h2>
+        <FftWindow title="La bonne réponse">
           <p class="correct">{{ correctText }}</p>
-          <p>{{ found.encounter.lesson.text }}</p>
+          <p class="text">{{ found.encounter.lesson.text }}</p>
           <small v-if="found.encounter.lesson.source">{{ found.encounter.lesson.source }}</small>
-        </section>
+        </FftWindow>
 
-        <router-link class="btn" :to="`/tabs/rpg/q/${found.encounter.id}`" replace>Réessayer</router-link>
+        <FftWindow title="Commandes">
+          <router-link class="cmd" :to="`/tabs/rpg/q/${found.encounter.id}`" replace>
+            <span class="cursor-mark" aria-hidden="true">▶</span> Réessayer
+          </router-link>
+        </FftWindow>
       </div>
       <div v-else class="wrap"><p>Leçon introuvable.</p></div>
     </ion-content>
@@ -34,6 +41,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import FftWindow from '@/components/FftWindow.vue';
 import { useRpgStore } from '@/stores/rpg';
 import { findEncounter } from '@/utils/rpg';
 
@@ -50,50 +58,59 @@ const correctText = computed(() => found.value?.encounter.choices.find((c) => c.
   padding: 16px;
   display: flex;
   flex-direction: column;
+  gap: 22px;
+}
+.speaker {
+  display: flex;
   gap: 12px;
+  align-items: flex-start;
 }
-.card {
-  padding: 16px;
-  border-radius: 16px;
-  background: var(--iman-card);
+.portrait {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  border: 2px solid #c9d1ff;
+  border-radius: 8px;
+  background: #0c1337;
 }
-.card p {
+.miss {
+  margin: 0 0 6px;
+  color: #ffe08a;
+  font-weight: 700;
+}
+.prompt {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.correct {
+  margin: 0 0 8px;
+  font-weight: 700;
+  color: #8dffbd;
+}
+.text {
   margin: 0 0 8px;
   line-height: 1.5;
 }
-.emoji {
-  font-size: 36px;
-  text-align: center;
-}
-.miss {
-  color: var(--iman-gold);
-}
-.prompt {
-  font-weight: 600;
-}
-.good {
-  border: 2px solid var(--iman-emerald);
-}
-.good h2 {
-  margin: 0 0 8px;
-  font-size: 16px;
-  color: var(--iman-emerald);
-}
-.correct {
-  font-weight: 700;
-}
-.good small {
-  color: var(--iman-text-soft);
+small {
+  color: #b9c4ff;
   font-size: 11px;
 }
-.btn {
+.cmd {
   display: block;
-  padding: 12px;
-  border-radius: 14px;
-  background: var(--iman-gold);
-  color: #0f2a4a;
+  padding: 10px 12px;
+  border: 1px solid #c9d1ff;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffe08a;
   font-weight: 700;
-  text-align: center;
   text-decoration: none;
+}
+.cursor-mark {
+  display: inline-block;
+  width: 1.2em;
 }
 </style>

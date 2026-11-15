@@ -14,25 +14,35 @@
         <p v-if="!playable" class="warn">Ce lieu est verrouillé : termine d'abord le lieu précédent.</p>
 
         <template v-else>
-          <section class="card">
-            <p class="emoji" aria-hidden="true">{{ found.encounter.emoji }}</p>
-            <p class="topic">{{ found.encounter.topic }}</p>
-            <p class="prompt">{{ found.encounter.prompt }}</p>
-          </section>
+          <FftWindow :title="found.encounter.who">
+            <div class="speaker">
+              <span class="portrait" aria-hidden="true">{{ found.encounter.emoji }}</span>
+              <div>
+                <p class="topic">{{ found.encounter.topic }}</p>
+                <p class="prompt">{{ found.encounter.prompt }}</p>
+              </div>
+            </div>
+          </FftWindow>
 
-          <section v-if="solved" class="card success" aria-live="polite">
-            <h2>✓ Bonne réponse</h2>
+          <FftWindow v-if="solved" title="Réussi" aria-live="polite">
+            <p class="good">✓ Bonne réponse</p>
             <p class="correct">{{ correctText }}</p>
-            <p>{{ found.encounter.lesson.text }}</p>
+            <p class="text">{{ found.encounter.lesson.text }}</p>
             <small v-if="found.encounter.lesson.source">{{ found.encounter.lesson.source }}</small>
-            <router-link class="btn" :to="`/tabs/rpg/place/${found.place.id}`">Continuer</router-link>
-          </section>
+            <router-link class="cmd" :to="`/tabs/rpg/place/${found.place.id}`">
+              <span class="cursor-mark" aria-hidden="true">▶</span> Continuer
+            </router-link>
+          </FftWindow>
 
-          <ul v-else class="choices">
-            <li v-for="c in choices" :key="c.id">
-              <button type="button" class="choice" @click="onChoose(c.id)">{{ c.text }}</button>
-            </li>
-          </ul>
+          <FftWindow v-else title="Commandes">
+            <ul class="menu">
+              <li v-for="c in choices" :key="c.id">
+                <button type="button" class="cmd" @click="onChoose(c.id)">
+                  <span class="cursor-mark" aria-hidden="true">▶</span> {{ c.text }}
+                </button>
+              </li>
+            </ul>
+          </FftWindow>
         </template>
       </div>
       <div v-else class="wrap"><p class="warn">Rencontre introuvable.</p></div>
@@ -44,6 +54,7 @@
 import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import FftWindow from '@/components/FftWindow.vue';
 import { useRpgStore } from '@/stores/rpg';
 import { findEncounter, shuffledChoices } from '@/utils/rpg';
 
@@ -74,79 +85,94 @@ onMounted(() => {
   padding: 16px;
   display: flex;
   flex-direction: column;
+  gap: 22px;
+}
+.speaker {
+  display: flex;
   gap: 12px;
+  align-items: flex-start;
 }
-.card {
-  padding: 16px;
-  border-radius: 16px;
-  background: var(--iman-card);
-}
-.card p {
-  margin: 0 0 8px;
-  line-height: 1.5;
-}
-.emoji {
-  font-size: 40px;
-  text-align: center;
+.portrait {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  border: 2px solid #c9d1ff;
+  border-radius: 8px;
+  background: #0c1337;
 }
 .topic {
-  font-size: 12px;
-  color: var(--iman-gold);
-  text-align: center;
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: #ffe08a;
 }
 .prompt {
-  font-size: 17px;
+  margin: 0;
+  font-size: 16px;
   font-weight: 600;
+  line-height: 1.5;
 }
-.choices {
+.menu {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
-.choice {
+.cmd {
+  display: block;
   width: 100%;
-  padding: 14px 16px;
-  border: 1px solid rgba(242, 201, 76, 0.3);
-  border-radius: 14px;
-  background: var(--iman-card);
-  color: inherit;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #f4f6ff;
   font: inherit;
   text-align: left;
+  text-decoration: none;
+  text-shadow: inherit;
 }
-.choice:active {
-  background: var(--iman-card-done);
+.cmd:hover,
+.cmd:focus-visible,
+.cmd:active {
+  border-color: #c9d1ff;
+  background: rgba(255, 255, 255, 0.12);
 }
-.success {
-  border: 2px solid var(--iman-emerald);
+.cursor-mark {
+  display: inline-block;
+  width: 1.2em;
+  color: #ffe08a;
+  visibility: hidden;
 }
-.success h2 {
-  margin: 0 0 8px;
-  font-size: 18px;
-  color: var(--iman-emerald);
+.cmd:hover .cursor-mark,
+.cmd:focus-visible .cursor-mark,
+.cmd:active .cursor-mark {
+  visibility: visible;
+}
+.good {
+  margin: 0 0 6px;
+  color: #8dffbd;
+  font-weight: 800;
 }
 .correct {
+  margin: 0 0 8px;
   font-weight: 700;
 }
-.success small {
+.text {
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+small {
   display: block;
-  margin-bottom: 12px;
-  color: var(--iman-text-soft);
+  margin-bottom: 10px;
+  color: #b9c4ff;
   font-size: 11px;
-}
-.btn {
-  display: block;
-  padding: 12px;
-  border-radius: 14px;
-  background: var(--iman-gold);
-  color: #0f2a4a;
-  font-weight: 700;
-  text-align: center;
-  text-decoration: none;
 }
 .warn {
   color: var(--iman-gold);

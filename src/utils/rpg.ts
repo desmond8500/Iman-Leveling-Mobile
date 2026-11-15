@@ -30,10 +30,16 @@ export interface RpgEncounter {
   lesson: RpgLesson;
 }
 
+export type Terrain = 'grass' | 'stone' | 'sand';
+
 export interface RpgPlace {
   id: string;
   title: string;
   emoji: string;
+  /** Position sur la carte du monde, en pourcentage (0 à 100) de la largeur et de la hauteur. */
+  map: { x: number; y: number };
+  /** Nature du sol sur le terrain du lieu. */
+  terrain: Terrain;
   intro: string;
   encounters: RpgEncounter[];
 }

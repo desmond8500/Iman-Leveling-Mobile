@@ -12,8 +12,8 @@ const enc = (id: string): RpgEncounter => ({
   correct: 'b', lesson: { text: 'l' },
 });
 const places: RpgPlace[] = [
-  { id: 'p1', title: 'P1', emoji: '1', intro: '', encounters: [enc('e1'), enc('e2')] },
-  { id: 'p2', title: 'P2', emoji: '2', intro: '', encounters: [enc('e3')] },
+  { id: 'p1', title: 'P1', emoji: '1', map: { x: 10, y: 10 }, terrain: 'grass', intro: '', encounters: [enc('e1'), enc('e2')] },
+  { id: 'p2', title: 'P2', emoji: '2', map: { x: 50, y: 50 }, terrain: 'stone', intro: '', encounters: [enc('e3')] },
 ];
 
 describe('données du parcours', () => {
@@ -31,6 +31,17 @@ describe('données du parcours', () => {
         expect(e.lesson.text.length).toBeGreaterThan(30);
         expect(e.lesson.source?.length ?? 0).toBeGreaterThan(3);
       }
+    }
+  });
+  it('chaque lieu a une position distincte sur la carte et un terrain', () => {
+    const spots = RPG_PLACES.map((p) => `${p.map.x},${p.map.y}`);
+    expect(new Set(spots).size).toBe(RPG_PLACES.length);
+    for (const p of RPG_PLACES) {
+      expect(p.map.x).toBeGreaterThanOrEqual(5);
+      expect(p.map.x).toBeLessThanOrEqual(95);
+      expect(p.map.y).toBeGreaterThanOrEqual(5);
+      expect(p.map.y).toBeLessThanOrEqual(95);
+      expect(['grass', 'stone', 'sand']).toContain(p.terrain);
     }
   });
   it('la maison couvre parents, famille, partage et pratique religieuse', () => {
