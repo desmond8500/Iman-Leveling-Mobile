@@ -96,3 +96,20 @@ describe('formatMoney', () => {
     expect(formatMoney(10)).toBe('10');
   });
 });
+
+import { emptyMaalForm, maalInputFromForm, sanitizeMaalForm } from '../../src/utils/zakat';
+
+describe('formulaire al-Maal', () => {
+  it('convertit les champs saisis à la française', () => {
+    const form = { ...emptyMaalForm(), cash: '1 234,5', goldGrams: '10', debts: 'abc', goldPricePerGram: '70' };
+    expect(maalInputFromForm(form)).toMatchObject({ cash: 1234.5, goldGrams: 10, debts: 0, goldPricePerGram: 70, savings: 0 });
+  });
+  it('relit un formulaire stocké en ignorant ce qui est invalide', () => {
+    expect(sanitizeMaalForm(null)).toEqual(emptyMaalForm());
+    const form = sanitizeMaalForm({ cash: '500', savings: 12, debts: 'x'.repeat(50), inconnu: '1' });
+    expect(form.cash).toBe('500');
+    expect(form.savings).toBe('');
+    expect(form.debts).toBe('');
+    expect('inconnu' in form).toBe(false);
+  });
+});

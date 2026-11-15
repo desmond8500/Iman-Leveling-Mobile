@@ -2,21 +2,21 @@
 
 ## Pages
 
-- [] Piliers de l'islam
-- [] piliers de la foi
-- [] Portes du paradis
-- [] Portes de l'enfer
+- [x] Piliers de l'islam
+- [x] piliers de la foi
+- [x] Portes du paradis
+- [x] Portes de l'enfer
 - [x] ajouter une page
 - [x] utiliser l'api HadeethEnc 
 
 ## Zikr
 
-- [] Système de chapelet comme celui de la video en dessous, créer une page pour ça
+- [x] Système de chapelet comme celui de la video en dessous, créer une page pour ça
 - [inspiration pour soubhannalah, al hamdou lilah alahou akbar](https://www.youtube.com/shorts/vHzrPW9kh1c)
 
 ## Zakat
 
-- [] Zakat al-Maal, mettre en place un système de calcul
+- [x] Zakat al-Maal, mettre en place un système de calcul
 
 ## Héritage en islam
 
