@@ -1,35 +1,28 @@
 # [Todo](readme.md)
 
-## Rappels 
+## Pages
 
-- [] ajouter une page
-- [] utiliser l'api HadeethEnc 
+- [] Piliers de l'islam
+- [] piliers de la foi
+- [] Portes du paradis
+- [] Portes de l'enfer
 
-## Zikr (pause)
+## Zikr
 
+- [] Système de chapelet comme celui de la video en dessous, créer une page pour ça
 - [inspiration pour soubhannalah, al hamdou lilah alahou akbar](https://www.youtube.com/shorts/vHzrPW9kh1c)
 
-## Zakat (pause)
+## Zakat
 
-- [] Zakat al-Maal
+- [] Zakat al-Maal, mettre en place un système de calcul
 
-## Héritage en islam (pause)
+## Héritage en islam
 
 - [] Créer une page ou l'on peut définer la généalogie de la personne, lister les biens avec leurs valeurs pour donner en fin la répartition
 
-## Invocations
+## Evenements
 
-- [x] Ajouter en bas de chaque invocation un bouton + et - afin de décompter chaque récitation sauf pour ceux de la citadelle des musulmans
-- [x] Ajouter une recherche à la citadelle
-
-## Coran
-
-- [] Marque page (ne semble pas marcher)
-- [] Valider manuellement les versets
-
-## Evenements  (pause)
-
-- [] Créer la page
+- [] Créer la page, et les sous pages seront vides pour le moment
 - [] aid al fitr
 - [] aid el kebir
 - [] Mariage
