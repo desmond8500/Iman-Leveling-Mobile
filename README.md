@@ -208,6 +208,10 @@ Les permissions `POST_NOTIFICATIONS` (Android 13+) et `SCHEDULE_EXACT_ALARM` son
 
 Menu **Plus > Chapelet** : un gros bouton rond qui compte à chaque touche (vibration légère, plus longue en fin d'étape et de série). Modèles : « Après la prière » (33 Subhana Llah, 33 Al-hamdu li-Llah, 34 Allahu akbar, qui s'enchaînent tout seuls, d'après Muslim 596), des compteurs à objectif (33 ou 100) et un compteur libre. Boutons « Annuler » (reprend même au-delà d'une étape) et « Remettre à zéro ». L'état est gardé sur l'appareil ; il n'est pas synchronisé avec le serveur.
 
+## Zakat al-Maal (calculateur)
+
+Menu **Plus > Zakat > Al-Maal** : saisie de l'argent, de l'épargne, des placements, des marchandises, des créances, de l'or et de l'argent (avec leur prix au gramme) et des dettes ; seuil (nisab) selon l'or (85 g) ou l'argent (595 g) ; 2,5 % du patrimoine net une fois le seuil atteint. Une case demande si les biens sont détenus depuis une année lunaire complète : sinon la zakat est signalée comme « pas encore due ». Les montants restent sur l'appareil. Estimation indicative ; bijoux, commerce et placements varient selon les écoles.
+
 ## Rubriques de culture islamique
 
 Menu **Plus** : Piliers de l'islam, Piliers de la foi, Portes du paradis, Portes de l'enfer. Le contenu est dans `src/data/topics.ts` (page générique `TopicPage`), avec la source de chaque texte ; à faire relire par une personne qualifiée avant diffusion large.

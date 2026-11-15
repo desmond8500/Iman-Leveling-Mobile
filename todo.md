@@ -16,7 +16,7 @@
 
 ## Zakat
 
-- [] Zakat al-Maal, mettre en place un système de calcul
+- [x] Zakat al-Maal, mettre en place un système de calcul
 
 ## Héritage en islam
 

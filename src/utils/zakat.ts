@@ -107,3 +107,28 @@ export function zakatFitr(persons: number, kgPerPerson: number, pricePerKg: numb
   const perPerson = round2(kgPerPerson * pricePerKg);
   return { perPerson, total: round2(perPerson * count), totalKg: round2(kgPerPerson * count) };
 }
+
+// --- Formulaire de la zakat al-Maal (champs saisis en texte, relus depuis le stockage) ---
+
+export type MaalForm = Record<keyof MaalInput, string>;
+
+export const MAAL_FORM_KEYS = Object.keys(emptyMaalInput()) as (keyof MaalInput)[];
+
+export const emptyMaalForm = (): MaalForm =>
+  Object.fromEntries(MAAL_FORM_KEYS.map((k) => [k, ''])) as MaalForm;
+
+/** Convertit les champs saisis en nombres (vide ou invalide = 0). */
+export function maalInputFromForm(form: MaalForm): MaalInput {
+  return Object.fromEntries(MAAL_FORM_KEYS.map((k) => [k, parseAmount(form[k])])) as unknown as MaalInput;
+}
+
+/** Formulaire relu du stockage : seuls les textes courts sont gardés. */
+export function sanitizeMaalForm(value: unknown): MaalForm {
+  const out = emptyMaalForm();
+  if (typeof value !== 'object' || value === null) return out;
+  for (const k of MAAL_FORM_KEYS) {
+    const v = (value as Record<string, unknown>)[k];
+    if (typeof v === 'string' && v.length <= 24) out[k] = v;
+  }
+  return out;
+}

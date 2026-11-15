@@ -10,6 +10,7 @@
       <ion-toolbar>
         <ion-segment :value="tab" @ionChange="onTab">
           <ion-segment-button value="overview"><ion-label>Aperçu</ion-label></ion-segment-button>
+          <ion-segment-button value="maal"><ion-label>Al-Maal</ion-label></ion-segment-button>
           <ion-segment-button value="fitr"><ion-label>Al-Fitr</ion-label></ion-segment-button>
         </ion-segment>
       </ion-toolbar>
@@ -23,6 +24,7 @@
             <p v-for="(p, i) in s.paragraphs" :key="i">{{ p }}</p>
           </section>
         </template>
+        <ZakatMaalCalculator v-else-if="tab === 'maal'" />
         <ZakatFitrCalculator v-else-if="tab === 'fitr'" />
         <p class="note">
           Ces repères sont généraux. En cas de doute, demande à un savant ou à une institution de confiance.
@@ -49,15 +51,16 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/vue';
+import ZakatMaalCalculator from '@/components/ZakatMaalCalculator.vue';
 import ZakatFitrCalculator from '@/components/ZakatFitrCalculator.vue';
 import { ZAKAT_SECTIONS } from '@/data/zakat';
 
-type Tab = 'overview' | 'fitr';
+type Tab = 'overview' | 'maal' | 'fitr';
 const tab = ref<Tab>('overview');
 
 function onTab(event: CustomEvent) {
   const value = event.detail.value;
-  if (value === 'overview' || value === 'fitr') tab.value = value;
+  if (value === 'overview' || value === 'maal' || value === 'fitr') tab.value = value;
 }
 </script>
 
