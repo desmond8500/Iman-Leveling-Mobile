@@ -24,12 +24,12 @@
 
 ## Evenements
 
-- [] Créer la page, et les sous pages seront vides pour le moment
-- [] aid al fitr
-- [] aid el kebir
-- [] Mariage
-- [] Bapteme
-- [] decès
+- [x] Créer la page, et les sous pages seront vides pour le moment
+- [x] aid al fitr
+- [x] aid el kebir
+- [x] Mariage
+- [x] Bapteme
+- [x] decès
 
 ## Widgets
 
