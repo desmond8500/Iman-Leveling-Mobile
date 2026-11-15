@@ -1,5 +1,4 @@
-import { describe, expect, test } from 'bun:test';
-import { easeInOut, pathLength, pointAlong, walkPath } from '@/utils/walk';
+import { easeInOut, pathLength, pointAlong, walkPath } from '../../src/utils/walk';
 
 describe('walkPath', () => {
   test('va en x puis en y, une case par pas', () => {

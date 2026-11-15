@@ -166,7 +166,7 @@ async function enter() {
   if (walking.value || !selected.value) return;
   const from = atIndex.value;
   const step = from <= target ? 1 : -1;
-  const points = [];
+  const points: { x: number; y: number }[] = [];
   for (let i = from; i !== target + step; i += step) points.push({ x: store.places[i].map.x, y: store.places[i].map.y });
   await walk(points, 28);
   atIndex.value = target;

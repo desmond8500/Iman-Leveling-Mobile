@@ -1,5 +1,4 @@
-import { describe, expect, test } from 'bun:test';
-import { AVATARS, avatarEmoji, DEFAULT_AVATAR, sanitizeAvatar } from '@/utils/avatar';
+import { AVATARS, avatarEmoji, DEFAULT_AVATAR, sanitizeAvatar } from '../../src/utils/avatar';
 
 describe('avatar', () => {
   test('les identifiants sont uniques et le défaut existe', () => {
