@@ -24,6 +24,8 @@
             </div>
           </FftWindow>
 
+          <Confetti v-if="celebrate" />
+
           <FftWindow v-if="solved" title="Réussi" aria-live="polite">
             <p class="good">✓ Bonne réponse</p>
             <p class="correct">{{ correctText }}</p>
@@ -51,9 +53,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import Confetti from '@/components/Confetti.vue';
 import FftWindow from '@/components/FftWindow.vue';
 import { useRpgStore } from '@/stores/rpg';
 import { findEncounter, shuffledChoices } from '@/utils/rpg';
@@ -68,8 +71,20 @@ const solved = computed(() => store.cleared(props.id));
 const choices = computed(() => (found.value ? shuffledChoices(found.value.encounter, store.mistakesOf(props.id)) : []));
 const correctText = computed(() => found.value?.encounter.choices.find((c) => c.id === found.value?.encounter.correct)?.text ?? '');
 
+/** Les confettis ne partent qu'à la réponse juste, pas en revenant sur une rencontre déjà réussie. */
+const celebrate = ref(false);
+
 function onChoose(choiceId: string) {
   const result = store.answer(props.id, choiceId);
+  if (result === true) {
+    celebrate.value = true;
+    try {
+      navigator.vibrate?.(60);
+    } catch {
+      /* vibration indisponible */
+    }
+    setTimeout(() => (celebrate.value = false), 3000);
+  }
   // Mauvaise réponse : on est redirigé vers la leçon, puis on retente.
   if (result === false) void router.push(`/tabs/rpg/lesson/${props.id}`);
 }

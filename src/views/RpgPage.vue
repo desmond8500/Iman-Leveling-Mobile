@@ -66,7 +66,7 @@
             <!-- Ton avatar : il marche d'un lieu à l'autre -->
             <g class="avatar" :class="{ walking }" :transform="`translate(${pos.x} ${pos.y - 10})`" aria-hidden="true">
               <ellipse cx="0" cy="10" rx="4" ry="1.6" class="shadow" />
-              <g :transform="`scale(${facing} 1)`"><text class="hero" y="9">🚶</text></g>
+              <g :transform="`scale(${facing} 1)`"><text class="hero" y="9">{{ avatar.emoji }}</text></g>
             </g>
           </svg>
 
@@ -94,6 +94,17 @@
           </template>
         </FftWindow>
 
+        <FftWindow title="Personnage">
+          <ul class="avatars" role="radiogroup" aria-label="Choisir ton personnage">
+            <li v-for="a in AVATARS" :key="a.id">
+              <button type="button" class="pick" :class="{ on: avatar.id === a.id }" role="radio" :aria-checked="avatar.id === a.id" :aria-label="a.label" @click="avatar.choose(a.id)">
+                <span aria-hidden="true">{{ a.emoji }}</span>
+                <small>{{ a.label }}</small>
+              </button>
+            </li>
+          </ul>
+        </FftWindow>
+
         <FftWindow title="Progression">
           <div class="bar" role="progressbar" :aria-valuenow="store.totals.done" aria-valuemin="0" :aria-valuemax="store.totals.total">
             <span :style="{ width: percent + '%' }" />
@@ -114,10 +125,13 @@ import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import FftWindow from '@/components/FftWindow.vue';
 import { useWalker } from '@/composables/useWalker';
+import { useAvatarStore } from '@/stores/avatar';
 import { useRpgStore } from '@/stores/rpg';
+import { AVATARS } from '@/utils/avatar';
 import { placeClearedCount } from '@/utils/rpg';
 
 const store = useRpgStore();
+const avatar = useAvatarStore();
 const router = useRouter();
 const selectedId = ref<string>('');
 /** Indice du lieu où se trouve l'avatar. */
@@ -180,6 +194,7 @@ watch(
 );
 
 onMounted(async () => {
+  void avatar.load();
   if (!store.loaded) await store.load();
   selectedId.value = store.current?.id ?? store.places[0]?.id ?? '';
   syncAvatar();
@@ -404,6 +419,39 @@ svg {
   color: #f4f6ff;
   font: inherit;
   font-size: 12px;
+}
+.avatars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.pick {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border: 1px solid rgba(201, 209, 255, 0.3);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f4f6ff;
+  font: inherit;
+}
+.pick span {
+  font-size: 26px;
+}
+.pick small {
+  font-size: 11px;
+  color: #b9c4ff;
+}
+.pick.on {
+  border-color: #ffe08a;
+  background: rgba(255, 224, 138, 0.16);
+  box-shadow: 0 0 12px rgba(255, 224, 138, 0.45);
 }
 @keyframes flow {
   to {

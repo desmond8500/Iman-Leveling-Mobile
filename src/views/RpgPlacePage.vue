@@ -56,7 +56,7 @@
 
               <g class="unit player" :class="{ walking }" aria-hidden="true">
                 <ellipse :cx="pos.x" :cy="pos.y" rx="13" ry="6" class="shadow" />
-                <g :transform="`translate(${pos.x} 0) scale(${facing} 1)`"><text x="0" :y="pos.y - 2" class="sprite hero">🚶</text></g>
+                <g :transform="`translate(${pos.x} 0) scale(${facing} 1)`"><text x="0" :y="pos.y - 2" class="sprite hero">{{ avatar.emoji }}</text></g>
                 <text :x="pos.x" :y="pos.y + 14" class="name">Toi</text>
               </g>
 
@@ -94,6 +94,7 @@ import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import FftWindow from '@/components/FftWindow.vue';
 import { useWalker } from '@/composables/useWalker';
+import { useAvatarStore } from '@/stores/avatar';
 import { useRpgStore } from '@/stores/rpg';
 import { buildStage, leftFace, rightFace, topFace, unitPoint, type GridPos } from '@/utils/iso';
 import { walkPath } from '@/utils/walk';
@@ -101,6 +102,7 @@ import { isPlaceCleared, type Terrain } from '@/utils/rpg';
 
 const props = defineProps<{ id: string }>();
 const store = useRpgStore();
+const avatar = useAvatarStore();
 const router = useRouter();
 
 const index = computed(() => store.places.findIndex((p) => p.id === props.id));
@@ -161,6 +163,7 @@ async function go(i: number) {
 
 onMounted(() => {
   if (!store.loaded) void store.load();
+  void avatar.load();
 });
 </script>
 
