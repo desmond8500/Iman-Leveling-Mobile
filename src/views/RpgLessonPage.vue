@@ -11,7 +11,7 @@
 
     <ion-content class="scene-content" :fullscreen="true">
       <p v-if="!found" class="warn">Leçon introuvable.</p>
-      <DialogueBox v-else name="Leçon" :text="dialogue" portrait="📖" :terrain="found.place.terrain">
+      <DialogueBox v-else name="Leçon" :text="dialogue" portrait="📖" :terrain="found.place.terrain" :place-id="found.place.id">
         <small v-if="found.encounter.lesson.source" class="source">{{ found.encounter.lesson.source }}</small>
         <router-link class="choice" :to="`/tabs/rpg/q/${found.encounter.id}`" replace>▶ Réessayer</router-link>
       </DialogueBox>
@@ -38,7 +38,7 @@ const dialogue = computed(() =>
 
 <style scoped>
 .scene-content {
-  --background: #0b1408;
+  --background: #0b1030;
 }
 .warn {
   padding: 16px;
@@ -47,11 +47,11 @@ const dialogue = computed(() =>
 .choice {
   display: block;
   padding: 12px 16px;
-  border: 3px solid #3c4a68;
-  border-radius: 6px;
-  background: linear-gradient(180deg, #f6eed8, #ebdfc0);
-  box-shadow: 0 0 0 2px #aab8cf, 0 5px 0 2px rgba(0, 0, 0, 0.35);
-  color: #3a2d2a;
+  border: 2px solid #e9ecf7;
+  border-radius: 8px;
+  background: rgba(14, 20, 48, 0.9);
+  box-shadow: 0 0 0 2px rgba(14, 20, 48, 0.8), 0 5px 10px rgba(0, 0, 0, 0.35);
+  color: #ffd34d;
   font-weight: 800;
   text-align: center;
   text-decoration: none;

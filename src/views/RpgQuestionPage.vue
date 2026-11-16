@@ -15,7 +15,7 @@
 
       <template v-else-if="found">
         <Confetti v-if="celebrate" />
-        <DialogueBox :key="solved ? 'ok' : 'q'" :name="found.encounter.who" :text="dialogue" :portrait="found.encounter.emoji" :look="npcLook(found.encounter.id)" :terrain="found.place.terrain">
+        <DialogueBox :key="solved ? 'ok' : 'q'" :name="found.encounter.who" :text="dialogue" :portrait="found.encounter.emoji" :look="npcLook(found.encounter.id)" :terrain="found.place.terrain" :place-id="found.place.id">
           <template v-if="solved">
             <small v-if="found.encounter.lesson.source" class="source">{{ found.encounter.lesson.source }}</small>
             <router-link class="choice go" :to="`/tabs/rpg/place/${found.place.id}`">▶ Continuer</router-link>
@@ -80,7 +80,7 @@ onMounted(() => {
 
 <style scoped>
 .scene-content {
-  --background: #0b1408;
+  --background: #0b1030;
 }
 .warn {
   padding: 16px;
@@ -91,19 +91,29 @@ onMounted(() => {
   width: 100%;
   box-sizing: border-box;
   padding: 12px 16px;
-  border: 3px solid #3c4a68;
-  border-radius: 6px;
-  background: linear-gradient(180deg, #f6eed8, #ebdfc0);
-  box-shadow: 0 0 0 2px #aab8cf, 0 5px 0 2px rgba(0, 0, 0, 0.35);
-  color: #3a2d2a;
+  border: 2px solid #e9ecf7;
+  border-radius: 8px;
+  background: rgba(14, 20, 48, 0.9);
+  box-shadow: 0 0 0 2px rgba(14, 20, 48, 0.8), 0 5px 10px rgba(0, 0, 0, 0.35);
+  color: #f4f6ff;
   font: inherit;
   font-weight: 600;
   text-align: left;
   text-decoration: none;
 }
+.choice::before {
+  content: '▶ ';
+  color: #ffd34d;
+  visibility: hidden;
+}
+.choice:hover::before,
+.choice:active::before,
+.choice:focus-visible::before {
+  visibility: visible;
+}
 .choice:active,
 .choice:focus-visible {
-  background: #ffe9a8;
+  background: rgba(40, 58, 140, 0.95);
   transform: translateY(2px);
 }
 .go {

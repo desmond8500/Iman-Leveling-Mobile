@@ -34,12 +34,15 @@
               <path d="M80 10 q4 -2 8 0 t8 0" />
             </g>
             <path d="M4 78 C6 56 12 46 26 40 C34 24 56 12 72 22 C88 30 96 46 94 64 C92 84 70 92 48 90 C26 94 8 92 4 78 Z" fill="url(#land)" stroke="#f6ebc5" stroke-width="0.8" />
-            <text x="30" y="58" class="deco" aria-hidden="true">🌲</text>
-            <text x="64" y="44" class="deco" aria-hidden="true">⛰️</text>
-            <text x="44" y="78" class="deco" aria-hidden="true">🌾</text>
-            <text x="76" y="84" class="deco" aria-hidden="true">🌴</text>
-            <text class="cloud c1" x="8" y="20" aria-hidden="true">☁️</text>
-            <text class="cloud c2" x="60" y="10" aria-hidden="true">☁️</text>
+            <g aria-hidden="true">
+              <path d="M62 46 L68 36 L72 41 L76 34 L84 46 Z" fill="#8e93a8" stroke="#2b1b17" stroke-width="0.5" stroke-linejoin="round" />
+              <path d="M68 36 L66.5 39 L69.5 39 Z M76 34 L74 37.5 L78 37.5 Z" fill="#f4f6ff" />
+              <g v-for="d in MAP_DECOR" :key="d.id" :transform="`translate(${d.x} ${d.y}) scale(${d.s})`">
+                <VectorShapes :shapes="d.shapes" />
+              </g>
+            </g>
+            <g class="cloud c1" aria-hidden="true"><ellipse cx="10" cy="20" rx="6" ry="2.6" /><ellipse cx="14" cy="18.6" rx="4" ry="2.6" /></g>
+            <g class="cloud c2" aria-hidden="true"><ellipse cx="62" cy="10" rx="7" ry="2.8" /><ellipse cx="66" cy="8.4" rx="4.4" ry="2.8" /></g>
 
             <polyline :points="routePoints" class="route" />
 
@@ -55,29 +58,34 @@
               @keydown.enter.prevent="select(place.id)"
               @keydown.space.prevent="select(place.id)"
             >
-              <circle v-if="store.statusOf(i) === 'open'" :cx="place.map.x" :cy="place.map.y" r="12" fill="url(#glow)" class="pulse" />
-              <circle :cx="place.map.x" :cy="place.map.y" r="8" class="disc" />
-              <text :x="place.map.x" :y="place.map.y + 3" class="icon">{{ place.emoji }}</text>
-              <text v-if="store.statusOf(i) === 'cleared'" :x="place.map.x + 7" :y="place.map.y - 5" class="badge">✓</text>
-              <text v-else-if="store.statusOf(i) === 'locked'" :x="place.map.x + 7" :y="place.map.y - 5" class="badge">🔒</text>
-              <text :x="place.map.x" :y="place.map.y + 14" class="label">{{ place.title }}</text>
+              <circle :cx="place.map.x" :cy="place.map.y - 3" r="11" class="hit" />
+              <circle v-if="store.statusOf(i) === 'open'" :cx="place.map.x" :cy="place.map.y" r="13" fill="url(#glow)" class="pulse" />
+              <ellipse :cx="place.map.x" :cy="place.map.y + 4" rx="11" ry="3.6" class="disc" />
+              <g :transform="`translate(${place.map.x} ${place.map.y + 4}) scale(${iconScale(place.id)})`" class="building">
+                <VectorShapes :shapes="placeIcon(place.id)" />
+              </g>
+              <g v-if="store.statusOf(i) === 'cleared'">
+                <circle :cx="place.map.x + 9" :cy="place.map.y - 9" r="3" class="ok" />
+                <text :x="place.map.x + 9" :y="place.map.y - 7.6" class="badge">✓</text>
+              </g>
+              <text v-else-if="store.statusOf(i) === 'locked'" :x="place.map.x + 9" :y="place.map.y - 7" class="badge">🔒</text>
+              <text :x="place.map.x" :y="place.map.y + 12" class="label">{{ place.title }}</text>
             </g>
 
             <!-- Ton avatar : il marche d'un lieu à l'autre -->
             <g class="avatar" :class="{ walking }" :transform="`translate(${pos.x} ${pos.y - 10})`" aria-hidden="true">
               <ellipse cx="0" cy="10" rx="4" ry="1.6" class="shadow" />
-              <PixelSprite :look="avatarLook(avatar.id)" :anim="walking ? 'walk' : 'idle'" :facing="facing" :px="0.46" :x="-3.7" y="-1" />
+              <VectorSprite :look="avatarLook(avatar.id)" :anim="walking ? 'walk' : 'idle'" :facing="facing" :px="0.6" :x="-4.8" y="-5" />
             </g>
           </svg>
 
           <!-- HUD -->
-          <div class="hud" aria-live="polite">
-            <div class="ring" :style="{ '--p': percent }" role="progressbar" :aria-valuenow="percent" aria-valuemin="0" aria-valuemax="100">
-              <span>{{ percent }}%</span>
-            </div>
-            <div class="hud-text">
-              <strong>{{ selected?.title ?? 'Parcours' }}</strong>
-              <small>{{ store.totals.done }} / {{ store.totals.total }} rencontres</small>
+          <div class="overlay">
+            <GameHud class="hud-card" />
+            <div class="hud">
+              <div class="ring" :style="{ '--p': percent }" role="progressbar" aria-label="Parcours accompli" :aria-valuenow="percent" aria-valuemin="0" aria-valuemax="100">
+                <span>{{ percent }}%</span>
+              </div>
             </div>
           </div>
         </div>
@@ -96,10 +104,10 @@
 
         <FftWindow title="Personnage">
           <ul class="avatars" role="radiogroup" aria-label="Choisir ton personnage">
-            <li v-for="a in AVATARS" :key="a.id">
-              <button type="button" class="pick" :class="{ on: avatar.id === a.id }" role="radio" :aria-checked="avatar.id === a.id" :aria-label="a.label" @click="avatar.choose(a.id)">
-                <PixelSprite :look="avatarLook(a.id)" :px="1.8" aria-hidden="true" />
-                <small>{{ a.label }}</small>
+            <li v-for="(a, i) in AVATARS" :key="a.id">
+              <button type="button" class="pick" :class="{ on: avatar.id === a.id }" :style="{ '--tone': RIBBONS[i % RIBBONS.length] }" role="radio" :aria-checked="avatar.id === a.id" :aria-label="a.label" @click="avatar.choose(a.id)">
+                <VectorSprite :look="avatarLook(a.id)" :anim="avatar.id === a.id ? 'walk' : 'idle'" :phase="i" :px="3" aria-hidden="true" />
+                <span class="ribbon">{{ a.label }}</span>
               </button>
             </li>
           </ul>
@@ -124,13 +132,33 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import FftWindow from '@/components/FftWindow.vue';
-import PixelSprite from '@/components/PixelSprite.vue';
+import VectorShapes from '@/components/VectorShapes.vue';
+import VectorSprite from '@/components/VectorSprite.vue';
+import GameHud from '@/components/game/GameHud.vue';
 import { avatarLook } from '@/data/sprites';
 import { useWalker } from '@/composables/useWalker';
 import { useAvatarStore } from '@/stores/avatar';
 import { useRpgStore } from '@/stores/rpg';
 import { AVATARS } from '@/utils/avatar';
 import { placeClearedCount } from '@/utils/rpg';
+import { bush, mosque, palm, pine, placeIcon, tree } from '@/utils/vectorScene';
+
+/** Décor vectoriel de l'île (positions dans le repère 100 × 100 de la carte). */
+const MAP_DECOR = [
+  { id: 'pin1', x: 30, y: 60, s: 0.13, shapes: pine() },
+  { id: 'pin2', x: 34, y: 56, s: 0.11, shapes: pine() },
+  { id: 'arbre1', x: 10, y: 84, s: 0.12, shapes: tree() },
+  { id: 'arbre2', x: 46, y: 52, s: 0.1, shapes: tree('#5aa64a') },
+  { id: 'buisson', x: 60, y: 86, s: 0.12, shapes: bush() },
+  { id: 'mosquee', x: 40, y: 80, s: 0.1, shapes: mosque() },
+  { id: 'palmier1', x: 76, y: 86, s: 0.13, shapes: palm() },
+  { id: 'palmier2', x: 66, y: 76, s: 0.11, shapes: palm() },
+  { id: 'arbre3', x: 38, y: 34, s: 0.1, shapes: tree() },
+];
+/** Bâtiments de la carte : environ 16 unités de large. */
+const iconScale = (id: string) => (id === 'ecole' ? 0.07 : id === 'travail' ? 0.08 : 0.1);
+/** Couleurs des rubans de la feuille de personnages. */
+const RIBBONS = ['#2f5fa8', '#8a4a2b', '#2f7a4a', '#5a3a8a', '#9a3a3a', '#3a6a8a'];
 
 const store = useRpgStore();
 const avatar = useAvatarStore();
@@ -228,13 +256,9 @@ svg {
   stroke-width: 0.5;
   animation: drift 6s ease-in-out infinite alternate;
 }
-.deco {
-  font-size: 7px;
-  opacity: 0.9;
-}
 .cloud {
-  font-size: 9px;
-  opacity: 0.55;
+  fill: #ffffff;
+  opacity: 0.6;
   animation: cloud 28s linear infinite;
 }
 .cloud.c2 {
@@ -255,38 +279,48 @@ svg {
   cursor: pointer;
   outline: none;
 }
+.node .hit {
+  fill: transparent;
+}
 .node .disc {
-  fill: #16215a;
+  fill: rgba(22, 33, 90, 0.45);
   stroke: #c9d1ff;
-  stroke-width: 1.2;
+  stroke-width: 0.6;
 }
 .node.open .disc {
   stroke: #ffe08a;
-  stroke-width: 1.8;
+  stroke-width: 0.9;
 }
 .node.cleared .disc {
-  fill: #1d5a3a;
+  fill: rgba(29, 90, 58, 0.6);
   stroke: #8be3a9;
 }
+.node.locked .building {
+  filter: grayscale(0.85) brightness(0.8);
+}
 .node.locked {
-  opacity: 0.55;
+  opacity: 0.75;
 }
 .node.selected .disc,
 .node:focus-visible .disc {
   stroke: #ffffff;
-  stroke-width: 2.4;
+  stroke-width: 1.2;
+}
+.node .ok {
+  fill: #1d8a50;
+  stroke: #fff;
+  stroke-width: 0.6;
 }
 .pulse {
   transform-box: fill-box;
   transform-origin: center;
   animation: pulse 1.8s ease-in-out infinite;
 }
-.icon {
-  font-size: 8px;
-  text-anchor: middle;
-}
 .badge {
-  font-size: 5px;
+  font-size: 4px;
+  font-weight: 800;
+  text-anchor: middle;
+  fill: #fff;
 }
 .label {
   font-size: 4.4px;
@@ -303,14 +337,24 @@ svg {
 .shadow {
   fill: rgba(0, 0, 0, 0.35);
 }
-.hud {
+.overlay {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+.hud-card {
+  width: min(230px, 66%);
+}
+.hud {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 14px 6px 6px;
+  padding: 5px;
   border-radius: 999px;
   background: rgba(12, 19, 55, 0.62);
   -webkit-backdrop-filter: blur(10px);
@@ -415,35 +459,52 @@ svg {
   font: inherit;
   font-size: 12px;
 }
+/* Feuille de personnages : chaque héros sur fond sombre, avec son ruban de nom. */
 .avatars {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 10px 4px 4px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 14px 8px;
+  border-radius: 12px;
+  background: #1b2036;
 }
 .pick {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 8px 4px;
-  border: 1px solid rgba(201, 209, 255, 0.3);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
+  gap: 6px;
+  padding: 6px 2px 0;
+  border: 0;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at 50% 85%, rgba(255, 255, 255, 0.08), transparent 60%);
   color: #f4f6ff;
   font: inherit;
 }
-.pick small {
-  font-size: 11px;
-  color: #b9c4ff;
+.pick svg {
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.35));
+}
+.ribbon {
+  position: relative;
+  width: 92%;
+  padding: 3px 0;
+  background: var(--tone);
+  clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
 }
 .pick.on {
-  border-color: #ffe08a;
-  background: rgba(255, 224, 138, 0.16);
-  box-shadow: 0 0 12px rgba(255, 224, 138, 0.45);
+  background: radial-gradient(ellipse at 50% 80%, rgba(255, 224, 138, 0.35), transparent 65%);
+}
+.pick.on .ribbon {
+  background: linear-gradient(90deg, #ffb84d, #ffe08a);
+  color: #1a2150;
 }
 @keyframes flow {
   to {
