@@ -1,5 +1,12 @@
 # [Todo Iman Leveling](readme.md)
 
+## Application
+
+- [ ] ajouter la couleur jaune à l'application et l'activer les jours blancs
+- [ ] faire un système de rappel les jours blancs
+- [ ] ajouter la couleur or pour les jours de fete
+ 
+
 ## Pages
 
 - [x] Piliers de l'islam
@@ -36,6 +43,8 @@
 ## Widgets
 
 > Code natif non compilé ni testé sur téléphone à ce stade : cases cochées = implémenté, à vérifier sur appareil. Le widget hadith affiche le hadith du jour (HadeethEnc, non essayé en réel).
+
+- [ ] rendre les widgets responsive en fonction de la taille des fenêtres 
 
 - [x] Crée un widget pour l'application mobile qui affiche la date, la prière valide dans l'heure en cours et les prière surrérogatoires
 - [x] ajouter la possibilité de valider directement les taches faites
