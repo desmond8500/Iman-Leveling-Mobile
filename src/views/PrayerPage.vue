@@ -76,6 +76,13 @@
           <p class="hint">
             Ce résumé ne remplace pas un apprentissage auprès d'une personne qualifiée.
           </p>
+          <router-link to="/tabs/sahw" class="sahw-link">
+            <span>
+              <strong>Un oubli, un doute ?</strong>
+              <small>Prosternations de l'oubli et correction de la prière</small>
+            </span>
+            <span aria-hidden="true">▶</span>
+          </router-link>
         </section>
 
         <section class="card">
@@ -133,6 +140,29 @@ const timeOf = (id: PrayerId) => {
 </script>
 
 <style scoped>
+.sahw-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--iman-card-done);
+  color: inherit;
+  text-decoration: none;
+}
+.sahw-link span:first-child {
+  display: flex;
+  flex-direction: column;
+}
+.sahw-link small {
+  color: var(--iman-text-soft);
+  font-size: 12px;
+}
+.sahw-link span:last-child {
+  color: var(--iman-gold);
+}
 .card {
   margin-bottom: 16px;
   padding: 16px;

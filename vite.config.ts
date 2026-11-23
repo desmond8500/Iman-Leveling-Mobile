@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { env } from 'node:process';
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
@@ -8,7 +9,8 @@ import pkg from './package.json';
 
 export default defineConfig({
   define: {
-    __APP_VERSION__: JSON.stringify(pkg.version),
+    // En compilation automatique, APP_BUILD ajoute le numéro de build : « 0.3.0-b12 », comme l'APK.
+    __APP_VERSION__: JSON.stringify(env.APP_BUILD ? `${pkg.version}-b${env.APP_BUILD}` : pkg.version),
   },
   plugins: [
     vue(),

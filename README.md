@@ -4,6 +4,21 @@ Application mobile (Ionic 8 + Vue 3) qui transforme le suivi des pratiques relig
 Hasanat, niveaux et séries de jours. Données stockées en local pour l'instant, avec une couche
 `ProgressRepository` prévue pour brancher plus tard une API Laravel 13.
 
+## Télécharger l'APK
+
+Chaque modification poussée sur `main` fabrique automatiquement une APK de test versionnée
+(GitHub Actions, `.github/workflows/apk.yml`) et la publie dans les
+[Releases du dépôt](https://github.com/desmond8500/Iman-Leveling-Mobile/releases) :
+
+- nom du fichier : `iman-leveling-v<version>-b<build>.apk` (ex. `iman-leveling-v0.3.0-b4.apk`) ;
+- dernière version, lien fixe : <https://github.com/desmond8500/Iman-Leveling-Mobile/releases/latest/download/iman-leveling.apk> ;
+- la version affichée dans **Paramètres** (ex. `v0.3.0-b4`) est celle de l'APK.
+
+La `version` de `package.json` change à chaque nouvelle fonctionnalité (0.3.0 : prosternations de
+l'oubli) ; le numéro de build augmente à chaque modification. Toutes les APK de test sont signées
+avec la même clé de test (`android/keystore/debug.keystore`) : chacune s'installe par-dessus la
+précédente sans perdre les données. Cette clé est publique : elle ne doit pas servir au Play Store.
+
 ## Lancer et tester
 
 Prérequis : Node 20 ou plus.
@@ -141,7 +156,10 @@ ISNA, Égypte, Oumm al-Qora, Karachi. Les heures peuvent différer de quelques m
 ta mosquée : en cas de doute, suis son calendrier.
 
 **Onglet « Plus ».** Ramadan (calendrier de 30 jours en 3 blocs de 10), Prière (5 prières, ablutions,
-déroulement, invocations des ablutions et de fin de prière) et Coran (114 sourates). Le calendrier
+déroulement, invocations des ablutions et de fin de prière), Oubli dans la prière (prosternations
+de l'oubli : avant ou après le salam selon l'école malikite, hanafite, chafiite ou hanbalite, huit
+situations guidées pas à pas — premier tachahhoud oublié, rak'ah en trop, salam trop tôt, doutes,
+pilier oublié — avec les hadiths de référence, et les règles pour corriger l'imam) et Coran (114 sourates). Le calendrier
 du mois affiche la date hégirienne (Oumm al-Qora, ±1 jour selon la lune), les jours blancs
 (13-14-15) et le lundi/jeudi.
 

@@ -28,13 +28,14 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { TOPICS } from '@/data/topics';
-import { bookmarkOutline, mapOutline, peopleOutline, calendarOutline, radioButtonOnOutline, bookOutline, chatbubbleEllipsesOutline, cashOutline, libraryOutline, chevronForward, moonOutline } from 'ionicons/icons';
+import { bookmarkOutline, mapOutline, peopleOutline, calendarOutline, radioButtonOnOutline, bookOutline, chatbubbleEllipsesOutline, cashOutline, libraryOutline, chevronForward, moonOutline, refreshOutline } from 'ionicons/icons';
 
 const items = [
   ...TOPICS.map((t) => ({ href: `/tabs/topics/${t.id}`, title: t.title, subtitle: t.subtitle, icon: bookOutline })),
   { href: '/tabs/zakat', title: 'Zakat', subtitle: 'Comprendre, calculer al-Maal et al-Fitr', icon: cashOutline },
   { href: '/tabs/quran', title: 'Coran', subtitle: 'Les 114 sourates, arabe, phonétique et français', icon: libraryOutline },
   { href: '/tabs/prayer', title: 'Prière', subtitle: 'Les 5 prières, ablutions, déroulement', icon: bookmarkOutline },
+  { href: '/tabs/sahw', title: "Oubli dans la prière", subtitle: "Prosternations de l'oubli, doutes, corrections", icon: refreshOutline },
   { href: '/tabs/rpg', title: 'Parcours', subtitle: 'Maison, école, travail : réponds juste pour avancer', icon: mapOutline },
   { href: '/tabs/heritage', title: 'Héritage', subtitle: 'Héritiers, biens et répartition des parts', icon: peopleOutline },
   { href: '/tabs/events', title: 'Événements', subtitle: 'Aïd, mariage, naissance, décès : rituel et invocations', icon: calendarOutline },

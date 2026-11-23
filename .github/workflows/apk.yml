@@ -1,0 +1,98 @@
+# Fabrique une APK Android versionnée à chaque modification poussée sur main,
+# puis la publie dans les Releases du dépôt (une release par build).
+name: APK Android
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Tests
+        run: npm test
+
+      - name: Version
+        id: v
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          BUILD=${{ github.run_number }}
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION-b$BUILD" >> "$GITHUB_OUTPUT"
+          echo "apk=iman-leveling-v$VERSION-b$BUILD.apk" >> "$GITHUB_OUTPUT"
+
+      - name: Compilation de l'app web
+        run: npm run build
+        env:
+          APP_BUILD: ${{ steps.v.outputs.build }}
+
+      - name: Synchronisation Capacitor
+        run: npx cap sync android
+
+      - name: APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug -PciBuild=${{ steps.v.outputs.build }} --no-daemon --stacktrace
+
+      - name: Préparer les fichiers
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/${{ steps.v.outputs.apk }}"
+          cp android/app/build/outputs/apk/debug/app-debug.apk out/iman-leveling.apk
+          {
+            echo "APK de test d'Iman Leveling, version ${{ steps.v.outputs.version }} (build ${{ steps.v.outputs.build }})."
+            echo
+            echo "Modification :"
+            echo
+            git log -1 --format='%B' | grep -v -E '^(Co-Authored-By|Claude-Session):'
+            echo
+            echo "Installation : télécharge ${{ steps.v.outputs.apk }} sur le téléphone et ouvre-le (autorise l'installation d'applications inconnues)."
+            echo "Toutes les APK de test ont la même signature : elles s'installent par-dessus la précédente, sans perdre tes données."
+          } > out/notes.md
+
+      - name: Garder l'APK dans les artefacts du build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.v.outputs.apk }}
+          path: out/${{ steps.v.outputs.apk }}
+          retention-days: 30
+
+      - name: Publier la release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.v.outputs.tag }}" \
+            "out/${{ steps.v.outputs.apk }}" out/iman-leveling.apk \
+            --title "Iman Leveling ${{ steps.v.outputs.version }} (build ${{ steps.v.outputs.build }})" \
+            --notes-file out/notes.md \
+            --target "$GITHUB_SHA" \
+            --latest
