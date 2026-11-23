@@ -8,10 +8,11 @@ import { manifest } from './pwa.manifest';
 import pkg from './package.json';
 
 export default defineConfig({
-  define: {
-    // En compilation automatique, APP_BUILD ajoute le numéro de build : « 0.3.0-b12 », comme l'APK.
-    __APP_VERSION__: JSON.stringify(env.APP_BUILD ? `${pkg.version}-b${env.APP_BUILD}` : pkg.version),
-  },
+  // Version injectée à la compilation (pas pendant les tests, où elle vaut « dev »).
+  // En compilation automatique, APP_BUILD ajoute le numéro de build : « 0.3.0-b12 », comme l'APK.
+  define: env.VITEST
+    ? {}
+    : { __APP_VERSION__: JSON.stringify(env.APP_BUILD ? `${pkg.version}-b${env.APP_BUILD}` : pkg.version) },
   plugins: [
     vue(),
     VitePWA({
