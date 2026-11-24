@@ -67,6 +67,8 @@
 
 ## RPG
 
+- [ ] reprendre le design, et se baser sur pokemon vert émeraude nous allons commencer par le choix des personnages.
+
 - [x] Moteur du parcours (carte, lieux, questions, leçon en cas d'erreur, progression hors ligne) et trois lieux : maison, école, travail
 - [ ] Autres lieux et rencontres (mosquée, marché, voyage, voisinage…) : contenu à ajouter dans `src/data/rpg.ts`
 
