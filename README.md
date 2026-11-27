@@ -115,7 +115,8 @@ l'app en HTTPS, avec `index.html` renvoyé pour toute route inconnue.
 **Paramètres.** Onglet « Paramètres » :
 
 - *Genre* : homme ou femme. Il détermine les Hasanat des prières (voir « Règles des Hasanat »).
-- *Apparence* : auto (bleu le vendredi), émeraude ou bleu.
+- *Apparence* : auto (or les jours de fête — Aïd al-Fitr, Aïd al-Adha et jours de tachriq —, jaune les jours blancs, bleu le vendredi), émeraude, bleu, jaune ou or.
+- *Rappel des jours blancs* : notification la veille à 20 h de chaque jour blanc (13, 14 et 15 du mois hégirien, hors Ramadan), indépendante des rappels de prière et de la position.
 - *Heures de prière* : méthode de calcul (celle du pays par défaut).
 - *Rappels* (mobile uniquement) : notification à l'heure de chaque prière et rappel des ablutions
   10 à 30 min avant.

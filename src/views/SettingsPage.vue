@@ -31,12 +31,18 @@
             Ne garde que l'essentiel : les 5 prières, les invocations et le Coran. Le mode avancé
             affiche aussi les sunnas, les noms d'Allah, Ramadan, la Zakat et le reste.
           </p>
-          <ion-segment :value="settings.theme" @ionChange="onTheme">
+          <ion-segment :value="settings.theme" :scrollable="true" @ionChange="onTheme">
             <ion-segment-button value="auto"><ion-label>Auto</ion-label></ion-segment-button>
             <ion-segment-button value="emerald"><ion-label>Émeraude</ion-label></ion-segment-button>
             <ion-segment-button value="blue"><ion-label>Bleu</ion-label></ion-segment-button>
+            <ion-segment-button value="yellow"><ion-label>Jaune</ion-label></ion-segment-button>
+            <ion-segment-button value="gold"><ion-label>Or</ion-label></ion-segment-button>
           </ion-segment>
-          <p class="hint">En mode auto, l'application passe au bleu le vendredi.</p>
+          <p class="hint">
+            En mode auto, l'application passe à l'or les jours de fête (Aïd al-Fitr, Aïd al-Adha et
+            jours de tachriq), au jaune les jours blancs (13, 14 et 15 du mois hégirien) et au bleu le
+            vendredi.
+          </p>
         </section>
 
         <!-- Notifications -->
@@ -69,7 +75,15 @@
               </ion-select>
             </template>
             <p v-if="!settings.location" class="hint">
-              Détecte d'abord ta position : les rappels en dépendent.
+              Détecte d'abord ta position : les rappels de prière en dépendent.
+            </p>
+            <ion-toggle :checked="settings.notifications.whiteDays" @ionChange="onWhiteDaysToggle">
+              Rappel des jours blancs
+            </ion-toggle>
+            <p class="hint">
+              La veille de chaque jour blanc (13, 14 et 15 du mois hégirien, hors Ramadan), à
+              {{ WHITE_DAY_REMINDER_HOUR }} h, un rappel pour le jeûne et le souhour. Dates du
+              calendrier : l'observation de la lune peut les décaler d'un jour.
             </p>
           </template>
           <p v-else class="hint">
@@ -271,7 +285,7 @@ import { LocationError } from '@/services/geolocation';
 import { useSettingsStore } from '@/stores/settings';
 import { DEFAULT_SERVER_URL } from '@/services/api';
 import { requestNotificationPermission, notificationsSupported } from '@/services/notifications';
-import { ABLUTION_CHOICES, END_CHOICES } from '@/utils/notifications';
+import { ABLUTION_CHOICES, END_CHOICES, WHITE_DAY_REMINDER_HOUR } from '@/utils/notifications';
 import { isThemeSetting } from '@/utils/theme';
 import { versionLabel } from '@/utils/version';
 import { METHODS, METHOD_IDS, isMethodId } from '@/utils/prayerTimes';
@@ -302,6 +316,17 @@ async function onNotifToggle(event: CustomEvent) {
     return;
   }
   await settings.setNotifications({ ...settings.notifications, enabled });
+}
+
+async function onWhiteDaysToggle(event: CustomEvent) {
+  const whiteDays = !!event.detail.checked;
+  if (whiteDays === settings.notifications.whiteDays) return;
+  if (whiteDays && !(await requestNotificationPermission())) {
+    say('Autorise les notifications dans les réglages du téléphone pour activer ce rappel.');
+    await settings.setNotifications({ ...settings.notifications, whiteDays: false });
+    return;
+  }
+  await settings.setNotifications({ ...settings.notifications, whiteDays });
 }
 
 function onAblution(event: CustomEvent) {

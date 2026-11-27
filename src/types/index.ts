@@ -124,10 +124,10 @@ export interface SettingsData {
   location: { lat: number; lon: number } | null;
   /** Méthode de calcul des heures ; `null` = celle qui correspond au pays. */
   prayerMethod: string | null;
-  /** Apparence : automatique (bleu le vendredi), émeraude ou bleu. */
-  theme: 'auto' | 'emerald' | 'blue';
-  /** Rappels d'ablutions et de prière (application mobile uniquement). */
-  notifications: { enabled: boolean; ablutionMinutes: number; endMinutes: number };
+  /** Apparence : automatique (or les jours de fête, jaune les jours blancs, bleu le vendredi) ou couleur fixe. */
+  theme: 'auto' | 'emerald' | 'blue' | 'yellow' | 'gold';
+  /** Rappels d'ablutions, de prière et des jours blancs (application mobile uniquement). */
+  notifications: { enabled: boolean; ablutionMinutes: number; endMinutes: number; whiteDays: boolean };
   /** Premier jour du Ramadan choisi par l'utilisateur (AAAA-MM-JJ), ou `null` = calendrier. */
   ramadanStart: string | null;
   /** Interface simplifiée : l'essentiel (prières, invocations, Coran) sans le reste. */

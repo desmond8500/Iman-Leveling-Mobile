@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { buildSchedule, type NotificationSettings } from '@/utils/notifications';
+import { buildSchedule, buildWhiteDaySchedule, type NotificationSettings } from '@/utils/notifications';
 import type { CalcOptions, Coordinates } from '@/utils/prayerTimes';
 
 /**
@@ -25,7 +25,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
   return asked.display === 'granted';
 }
 
-/** Remplace toutes les notifications programmées par celles des prochains jours. */
+/** Remplace toutes les notifications programmées par celles des prochains jours (prières et jours blancs). */
 export async function rescheduleNotifications(
   coords: Coordinates | null,
   calc: CalcOptions,
@@ -36,8 +36,9 @@ export async function rescheduleNotifications(
   const ln = await plugin();
   const pending = await ln.getPending();
   if (pending.notifications.length) await ln.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) });
-  if (!coords || !settings.enabled) return 0;
-  const plan = buildSchedule(now, coords, calc, settings);
+  // Les rappels de prière dépendent de la position ; ceux des jours blancs, non.
+  const prayers = coords && settings.enabled ? buildSchedule(now, coords, calc, settings) : [];
+  const plan = [...prayers, ...buildWhiteDaySchedule(now, settings)];
   if (!plan.length) return 0;
   await ln.schedule({
     notifications: plan.map((n) => ({

@@ -57,6 +57,42 @@ ion-segment {
   --ion-color-primary-tint: #5cacff;
 }
 
+/* Thème jaune : jours blancs (13, 14 et 15 du mois hégirien, nuits de pleine lune). */
+:root.theme-yellow {
+  --iman-bg-top: #1f1d0c;
+  --iman-bg-bottom: #100f05;
+  --iman-card: #333013;
+  --iman-card-done: #48431a;
+  --iman-emerald: #ffe45c;
+  --iman-gold: #fff4b8;
+  --iman-text-soft: #cfc89a;
+
+  --ion-color-primary: #ffe45c;
+  --ion-color-primary-rgb: 255, 228, 92;
+  --ion-color-primary-contrast: #100f05;
+  --ion-color-primary-contrast-rgb: 16, 15, 5;
+  --ion-color-primary-shade: #e0c951;
+  --ion-color-primary-tint: #ffe76c;
+}
+
+/* Thème or : jours de fête (Aïd al-Fitr, Aïd al-Adha et jours de tachriq). */
+:root.theme-gold {
+  --iman-bg-top: #24180a;
+  --iman-bg-bottom: #120b04;
+  --iman-card: #3a2810;
+  --iman-card-done: #523813;
+  --iman-emerald: #f0b429;
+  --iman-gold: #ffd77a;
+  --iman-text-soft: #d2b98e;
+
+  --ion-color-primary: #f0b429;
+  --ion-color-primary-rgb: 240, 180, 41;
+  --ion-color-primary-contrast: #120b04;
+  --ion-color-primary-contrast-rgb: 18, 11, 4;
+  --ion-color-primary-shade: #d39e24;
+  --ion-color-primary-tint: #f2bc3e;
+}
+
 /* Mise en page adaptative : la colonne s'élargit avec l'écran (téléphone, tablette, ordinateur). */
 .wrap {
   width: 100%;

@@ -2,9 +2,9 @@
 
 ## Application
 
-- [ ] ajouter la couleur jaune à l'application et l'activer les jours blancs
-- [ ] faire un système de rappel les jours blancs
-- [ ] ajouter la couleur or pour les jours de fete
+- [x] ajouter la couleur jaune à l'application et l'activer les jours blancs
+- [x] faire un système de rappel les jours blancs
+- [x] ajouter la couleur or pour les jours de fete
  
 
 ## Pages

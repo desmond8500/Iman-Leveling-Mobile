@@ -1,3 +1,5 @@
+import { fastingInfo } from './fasting';
+import { formatHijri, toHijri } from './hijri';
 import { PRAYER_KEYS, formatTime, prayerWindows, type CalcOptions, type Coordinates, type PrayerKey } from './prayerTimes';
 
 export interface NotificationSettings {
@@ -6,9 +8,16 @@ export interface NotificationSettings {
   ablutionMinutes: number;
   /** Rappel avant la fin du temps de la prière, en minutes ; 0 = désactivé. */
   endMinutes: number;
+  /** Rappel la veille de chaque jour blanc (jeûne recommandé). Indépendant des rappels de prière. */
+  whiteDays: boolean;
 }
 
-export const defaultNotificationSettings = (): NotificationSettings => ({ enabled: false, ablutionMinutes: 15, endMinutes: 15 });
+export const defaultNotificationSettings = (): NotificationSettings => ({
+  enabled: false,
+  ablutionMinutes: 15,
+  endMinutes: 15,
+  whiteDays: false,
+});
 
 export const ABLUTION_CHOICES = [0, 10, 15, 20, 30];
 export const END_CHOICES = [0, 10, 15, 20, 30, 45];
@@ -21,6 +30,7 @@ export function normalizeNotificationSettings(value: unknown): NotificationSetti
     enabled: v.enabled === true,
     ablutionMinutes: ABLUTION_CHOICES.includes(v.ablutionMinutes as number) ? (v.ablutionMinutes as number) : base.ablutionMinutes,
     endMinutes: END_CHOICES.includes(v.endMinutes as number) ? (v.endMinutes as number) : base.endMinutes,
+    whiteDays: v.whiteDays === true,
   };
 }
 
@@ -29,8 +39,9 @@ export interface PlannedNotification {
   at: Date;
   title: string;
   body: string;
-  kind: 'ablution' | 'prayer' | 'ending';
-  prayer: Exclude<PrayerKey, 'sunrise'>;
+  kind: 'ablution' | 'prayer' | 'ending' | 'white';
+  /** Prière concernée (absent pour les rappels des jours blancs). */
+  prayer?: Exclude<PrayerKey, 'sunrise'>;
 }
 
 export const PRAYER_LABELS: Record<Exclude<PrayerKey, 'sunrise'>, string> = {
@@ -100,4 +111,46 @@ export function buildSchedule(
     });
   }
   return out.sort((a, b) => a.at.getTime() - b.at.getTime());
+}
+
+/** Heure (locale) du rappel des jours blancs, la veille au soir. */
+export const WHITE_DAY_REMINDER_HOUR = 20;
+
+/** Jours couverts à l'avance : un peu plus d'un mois, pour toujours inclure la prochaine série. */
+export const WHITE_DAYS_AHEAD = 35;
+
+/** Identifiants réservés aux rappels des jours blancs (ceux des prières restent sous 100). */
+const WHITE_ID_BASE = 1000;
+
+const WHITE_RANK = ['1er', '2e', '3e'];
+
+/**
+ * Rappels des jours blancs (13, 14 et 15 du mois hégirien, hors Ramadan et jours de fête) :
+ * une notification la veille à {@link WHITE_DAY_REMINDER_HOUR} h, pour penser à l'intention et au
+ * souhour. Ne dépend pas de la position. Les moments déjà passés sont écartés.
+ */
+export function buildWhiteDaySchedule(
+  now: Date,
+  settings: NotificationSettings,
+  days: number = WHITE_DAYS_AHEAD,
+): PlannedNotification[] {
+  if (!settings.whiteDays) return [];
+  const out: PlannedNotification[] = [];
+  // offset 0 = aujourd'hui : son rappel serait tombé hier, il est donc ignoré.
+  for (let offset = 1; offset <= days; offset++) {
+    const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+    if (!fastingInfo(day).white) continue;
+    const at = new Date(day.getFullYear(), day.getMonth(), day.getDate() - 1, WHITE_DAY_REMINDER_HOUR, 0);
+    if (at.getTime() <= now.getTime()) continue;
+    const h = toHijri(day);
+    const rank = WHITE_RANK[h.day - 13] ?? '';
+    out.push({
+      id: WHITE_ID_BASE + offset,
+      at,
+      title: h.day === 13 ? 'Demain commencent les jours blancs' : `Demain, ${rank} jour blanc`,
+      body: `${formatHijri(h)} : jeûne recommandé. Pense à l'intention et au souhour.`,
+      kind: 'white',
+    });
+  }
+  return out;
 }
