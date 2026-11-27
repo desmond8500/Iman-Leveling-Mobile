@@ -61,10 +61,6 @@
 
 - [x] paramètres, j'ai une erreur "Les cases du jour 2026-11-11 (counts) doivent être des booléens".
 
-## invocations
-
-- [ ] Ajouter une interface coté backend pour en rajouter pour les trois sections (reporté, voir ci-dessus)
-
 ## RPG
 
 - [ ] reprendre le design, et se baser sur pokemon vert émeraude nous allons commencer par le choix des personnages.
